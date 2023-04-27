@@ -9,15 +9,15 @@ import matplotlib.pyplot as plt
 # POSSIBLE FUNCTION TO GET CLUSTERS#
 ####################################
 
-"""
-Function that will create a list of clusters based on a list of labels
+# """
+# Function that will create a list of clusters based on a list of labels
 
-Return list of list of indices (each list of indices is a cluster) 
+# Return list of list of indices (each list of indices is a cluster)
 
-Parameter :
-prediction is a list of labels of the same size that the dataset
-each label corresponds to the cluster the point of the same index in the dataset belong to
-"""
+# Parameter :
+# prediction is a list of labels of the same size that the dataset
+# each label corresponds to the cluster the point of the same index in the dataset belong to
+# """
 
 
 def get_clusters_from_scikit(prediction):
@@ -36,12 +36,12 @@ def get_clusters_from_scikit(prediction):
     return list_clusters
 
 
-"""
-Return list of list of indices (each list of indices is a cluster) 
+# """
+# Return list of list of indices (each list of indices is a cluster)
 
-Parameter :
-bm is an object Ballmapper
-"""
+# Parameter :
+# bm is an object Ballmapper
+# """
 
 
 def get_clusters_from_BM(bm):
