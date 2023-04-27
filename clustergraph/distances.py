@@ -1,5 +1,5 @@
 import scipy.spatial.distance as sp
-from annexe_functions import insert_sorted_list
+from .utils import insert_sorted_list
 import ot
 import numpy as np
 
