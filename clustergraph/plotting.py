@@ -41,38 +41,23 @@ import numpy as np
 import pandas as pd
 
 
-"""
-General parameters
-
-Parameters :
-info_graph : can be a networkx graph or a dictionary with keys 'title_vertices' and 'title_edges' with each one get a string value corresponding to the file in which the corresponding information are
-
-nb_edges :  integer for which we can choose the number of edges we want from shortest to longest. If negative, we add them all
-
-edges : list of edge= [node_i, node_j, length_edge] , the edges that we want to be on the graph
-
-If there are edges and a number then the number will be apply for the given list of edges
-
-color_label : boolean to know if we should color the graph depending on their labels or not
-
-labels : must be an array and not a list 
-"""
-
-# -------------------------------------------------------------------------------------------------------------------------------------------
-
-
-"""
-Functions which from a graph and often the points covered, returns the nodes which covers the most points
-Returns the maximum length of the given variable (expected to get a list for this label in each nodes)
-
-Parameters :
-- graph : netowrkx graph for which we want to know to biggest node
-- variable : string which correspond to the label in the graph for which we want to compare to get the maximum size
-- nodes : list of integers in case we want to limit the reseach to some specific nodes
-"""
-
-
 def reshape_vertices(graph, variable=None, max_size=600):
+    """_summary_
+
+    Parameters
+    ----------
+    graph : _type_
+        _description_
+    variable : _type_, optional
+        _description_, by default None
+    max_size : int, optional
+        _description_, by default 600
+
+    Returns
+    -------
+    _type_
+        _description_
+    """
     size_vertices = []
     # IF NO VARIABLE THEN ALL THE SAME SIZE
     nodes = list(graph.nodes)
@@ -95,26 +80,7 @@ def reshape_vertices(graph, variable=None, max_size=600):
 
     return size_vertices
 
-    ############################
-    #      DISTANCES GRAPH     #
-    ############################
-
-
-"""
-Function that will create the interactive matplotlib plot with a sliderbar to choose the number of edges from shortest to longest
-
-Returns the slider
-
-Parameters :
-- graph : the networkx graph that we want to visualize
-- edges : the list of edges we want to observe 
-- vertices : the list of vertices we want to visualize
-- variable_points : the label for the nodes which corresponds to the points covered by the node, if there is no such label, they will all have the same size
-- variable_edges : the label which lets us access edges labels that we want to display 
--nb_decimal : integers to choose how many decimal we want to display
-
-"""
-
+   
 
 def draw_distances_graph(
     graph,
@@ -124,6 +90,28 @@ def draw_distances_graph(
     variable_edges="label",
     nb_decimal=2,
 ):
+    """_summary_
+
+    Parameters
+    ----------
+    graph : _type_
+        _description_
+    edges : _type_, optional
+        _description_, by default None
+    vertices : _type_, optional
+        _description_, by default None
+    variable_points : str, optional
+        _description_, by default "points_covered"
+    variable_edges : str, optional
+        _description_, by default "label"
+    nb_decimal : int, optional
+        _description_, by default 2
+
+    Returns
+    -------
+    _type_
+        _description_
+    """
     global temp_graph
     global temp_edges_labelled
     global temp_vertices
@@ -139,6 +127,13 @@ def draw_distances_graph(
 
     # UPDATE GRAPH BY CHANGING SLIDER VALUE
     def slider_update_graph(value):
+        """_summary_
+
+        Parameters
+        ----------
+        value : _type_
+            _description_
+        """
         global temp_graph
         global temp_edges_labelled
         global temp_vertices
@@ -242,21 +237,33 @@ def draw_distances_graph(
 
     return slider
 
-    ############################
-    #         HTML GRAPHS      #
-    ############################
-
-
-"""
-Function which for a given plot and limits will add a colorbar
-Returns Plot  with the color bar on the right
-
-"""
 
 
 def add_colorbar(
     plot, palette, variable="variable", num_ticks=100, low=None, high=None
 ):
+    """_summary_
+
+    Parameters
+    ----------
+    plot : _type_
+        _description_
+    palette : _type_
+        _description_
+    variable : str, optional
+        _description_, by default "variable"
+    num_ticks : int, optional
+        _description_, by default 100
+    low : _type_, optional
+        _description_, by default None
+    high : _type_, optional
+        _description_, by default None
+
+    Returns
+    -------
+    _type_
+        _description_
+    """
     ticks = [i for i in np.linspace(low, high, 5)]
 
     color_ticks = FixedTicker(ticks=ticks)
@@ -284,19 +291,24 @@ def add_colorbar(
     return plot
 
 
-"""
-From a points cloud, create a graph with size of nodes and points covered,the size rescaled of each nod can be chosen here too
-the goal is to display it in html plot
 
-Returns a networkx graph with nodes and some labels
-
-Parameters :
-- X_cloud : numpy darray the dataset we want to be on the html figure
-- size_rescaled : size of each point in the html plot
-"""
 
 
 def graph_from_2D(X_cloud, size_rescaled=1):
+    """_summary_
+
+    Parameters
+    ----------
+    X_cloud : _type_
+        _description_
+    size_rescaled : int, optional
+        _description_, by default 1
+
+    Returns
+    -------
+    _type_
+        _description_
+    """
     # Coordinate max and min on each axis fro display correctly the point (zoom inaff) in the plot
     min_x = X_cloud[0][0]
     max_x = X_cloud[0][0]
@@ -328,20 +340,21 @@ def graph_from_2D(X_cloud, size_rescaled=1):
     return graph, (min_x, max_x), (min_y, max_y)
 
 
-###############################
-# Different ways to color nodes#
-###############################
-
-"""
-Functions which return a dictionnary in which each key is a label and each value is a list of the node covered by this label
-
-Parameters :
-labels : list of same size that nodes or same size than number of points in the dataset
-graph : networkx graph
-"""
-
-
 def nodes_covered_by_label(graph, labels):
+    """_summary_
+
+    Parameters
+    ----------
+    graph : _type_
+        _description_
+    labels : _type_
+        _description_
+
+    Returns
+    -------
+    _type_
+        _description_
+    """
     dict_labels = {}
     nodes = list(graph.nodes)
     if isinstance(labels, dict):
@@ -358,7 +371,6 @@ def nodes_covered_by_label(graph, labels):
         for label in unique_labels:
             dict_labels[int(label)] = []
 
-        # NOT SURE STILL USEFUL NOW THAT ASSOCIATION AND PREDICTION ARE SEPARATED
         if len(labels) == len(nodes):
             for i in range(len(nodes)):
                 dict_labels[int(labels[i])].append(int(nodes[i]))
@@ -374,27 +386,29 @@ def nodes_covered_by_label(graph, labels):
     return dict_labels, list(unique_labels)
 
 
-"""
-This functions color nodes depeding on labels for nodes or for points 
-if for points, the label the most represented in the class will give its color
 
-Parameters :
-bokeh_graph : networkx graph that we want to color
-labels : a list which can be the size of the number of nodes or number of points
-palette : palette from which we will get the color
-"""
-
-
-# pour un graph soit une prediction donc fonctionne par points covered
-# soit une association : dictionnary , all nodes must have a color or error
 def color_nodes_labels(bokeh_graph, labels, palette):
+    """_summary_
+
+    Parameters
+    ----------
+    bokeh_graph : _type_
+        _description_
+    labels : _type_
+        _description_
+    palette : _type_
+        _description_
+
+    Returns
+    -------
+    _type_
+        _description_
+    """
     nb_labels = len(labels)
     nodes = list(bokeh_graph.nodes)
     nb_nodes = len(nodes)
 
-    # If labels given is an association between node and labels
     if isinstance(labels, dict):
-        # Get all different existing labels
         list_nodes = list(labels)
         all_labels = np.array([])
         for node in list_nodes:
@@ -407,7 +421,6 @@ def color_nodes_labels(bokeh_graph, labels, palette):
         for node in nodes:
             bokeh_graph.nodes[node]["color"] = color_list[int(labels[node])]
 
-    # PREDICTION
     else:
         labels = np.array(labels)
         unique_labels = np.unique(labels)
@@ -448,13 +461,6 @@ def color_nodes_labels(bokeh_graph, labels, palette):
             if per_label != "":
                 bokeh_graph.nodes[node]["perc_labels"] = per_label
 
-            """
-            per_label = []
-            for i in range( len( label_in_node)   ) :
-                print(nb_each[i] )
-                per_label.append( [ "label" + str(label_in_node[i]) +":"  , round(nb_each[i] /len(bokeh_graph.nodes[node]['points_covered']) ,2) ] )
-                
-             """
 
             # per_label = 42
             bokeh_graph.nodes[node]["perc_labels"] = per_label
@@ -464,16 +470,6 @@ def color_nodes_labels(bokeh_graph, labels, palette):
 
     return bokeh_graph, nb_labels
 
-
-"""
-Function which colors the nodes depending on the value of one variable 
-
-Parameters :
--X : is a list or array of value which is the column of the variable based on which we want to color
--bokeh_graph : networkx graph with the nodes and the label 'points_covered' that we want to color
--palette : the palette used to color
--color_variable : string which is the name of the colored variable
-"""
 
 
 def color_nodes_variable(
@@ -485,6 +481,30 @@ def color_nodes_variable(
     MAX_VALUE=-10000,
     logscale=False,
 ):
+    """_summary_
+
+    Parameters
+    ----------
+    X : _type_
+        _description_
+    bokeh_graph : _type_
+        _description_
+    palette : _type_
+        _description_
+    color_variable : _type_
+        _description_
+    MIN_VALUE : int, optional
+        _description_, by default 10000
+    MAX_VALUE : int, optional
+        _description_, by default -10000
+    logscale : bool, optional
+        _description_, by default False
+
+    Returns
+    -------
+    _type_
+        _description_
+    """
     for node in bokeh_graph.nodes:
         # ASSIGN AT EACH NODE ITS AVERAGE FOR THE GIVEN VARIABLE
         bokeh_graph.nodes[node][color_variable] = X[
@@ -516,24 +536,25 @@ def color_nodes_variable(
     return bokeh_graph, MIN_VALUE, MAX_VALUE
 
 
-####################################
-# Get graphs information from file #
-####################################
-
-"""
-Functions which add the nodes and the points covered by those nodes with the nodes stored in a file
-Each line of the file will be interpreted as column 1 the node number (label) and the other columns the points covered by this node
-
-Returns networkx graph which is the given graph + the nodes with label 'points_covered' and 'size' in the file
-
-Parameters :
--graph : networkx graph in which we want to add edges
-- title : string which is the location and name of the file in which the nodes are stored
--delimiter : string which separates the values in the file
-"""
 
 
 def add_covered_points_from_file(graph, title, delimiter=","):
+    """_summary_
+
+    Parameters
+    ----------
+    graph : _type_
+        _description_
+    title : _type_
+        _description_
+    delimiter : str, optional
+        _description_, by default ","
+
+    Returns
+    -------
+    _type_
+        _description_
+    """
     dico = {}
     MAX_NODE_SIZE = 0
     with open(title) as csv_file:
@@ -547,21 +568,27 @@ def add_covered_points_from_file(graph, title, delimiter=","):
     return graph, MAX_NODE_SIZE
 
 
-"""
-Functions which add the number of edges wanted to an existing graph, with the edges stored in a file
-Each line of the file will be interpreted as column 1 and 2 the two nodes for the edge and the 3rd column the length of the edge
-
-Returns networkx graph which is the given graph + the edges wanted in the file
-
-Parameters :
--graph : networkx graph in which we want to add edges
-- title : string which is the location and name of the file in which the edges are stored
--nb_edges : integer , is the number of edges we want to add with the same order that they are in the file
--delimiter : string which separates the values in the file
-"""
 
 
 def add_edges_from_file(graph, title, nb_edges=-1, delimiter=","):
+    """_summary_
+
+    Parameters
+    ----------
+    graph : _type_
+        _description_
+    title : _type_
+        _description_
+    nb_edges : int, optional
+        _description_, by default -1
+    delimiter : str, optional
+        _description_, by default ","
+
+    Returns
+    -------
+    _type_
+        _description_
+    """
     with open(title) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=delimiter)
         count = 1
@@ -573,22 +600,6 @@ def add_edges_from_file(graph, title, nb_edges=-1, delimiter=","):
         return graph
 
 
-#############################################################
-# Creation of the graph ready to be stored in the html file #
-#############################################################
-
-"""
-Function which from graph returns a new graph ready to be used by the bokeh library and in a html plot
-Returns :  networkx graph
-
--graph : networkx graph from which we will create the new one
--nb_edges : as described
--edges : as described , list of edges we want in the bokeh graph
--nb_decimal : the number of decimal we want to see on the screen as labels for edges
--my_palette : palette on which the color of the plot will be based
--X : the column with the values for each instance for the chosen variable
--variable_name : string for the name of the variable but maybe not useful except for title
-"""
 
 
 def get_bokeh_graph_from_info(
@@ -604,6 +615,43 @@ def get_bokeh_graph_from_info(
     MIN_SCALE=7,
     MAX_SCALE=20,
 ):
+    """_summary_
+
+    Parameters
+    ----------
+    graph : _type_
+        _description_
+    my_palette : _type_, optional
+        _description_, by default cm.get_cmap(name="Reds")
+    nb_edges : int, optional
+        _description_, by default -1
+    edges : _type_, optional
+        _description_, by default None
+    nb_decimal : int, optional
+        _description_, by default 2
+    choice_col_type : _type_, optional
+        _description_, by default None
+    X_col : _type_, optional
+        _description_, by default None
+    name_var_col : _type_, optional
+        _description_, by default None
+    labels_col : _type_, optional
+        _description_, by default None
+    MIN_SCALE : int, optional
+        _description_, by default 7
+    MAX_SCALE : int, optional
+        _description_, by default 20
+
+    Returns
+    -------
+    _type_
+        _description_
+
+    Raises
+    ------
+    TypeError
+        _description_
+    """
     #######################################
     # GET THE GRAPH IS NOT DIRECTLY GIVEN #
 
@@ -684,20 +732,6 @@ def get_bokeh_graph_from_info(
 
     return bokeh_graph, MIN_CBAR, MAX_CBAR
 
-    #############################
-    # CREATION OF THE BOKEH PLOT#
-    #############################
-
-
-"""
-Parameters :
--graph : networkx graph which is an already prepared graph with the labels ready for the edges and the nodes
--x_range and y_range : each one is a tuple of length 2 with the range on which the graph should be displayed
--title : string to write a title on top of the plot
--pos : Boolean, must be true if we want to fix in advance the position of each nodes like for a point cloud for example
--color_label : bool, must be true if we should color the nodes just depending or their number
--title : string which is the title displayed at the top of the figure
-"""
 
 
 def create_html_plot(
@@ -710,11 +744,41 @@ def create_html_plot(
     MIN_CBAR=None,
     MAX_CBAR=None,
     palette=cm.get_cmap(name="Reds"),
-    title_color_bar="variable",
+    title_color_bar="Variable",
     font_size_edges_labels="40px",
     percentage_label=True,
 ):
-    # CREATION OF THE PLOT AND THE OPTION POSSIBLES (zoom...)
+    # MUST BE CHECKED, NOT GENERATED AUTOMATICALLY
+    """_summary_
+
+    Parameters
+    ----------
+    graph : _type_
+        _description_
+    x_range : _type_, optional
+        _description_, by default (-1.1, 1.1)
+    y_range : _type_, optional
+        _description_, by default (-1.1, 1.1)
+    color_bar : _type_, optional
+        _description_, by default False
+    MIN_CBAR : _type_, optional
+        _description_, by default None
+    MAX_CBAR : _type_, optional
+        _description_, by default None
+    my_palette : _type_, optional
+        _description_, by default cm.get_cmap(name="Reds")
+    title_color_bar : str, optional
+        _description_, by default "Variable"
+    font_size_edges_labels : str, optional
+        _description_, by default "40px"
+    percentage_label : bool, optional
+        _description_, by default True
+
+    Returns
+    -------
+    _type_
+        _description_
+    """
 
     plot = Plot(
         plot_width=800,
@@ -859,27 +923,7 @@ def create_html_plot(
 
     return plot, graph_renderer
 
-    #############################
-    # CREATION OF THE HTML FILE #
-    #############################
-
-
-"""
-Function which shows one or two graphs and potentially save an html file comparing the two
-
-Parameters :
--graph_1 and graph_2 :networkx graphs already ready to display (size, color...)
--gr_1 and gr_2 : graph renderer obtained usually from 'from_networkx" function in bokeh library
--nb_edges_1 and nb_edges_2  : as described
--edges_1 and edges_2 : as described 
--plot_1 and plot_2 : type Plot from bokeh with the tools, title, graph_renderer... already added potentially from 'get_bokeh_graph_from_info'
-function. If plot_2 has no value then only one figure will be displayed
--name_file : if no value given the html won't be saved, otherwise must be a string with the path and the name without the type of document
--color_button : boolean depending on if we want a color button or not
-"""
-"""
-Functions which from plot, coloring indication will show and if wanted save an html plot with one or two plots and some tools if needed
-"""
+   
 
 
 # CAN BE IMPROVED BY POSSIBILITY TO GET ONLY ONE PLOT WHEN WE SELECT LABELS TO BE COVERED
@@ -897,6 +941,40 @@ def show_save_with_graphs(
     palette=cm.get_cmap(name="Reds"),
     color_non_selected_nodes="black",
 ):
+    """_summary_
+
+    Parameters
+    ----------
+    plot_1 : _type_
+        _description_
+    graph_1 : _type_
+        _description_
+    gr_1 : _type_
+        _description_
+    name_file : str, optional
+        _description_, by default None
+    plot_2 : _type_, optional
+        _description_, by default None
+    graph_2 : _type_, optional
+        _description_, by default None
+    gr_2 : _type_, optional
+        _description_, by default None
+    choice_col_type : _type_, optional
+        _description_, by default None
+    labels_col : _type_, optional
+        _description_, by default None
+    my_palette : _type_, optional
+        _description_, by default cm.get_cmap(name="Reds")
+    color_non_selected_nodes : str, optional
+        _description_, by default "black"
+
+    Returns
+    -------
+    _type_
+        _description_
+    """
+    
+    
     #####################
     # COLORING BY LABEL #
 
@@ -1181,25 +1259,7 @@ def show_save_with_graphs(
 
     show(layout)
 
-    ################################
-    # COMPARE GRAPH AND POINT CLOUD#
-    ################################
-
-
-"""
-Function which from a graph and a point cloud show and potentially save an html file showing and comparing the two
-
-Parameters :
--info_graph : as described
--X_cloud : numpy dataset
--name_file : if no value given the html won't be saved, otherwise must be a string with the path and the name without the type of document
--nb_edges :  integer for which we can choose the number of edges we want from shortest to longest. If negative, we add them all
--edges : as described 
--color_label : as described
--title_right and title_left = strings for the title on the right and left figure, if only one figure, the title left will be taken
-if only one label then it has to be a prediction
-"""
-
+   
 
 def compare_graph_cloud(
     info_graph,
@@ -1221,6 +1281,47 @@ def compare_graph_cloud(
     MAX_SCALE=20,
     font_size_edges_labels="40px",
 ):
+    """_summary_
+
+    Parameters
+    ----------
+    info_graph : _type_
+        _description_
+    X_cloud : _type_
+        _description_
+    nb_edges : int, optional
+        _description_, by default -1
+    edges : _type_, optional
+        _description_, by default None
+    title_left : str, optional
+        _description_, by default "Title left"
+    title_right : str, optional
+        _description_, by default "Title right"
+    name_file : _type_, optional
+        _description_, by default None
+    palette : _type_, optional
+        _description_, by default cm.get_cmap(name="Reds")
+    choice_col_type : _type_, optional
+        _description_, by default None
+    X_col : _type_, optional
+        _description_, by default None
+    name_var_col : _type_, optional
+        _description_, by default None
+    labels_col : _type_, optional
+        _description_, by default None
+    labels_2 : _type_, optional
+        _description_, by default None
+    color_non_selected_nodes : str, optional
+        _description_, by default "black"
+    size_points : int, optional
+        _description_, by default 6
+    MIN_SCALE : int, optional
+        _description_, by default 7
+    MAX_SCALE : int, optional
+        _description_, by default 20
+    font_size_edges_labels : str, optional
+        _description_, by default "40px"
+    """
     # GRAPH CREATION
     graph_1, MIN_CBAR_1, MAX_CBAR_1 = get_bokeh_graph_from_info(
         info_graph,
@@ -1312,22 +1413,7 @@ def compare_graph_cloud(
         palette=palette,
     )
 
-    ##########################
-    # SHOW ONE OR TWO GRAPHS #
-    ##########################
-
-
-"""
-Function which shows one or two ClusterGraph and potentially save an html file comparing the two
-
-Parameters :
--info_graph_1 and info_graph_2 : as described. If info_graph_2 has no value then only one graph is shown
--nb_edges_1 and nb_edges_2  : as described
--edges_1 and edges_2 : as described 
--color_label : as described
--name_file : if no value given the html won't be saved, otherwise must be a string with the path and the name without the type of document
--title_right and title_left = strings for the title on the right and left figure, if only one figure, the title left will be taken
-"""
+ 
 
 
 def show_graphs(
@@ -1352,6 +1438,51 @@ def show_graphs(
     font_size_edges_labels="40px",
     percentage_label=True,
 ):
+    """_summary_
+
+    Parameters
+    ----------
+    info_graph_1 : _type_
+        _description_
+    nb_edges_1 : int, optional
+        _description_, by default -1
+    edges_1 : _type_, optional
+        _description_, by default None
+    info_graph_2 : _type_, optional
+        _description_, by default None
+    nb_edges_2 : int, optional
+        _description_, by default -1
+    edges_2 : _type_, optional
+        _description_, by default None
+    title_left : str, optional
+        _description_, by default "Title left"
+    title_right : str, optional
+        _description_, by default "Title right"
+    name_file : _type_, optional
+        _description_, by default None
+    palette : _type_, optional
+        _description_, by default cm.get_cmap(name="Reds")
+    choice_col_type : _type_, optional
+        _description_, by default None
+    X_col : _type_, optional
+        _description_, by default None
+    name_var_col : _type_, optional
+        _description_, by default None
+    labels_col : _type_, optional
+        _description_, by default None
+    labels_2 : _type_, optional
+        _description_, by default None
+    color_non_selected_nodes : str, optional
+        _description_, by default "black"
+    MIN_SCALE : int, optional
+        _description_, by default 7
+    MAX_SCALE : int, optional
+        _description_, by default 20
+    font_size_edges_labels : str, optional
+        _description_, by default "40px"
+    percentage_label : bool, optional
+        _description_, by default True
+    """
     # GRAPHS CREATION
     graph_1, MIN_CBAR_1, MAX_CBAR_1 = get_bokeh_graph_from_info(
         info_graph_1,

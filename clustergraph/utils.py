@@ -63,9 +63,25 @@ def insert_sorted_list(liste, element_to_insert):
     return liste
 
 
-# -------------------------------------------------------
-# Function which from a list of element [keys, value] return a list of the values
+
 def get_values(list_key_value):
+    """_summary_
+
+    Parameters
+    ----------
+    list_key_value : _type_
+        _description_
+
+    Returns
+    -------
+    _type_
+        _description_
+
+    Raises
+    ------
+    ValueError
+        _description_
+    """
     if list_key_value == []:
         raise ValueError("List is empty")
     values = []
@@ -74,18 +90,24 @@ def get_values(list_key_value):
     return values
 
 
-"""
-From a graph, return a list of edges ordered from shortest to longest one
 
-Return list of edge and each edge has this representation  [node_i, node_j, length_edge]
-
-Parameters :
--graph : networkx graph from which we want to get the edges ordered
--variable_length : string which is the label which lets us compare and then order from shortest to longest
-"""
 
 
 def get_sorted_edges(graph, variable_length="label"):
+    """_summary_
+
+    Parameters
+    ----------
+    graph : _type_
+        _description_
+    variable_length : str, optional
+        _description_, by default "label"
+
+    Returns
+    -------
+    _type_
+        _description_
+    """
     edges = []
     for edge in graph.edges:
         edges = insert_sorted_list(
@@ -95,14 +117,22 @@ def get_sorted_edges(graph, variable_length="label"):
     return edges
 
 
-"""
-Functions which returns a list of edges connecting only the given vertices to each others
-- edges : list of edges and each edge is a list like [vertice_i, vertice_j, length_edge]
-- vertices : list of integers and each integers represent a vertice
-"""
-
 
 def get_corresponding_edges(vertices, edges):
+    """_summary_
+
+    Parameters
+    ----------
+    vertices : _type_
+        _description_
+    edges : _type_
+        _description_
+
+    Returns
+    -------
+    _type_
+        _description_
+    """
     corres_edges = []
     for edge in edges:
         if edge[0] in vertices and edge[1] in vertices:
@@ -110,18 +140,25 @@ def get_corresponding_edges(vertices, edges):
     return corres_edges
 
 
-"""
-Functions which from a graph and often the points covered, returns the nodes which covers the most points
-Returns the maximum length of the given variable (expected to get a list for this label in each nodes)
-
-Parameters :
-- graph : netowrkx graph for which we want to know to biggest node
-- variable : string which correspond to the label in the graph for which we want to compare to get the maximum size
-- nodes : list of integers in case we want to limit the reseach to some specific nodes
-"""
 
 
 def max_size_node_graph(graph, variable, nodes=None):
+    """_summary_
+
+    Parameters
+    ----------
+    graph : _type_
+        _description_
+    variable : _type_
+        _description_
+    nodes : _type_, optional
+        _description_, by default None
+
+    Returns
+    -------
+    _type_
+        _description_
+    """
     if not (nodes):
         nodes = graph.nodes
     maxi = 0

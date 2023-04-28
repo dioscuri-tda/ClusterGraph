@@ -5,22 +5,19 @@ from .utils import get_corresponding_edges
 import matplotlib.pyplot as plt
 
 
-####################################
-# POSSIBLE FUNCTION TO GET CLUSTERS#
-####################################
-
-# """
-# Function that will create a list of clusters based on a list of labels
-
-# Return list of list of indices (each list of indices is a cluster)
-
-# Parameter :
-# prediction is a list of labels of the same size that the dataset
-# each label corresponds to the cluster the point of the same index in the dataset belong to
-# """
-
-
 def get_clusters_from_scikit(prediction):
+    """_summary_
+
+    Parameters
+    ----------
+    prediction : _type_
+        _description_
+
+    Returns
+    -------
+    _type_
+        _description_
+    """
     clusters = np.unique(prediction)
     print(clusters)
     dictionary = {}
@@ -36,15 +33,20 @@ def get_clusters_from_scikit(prediction):
     return list_clusters
 
 
-# """
-# Return list of list of indices (each list of indices is a cluster)
-
-# Parameter :
-# bm is an object Ballmapper
-# """
-
 
 def get_clusters_from_BM(bm):
+    """_summary_
+
+    Parameters
+    ----------
+    bm : _type_
+        _description_
+
+    Returns
+    -------
+    _type_
+        _description_
+    """
     clusters = list(bm.points_covered_by_landmarks)
     nb_clusters = len(clusters)
     list_clusters = []
@@ -60,15 +62,20 @@ def get_clusters_from_BM(bm):
     return list_clusters
 
 
-"""
-Return list of list of indices (each list of indices is a cluster) 
-
-Parameter :
-graph is the dictionnary returned by mapper and the method "map"
-"""
-
 
 def get_clusters_from_Mapper(graph):
+    """_summary_
+
+    Parameters
+    ----------
+    graph : _type_
+        _description_
+
+    Returns
+    -------
+    _type_
+        _description_
+    """
     clusters = list(graph["nodes"])
     nb_clusters = len(clusters)
     list_clusters = []
@@ -83,15 +90,21 @@ def get_clusters_from_Mapper(graph):
         nb_nodes += 1
     return list_clusters
 
-    #######################
-    # CLASS CLUSTER_GRAPH #
-    #######################
+
 
 
 class ClusterGraph:
-    # INITIALIZATION
+    """_summary_
+    """
 
     def __init__(self, distance_clusters):
+        """_summary_
+
+        Parameters
+        ----------
+        distance_clusters : _type_
+            _description_
+        """
         self.distance_clusters = distance_clusters
 
         self.graph = nx.Graph()
@@ -102,27 +115,29 @@ class ClusterGraph:
         self.central_vertice = False
         self.farthest_vertice = False
         self.list_diameters = []
-
-        # PERSONNALIZE GRAPH
         self.my_graph = nx.Graph()
 
-        # self.distance_clusters.compute_all_distances()
 
-    """   
-    Function which applies the metrics and its parameters stored in the object to the clusters and then create the ClusterGraph the 
-    networkx graph and some properties of this graph
-    Returns the networkx graph
-    """
-
+   
     def distances_clusters(self, normalize=True):
-        # We compute the distances between clusters
+        """_summary_
+
+        Parameters
+        ----------
+        normalize : bool, optional
+            _description_, by default True
+
+        Returns
+        -------
+        _type_
+            _description_
+        """
         (
             self.vertices,
             self.edges,
             nb_points_by_clusters,
         ) = self.distance_clusters.compute_all_distances()
 
-        # Put all new datas into the graph
         self.update_graph(nb_points_by_clusters)
         if normalize == True:
             self.normalize_max()
@@ -134,32 +149,15 @@ class ClusterGraph:
 
         return self.graph
 
-    # -------------------------------------------------------------------------------------------------------------------------------
 
-    """    
-    UPDATE THE GRAPH WITH ALL EDGES AND VERTICES WITH THEIR LABELS
-    Returns a networkx graph updated with the current information in the object
     
-    Parameter :
-    -nb_edges : integer which corresponds to  the number of edges to be in the graph, if negative we add them all
-    - list_node_attributes : list of nodes and attributes we want to add to the graph each node is represented as followed
-    [node, size, list_indices_points_covered] 
-    """
-
     def update_graph(self, list_node_attributes=[], nb_edges=-1):
         self.graph.clear()
         self.graph_add_nodes_attributes(list_node_attributes)
         self.graph_add_edges(nb_edges=nb_edges)
         return self.graph
 
-    """    
-    Update the graph with the current edges in the object
-    Returns a networkx graph updated with the current edges
     
-    Parameter :
-    nb_edges : integer which corresponds to  the number of edges to be in the graph, if negative we add them all
-    """
-
     def graph_add_edges(self, nb_edges=-1):
         if nb_edges < 0:
             nb_edges = len(self.edges)
@@ -169,27 +167,23 @@ class ClusterGraph:
             )
         return self.graph
 
-    """    
-    Update the graph with the current nodes in the object stored in the variable vertices
-    Returns a networkx graph updated in which we have added the current vertices
-    Parameter :
-    - list_node_attributes : list of nodes and attributes we want to add to the graph each node is represented as followed
-    [node, size, list_indices_points_covered] 
-    """
-
+  
     def graph_add_nodes_attributes(self, list_node_attributes):
         for i in list_node_attributes:
             self.graph.add_node(i[0], size=i[1], points_covered=i[2])
 
         return self.graph
 
-    # -----------------------------------------------------------
-    """
-    Function which normalize the distances between clusters by dividing by the maximum length
-    Return the list of edges 
-    """
+    
 
     def normalize_max(self):
+        """_summary_
+
+        Returns
+        -------
+        _type_
+            _description_
+        """
         if self.edges == []:
             print("No edges computed")
             return []
@@ -201,12 +195,7 @@ class ClusterGraph:
         self.graph_add_edges()
         return self.edges
 
-    # -----------------------------------------------------------
-    """
-    Function which normalize the distances between clusters by dividing by the maximum diameter of the vertices
-    Return the list of edges 
-    """
-
+  
     def normalize_edges_diameter(
         self,
         metric_clusters=None,
@@ -214,6 +203,24 @@ class ClusterGraph:
         data_preparation=None,
         parameters_metric_clusters=None,
     ):
+        """_summary_
+
+        Parameters
+        ----------
+        metric_clusters : _type_, optional
+            _description_, by default None
+        distance_points : _type_, optional
+            _description_, by default None
+        data_preparation : _type_, optional
+            _description_, by default None
+        parameters_metric_clusters : _type_, optional
+            _description_, by default None
+
+        Returns
+        -------
+        _type_
+            _description_
+        """
         self.list_diameters = self.distance_clusters.diameter_clusters(
             metric_clusters,
             distance_points,
@@ -235,14 +242,15 @@ class ClusterGraph:
         self.normalize_max()
         return self.edges
 
-    # --------------------------------------------------------------
-
-    """
-    Function which calculates the central and farthest away nodes from the others
-    Return the two vertices (integers)
-    """
 
     def ends_avg_cluster(self):
+        """_summary_
+
+        Returns
+        -------
+        _type_
+            _description_
+        """
         if len(self.edges) == 0:
             print("No edges saved")
             return -1, -1
@@ -278,11 +286,10 @@ class ClusterGraph:
 
         return node_mini, node_maxi
 
-    """
-    Function which draws and shows the function which associate to each edge its length with the edges ordered from shortest to longest
-    """
 
     def draw_edges(self):
+        """_summary_
+        """
         nb = list(range(1, len(self.edges) + 1))
 
         lengths = []
@@ -293,17 +300,25 @@ class ClusterGraph:
         plt.plot(nb, lengths)
         plt.show()
 
-    # -------------------------------------------------
 
-    """
-    Parameters :
-    - vertices : list of integers representing the vertices we want to be in the new graph
-    - nb_edges : integer which is the number of edges we want to add , if negative, we add them all
-    - edges : list of edge 
-    The number of edges will be applied to either the whole list of edges or the given one
-    """
 
     def personnalize_graph(self, vertices=False, nb_edges=-1, edges=None):
+        """_summary_
+
+        Parameters
+        ----------
+        vertices : bool, optional
+            _description_, by default False
+        nb_edges : int, optional
+            _description_, by default -1
+        edges : _type_, optional
+            _description_, by default None
+
+        Returns
+        -------
+        _type_
+            _description_
+        """
         if isinstance(vertices, np.ndarray) or isinstance(vertices, list):
             vertices = np.sort(vertices)
 
@@ -344,20 +359,28 @@ class ClusterGraph:
         return self.my_graph
 
 
-        #######################
-        #  END CLUSTER_GRAPH  #
-        #######################
 
-
-"""
-Return  graph with the edges filtarated, if an edge does not change a lot the existing shortest path, we do not add this edge
-Parameters :
-- edges is a list of list such as [ [node_i, node_j, lenght_edge_1] ,[node_r, node_k, lenght_edge_2] ,....]
-- graph is a networkx graph from which we will copy all the nodes
-"""
 
 
 def filtration(graph, edges, label="label", precision=0.5):
+    """_summary_
+
+    Parameters
+    ----------
+    graph : _type_
+        _description_
+    edges : _type_
+        _description_
+    label : str, optional
+        _description_, by default "label"
+    precision : float, optional
+        _description_, by default 0.5
+
+    Returns
+    -------
+    _type_
+        _description_
+    """
     g = nx.Graph()
     g.add_nodes_from(graph.nodes(data=True))
 
