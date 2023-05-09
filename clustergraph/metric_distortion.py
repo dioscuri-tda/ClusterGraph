@@ -48,7 +48,13 @@ def distortion_two_clusters(d_cg, c1, c2, dijkstra_length_dict ) :
                 avg_distort += alpha_i_j
                 nb +=1
                 
-    return avg_distort/nb
+    if(nb==0) :
+        avg_distort =0
+       
+    else :
+        avg_distort = avg_distort/nb
+        
+    return avg_distort
 
 
 
