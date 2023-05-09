@@ -23,12 +23,12 @@ def get_clusters_from_scikit(prediction):
     dictionary = {}
     list_clusters = []
     for i in range(len(clusters)):
-        dictionary[int(clusters[i])] = i + 1
+        dictionary[int(clusters[i])] = i 
         list_clusters.append([])
 
     count = 0
     for i in prediction:
-        list_clusters[dictionary[int(i)] - 1].append(count)
+        list_clusters[dictionary[int(i)] ].append(count)
         count += 1
     return list_clusters
 

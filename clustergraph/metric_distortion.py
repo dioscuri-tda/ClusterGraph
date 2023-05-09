@@ -1,5 +1,5 @@
-from math import log
-from math import inf
+#from math import np.log10 # replace by np.log10 by np.np.log10
+#from math import np.inf replace by np.inf by np.np.inf
 from sklearn.neighbors import NearestNeighbors
 import networkx as nx
 import copy 
@@ -23,28 +23,28 @@ def distortion_two_clusters(d_cg, c1, c2, dijkstra_length_dict ) :
     for i in c1 :
         for j in c2 :
             
-            # if points are not connected  => d_k_g = +inf => log = -inf
+            # if points are not connected  => d_k_g = +np.inf => np.log10 = -np.inf
             try :
                 # this try can be improved by storing first dict and try to access second after
                 d_k_x = dijkstra_length_dict[i][j]
                 
             except KeyError :
                 # !! add a verification in case points are the same !!
-                d_k_x = inf
+                d_k_x = np.inf
             
-            if(d_k_x == inf and d_cg == inf) :
-                alpha_i_j = abs( log(1) )
+            if(d_k_x == np.inf and d_cg == np.inf) :
+                alpha_i_j = 0 # abs( np.log10(1) )
                 
-            elif( d_k_x == inf ) :
+            elif( d_k_x == np.inf ) :
                 #ln(0)
-                #alpha_i_j = - inf 
-                alpha_i_j = - inf 
+                #alpha_i_j = - np.inf 
+                alpha_i_j = - np.inf 
             
             # now we suppose d_cg !=0
             else :
-                alpha_i_j = abs( log( d_cg/d_k_x ) )
+                alpha_i_j = abs( np.log10( d_cg/d_k_x ) )
                 
-            if( alpha_i_j != -inf) :   
+            if( alpha_i_j != -np.inf) :   
                 avg_distort += alpha_i_j
                 nb +=1
                 
@@ -99,7 +99,7 @@ def metric_distortion_edges_CG( cg, nn_graph, variable= 'label' ) :
                     d_cg =  dijstra_CG[n1][n2]
                 
                 except KeyError :
-                    d_cg = inf
+                    d_cg = np.inf
                     print("nodes not same component")
                     
                 c2 = cg.nodes[n2]['points_covered']
@@ -108,8 +108,8 @@ def metric_distortion_edges_CG( cg, nn_graph, variable= 'label' ) :
                 distortion_2_clusters = distortion_two_clusters(d_cg, c1, c2, dijkstra_length_dict )
                 #new_cg.edges[(n1,n2)][variable] = distortion_2_clusters
                 
-                if(distortion_2_clusters == inf) :
-                    return inf
+                if(distortion_2_clusters == np.inf) :
+                    return np.inf
                 
                 else :
                     weight_i_j = (len(c1) + len(c2) )
@@ -160,8 +160,9 @@ def prune_useless_edges(g) :
     M = []
     list_rk = [connectivity_graph(graph)]
     nb_edge_pruned =  len( list( graph.edges ) ) -     ( len( list( graph.nodes  ) ) -1 )
+    first = False
     for i in range(nb_edge_pruned) :
-        rk_largest = float('-inf')
+        rk_largest = float('-np.inf')
         e_largest = False
 
         # GET F\M
@@ -206,8 +207,9 @@ def prune_useless_edges(g) :
                         f.pop(i)
                         break
             
-            if(c_largest < list_rk[-1]) :
+            if(c_largest < list_rk[-1] and not(first) ) :
                 best_g = copy.deepcopy(graph)
+                first = True
                 #return best_g
                 
                 
@@ -231,9 +233,9 @@ def prune_useless_edges(g) :
 # geodesic_dm's values are distances distances based on disjktra distance
 # Function which from a normal complete clustergraph and a distance matrix based on dijsktra nb_clusters x nb_clusters,
 # return a graph with weighted edges but with the absolute difference between dijsktra and the graph
-def get_error_graph( cg_graph, geodesic_dm, weight ='label' ) :
+def get_error_graph( cg, geodesic_dm, weight ='label' ) :
     edge_to_remove = []
-    
+    cg_graph = copy.deepcopy(cg)
     # WE ASSUME GEODESICDM IS ORDERED AS THE NODES IN CLUSTERGRAPH
     nodes = list(cg_graph.nodes) 
     #min_node = min( list(cg_graph.nodes) )
@@ -257,7 +259,7 @@ def get_error_graph( cg_graph, geodesic_dm, weight ='label' ) :
 def geodesic_mat_clusters(nn_Graph, clusters, variable = 'label' ) :
     dijkstra_length_dict = dict(nx.all_pairs_dijkstra_path_length(nn_Graph, weight = variable))
     nb_clusters = len(clusters)
-    geo_matrix = np.array([float('inf')]*nb_clusters**2).reshape(nb_clusters, nb_clusters)
+    geo_matrix = np.array([float('np.inf')]*nb_clusters**2).reshape(nb_clusters, nb_clusters)
     for i in range(nb_clusters) : 
         
         for j in range(i,nb_clusters) :
