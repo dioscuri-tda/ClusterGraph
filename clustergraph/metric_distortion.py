@@ -5,6 +5,7 @@ import networkx as nx
 import copy 
 import numpy as np
 import matplotlib.pyplot as plt
+import warnings
 
 
 
@@ -17,7 +18,7 @@ return the average distortion from points from c1 and points from c2
 #!! Change this fonction in case of soft clustering algorithms !!
 # si d_cg = 0 si d_k_x(x,y) avec x==y parce que soft clustering
 # count the values which are ignored
-def distortion_two_clusters(d_cg, c1, c2, dijkstra_length_dict ) :
+def distortion_two_clusters(d_cg, c1, c2, dijkstra_length_dict, use_abs ) :
     avg_distort = 0 
     nb=0
     for i in c1 :
@@ -29,11 +30,13 @@ def distortion_two_clusters(d_cg, c1, c2, dijkstra_length_dict ) :
                 d_k_x = dijkstra_length_dict[i][j]
                 
             except KeyError :
+                warnings.warn('KeyError! {} {}'.format(i,j))
                 # !! add a verification in case points are the same !!
                 d_k_x = np.inf
             
             if(d_k_x == np.inf and d_cg == np.inf) :
                 alpha_i_j = 0 # abs( np.log10(1) )
+                print('zero {}'.format(i, j))
                 
             elif( d_k_x == np.inf ) :
                 #ln(0)
@@ -42,7 +45,10 @@ def distortion_two_clusters(d_cg, c1, c2, dijkstra_length_dict ) :
             
             # now we suppose d_cg !=0
             else :
-                alpha_i_j = abs( np.log10( d_cg/d_k_x ) )
+                if use_abs:
+                    alpha_i_j = np.abs(np.log10( d_cg/d_k_x ))
+                else:
+                    alpha_i_j = np.log10( d_cg/d_k_x ) 
                 
             if( alpha_i_j != -np.inf) :   
                 avg_distort += alpha_i_j
@@ -77,7 +83,7 @@ Graph with the distortion per edge
 
 cg is the grph itself and not the CG objet
 """
-def metric_distortion_edges_CG( cg, nn_graph, variable= 'label' ) :
+def metric_distortion_edges_CG( cg, nn_graph, variable= 'label' , use_abs=False) :
     avg_dist =0
     nb_pair_clust = 0
     nb_points = get_nb_points_from_g(cg)
@@ -105,7 +111,7 @@ def metric_distortion_edges_CG( cg, nn_graph, variable= 'label' ) :
                 c2 = cg.nodes[n2]['points_covered']
 
                 # We compute the distortion for the two clusters 
-                distortion_2_clusters = distortion_two_clusters(d_cg, c1, c2, dijkstra_length_dict )
+                distortion_2_clusters = distortion_two_clusters(d_cg, c1, c2, dijkstra_length_dict, use_abs )
                 #new_cg.edges[(n1,n2)][variable] = distortion_2_clusters
                 
                 if(distortion_2_clusters == np.inf) :
@@ -118,10 +124,42 @@ def metric_distortion_edges_CG( cg, nn_graph, variable= 'label' ) :
                     
                     
     return (avg_dist/(nb_pair_clust*nb_points) )
-                 
-                
 
-                                                    # IMPROVEMENT OF THE METRIC DISTORTION USING EDGE PRUNING #
+
+def metric_distortion_matrix(cg, nn_graph, variable= 'label'):
+
+    dijkstra_length_dict = dict(nx.all_pairs_dijkstra_path_length(nn_graph, weight = variable))
+    dijstra_CG = dict(nx.all_pairs_dijkstra_path_length(cg, weight = variable))
+
+    dm = np.zeros((len(cg.nodes), len(cg.nodes)))
+    
+    for i, n1 in enumerate(cg.nodes) :
+        c1 = cg.nodes[n1]['points_covered']
+        for j, n2 in enumerate(cg.nodes):
+            
+            if(n1 != n2) :
+                # if the two nodes are in the same CG components we compute the distortion for their path
+                try : 
+                    d_cg =  dijstra_CG[n1][n2]
+                
+                except KeyError :
+                    d_cg = np.inf
+                    print("nodes not same component")
+                    
+                c2 = cg.nodes[n2]['points_covered']
+
+                # We compute the distortion for the two clusters 
+                distortion_2_clusters = distortion_two_clusters(d_cg, c1, c2, dijkstra_length_dict )
+                #new_cg.edges[(n1,n2)][variable] = distortion_2_clusters
+                
+                if(distortion_2_clusters == np.inf) :
+                    print('distortion between {} and {} is infinite'.format(n1, n2))
+                
+                dm[i,j] = distortion_2_clusters
+         
+    return dm            
+
+
 
 
 

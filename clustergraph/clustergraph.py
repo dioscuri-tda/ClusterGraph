@@ -119,7 +119,7 @@ class ClusterGraph:
 
 
    
-    def distances_clusters(self, normalize=True):
+    def distances_clusters(self, normalize=True, verbose=False):
         """_summary_
 
         Parameters
@@ -143,9 +143,10 @@ class ClusterGraph:
             self.normalize_max()
         self.ends_avg_cluster()
 
-        print("Central Vertice", self.central_vertice)
-        print("Farthest away Vertice", self.farthest_vertice)
-        print("Vertices and size", nx.get_node_attributes(self.graph, "size"))
+        if verbose:
+            print("Central Vertice", self.central_vertice)
+            print("Farthest away Vertice", self.farthest_vertice)
+            print("Vertices and size", nx.get_node_attributes(self.graph, "size"))
 
         return self.graph
 
