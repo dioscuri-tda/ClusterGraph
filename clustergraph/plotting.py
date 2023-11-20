@@ -781,8 +781,8 @@ def create_html_plot(
     """
 
     plot = Plot(
-        plot_width=800,
-        plot_height=800,
+        #width=800,
+        #height=800,
         x_range=Range1d(x_range[0], x_range[1]),
         y_range=Range1d(y_range[0], y_range[1]),
         sizing_mode="stretch_both",
@@ -903,7 +903,7 @@ def create_html_plot(
             x_offset=5,
             y_offset=5,
             source=source_2,
-            render_mode="canvas",
+            #render_mode="canvas",
         )
 
         plot.add_layout(labels_edges)
