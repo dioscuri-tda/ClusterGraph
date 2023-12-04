@@ -116,6 +116,8 @@ class Distances_between_clusters:
         """
         
 
+        self.get_clusters = self.get_clusters_identity
+
         self.distance_points = distance_points
         if not (parameters_metric_clusters):
             self.parameters_metric_clusters = {}
@@ -209,7 +211,15 @@ class Distances_between_clusters:
                     )
                 self.clusters = clusters
 
+
+
+    def get_clusters_identity(self) :
+        return self.clusters
     
+    def get_subsampled_clusters(self) :
+        return self.subsample_.subsampled_clusters
+    
+
 
     def compute_distance_clusters(self, parameters):
         """_summary_
@@ -396,6 +406,9 @@ class Distances_between_clusters:
         return avg / compt
     
 
+    
+    
+
     def compute_all_distances(self):
         """_summary_
 
@@ -410,7 +423,7 @@ class Distances_between_clusters:
             _description_
         """
         if self.distance_matrix_clusters is None:
-            clusters = self.clusters
+            clusters = self.get_clusters()
         else:
             nb_clusters = len(self.distance_matrix_clusters)
             clusters = np.array(list(range(nb_clusters))).reshape(nb_clusters, 1)
@@ -652,3 +665,5 @@ class Creation_distances:
             _description_
         """
         return self.distance_clusters_
+    
+    
