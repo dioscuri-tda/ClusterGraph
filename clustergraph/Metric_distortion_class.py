@@ -202,8 +202,7 @@ class Metric_distortion :
             compo, nb = self.associate_cluster_one_compo(  self.cg.graph.nodes[n][ self.label_points_covered_intr ]   )
             compo_clusters[compo].append( n )
             self.nb_compo_cluster[n] = nb
-
-            
+ 
         return compo_clusters
 
 

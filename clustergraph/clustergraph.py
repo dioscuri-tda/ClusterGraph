@@ -3,11 +3,12 @@ import numpy as np
 import networkx as nx
 from .utils import get_corresponding_edges
 import matplotlib.pyplot as plt
+from .distances import CreationDistances
 
 
 def get_clusters_from_scikit(prediction):
     """_summary_
-
+    From a list of prediction returns a list of clusters with each cluster being a list of indices
     Parameters
     ----------
     prediction : _type_
@@ -36,10 +37,11 @@ def get_clusters_from_scikit(prediction):
 
 def get_clusters_from_BM(bm):
     """_summary_
+    From a BallMapper object returns a list of clusters with each cluster being a list of indices corresponding to the points covered
 
     Parameters
     ----------
-    bm : _type_
+    bm : _type_ BallMapper
         _description_
 
     Returns
@@ -65,6 +67,7 @@ def get_clusters_from_BM(bm):
 
 def get_clusters_from_Mapper(graph):
     """_summary_
+    From a Mapper object returns a list of clusters with each cluster being a list of indices corresponding to the points covered 
 
     Parameters
     ----------
@@ -97,7 +100,16 @@ class ClusterGraph:
     """_summary_
     """
 
-    def __init__(self, distance_clusters):
+    def __init__(self, clusters=None, X=None , sample = 1,
+        metric_clusters="average",
+        parameters_metric_clusters={},
+        distance_points=None,
+        data_preparation="usual",
+        # Parameters connected with Distance_between_points
+        metric_points=sp.euclidean,
+        parameters_metric_points={},
+        seed = None
+        ) :
         """_summary_
 
         Parameters
@@ -105,8 +117,14 @@ class ClusterGraph:
         distance_clusters : _type_
             _description_
         """
-        self.distance_clusters = distance_clusters
+        # Get a DistancesBetweenClusters object
+        self.distance_clusters = CreationDistances(  metric_clusters= metric_clusters,
+        parameters_metric_clusters= parameters_metric_clusters ,  clusters= clusters , distance_points= distance_points , 
+        data_preparation=data_preparation ,
+        # Parameters connected with Distance_between_points
+        metric_points= metric_points, parameters_metric_points= parameters_metric_points ,  X=X  )
 
+        # Creation of the ClusterGraph 
         self.graph = nx.Graph()
         # List [ [node_1,node_2, length_edge_1] , ...]
         self.edges = []
@@ -117,10 +135,15 @@ class ClusterGraph:
         self.list_diameters = []
         self.my_graph = nx.Graph()
 
+        if(sample < 1) :
+            self.distance_clusters.subsample( sample, seed )
+        
+
 
    
-    def distances_clusters(self, normalize=True):
+    def distances_clusters(self):
         """_summary_
+        Method which compute the distances between clusters and creates ClusterGraph.
 
         Parameters
         ----------
@@ -139,8 +162,6 @@ class ClusterGraph:
         ) = self.distance_clusters.compute_all_distances()
 
         self.update_graph(nb_points_by_clusters)
-        if normalize == True:
-            self.normalize_max()
         self.ends_avg_cluster()
 
         print("Central Vertice", self.central_vertice)
@@ -176,25 +197,7 @@ class ClusterGraph:
 
     
 
-    def normalize_max(self):
-        """_summary_
-
-        Returns
-        -------
-        _type_
-            _description_
-        """
-        if self.edges == []:
-            print("No edges computed")
-            return []
-
-        maxi = self.edges[-1][2]
-        for i in self.edges:
-            i[2] = i[2] / maxi
-
-        self.graph_add_edges()
-        return self.edges
-
+    
   
     def normalize_edges_diameter(
         self,
@@ -239,7 +242,6 @@ class ClusterGraph:
             self.edges[j][2] = self.edges[j][2] / maxi_diameter
 
         self.graph.remove_edges_from(list(self.graph.edges()))
-        self.normalize_max()
         return self.edges
 
 
@@ -357,45 +359,3 @@ class ClusterGraph:
             )
 
         return self.my_graph
-
-
-
-
-
-def filtration(graph, edges, label="label", precision=0.5):
-    """_summary_
-
-    Parameters
-    ----------
-    graph : _type_
-        _description_
-    edges : _type_
-        _description_
-    label : str, optional
-        _description_, by default "label"
-    precision : float, optional
-        _description_, by default 0.5
-
-    Returns
-    -------
-    _type_
-        _description_
-    """
-    g = nx.Graph()
-    g.add_nodes_from(graph.nodes(data=True))
-
-    for edge in edges:
-        # We test if there exist a path
-        try:
-            shortest_path = nx.dijkstra_path_length(g, edge[0], edge[1], weight=label)
-            error = precision * edge[2]
-
-            # If there is a big difference between the two then we add
-            if abs(shortest_path - edge[2]) > error:
-                g.add_edge(edge[0], edge[1], label=edge[2])
-
-        # If there is no existing path between the two nodes, we add the edge
-        except nx.NetworkXNoPath:
-            g.add_edge(edge[0], edge[1], label=edge[2])
-
-    return g

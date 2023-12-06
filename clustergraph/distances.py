@@ -2,10 +2,10 @@ import scipy.spatial.distance as sp
 from .utils import insert_sorted_list
 import ot
 import numpy as np
+from .subsampling import Subsampling
 
 
-
-class Distances_between_points:
+class DistancesBetweenPoints:
     """_summary_
     """
     def __init__(self, metric_points=sp.euclidean, X=None, parameters_metric_points={}):
@@ -13,12 +13,12 @@ class Distances_between_points:
 
         Parameters
         ----------
-        metric_points : _type_, optional
-            _description_, by default sp.euclidean
-        X : _type_, optional
-            _description_, by default None
+        metric_points : _type_ callable or squared numpy darray, optional
+            _description_  Function or distance matrix letting the possibility to access or compute the distance between two points , by default sp.euclidean
+        X : _type_ numpy darray , optional
+            _description_ X is the dataset. It can be None when metric_points is a distance matrix, by default None
         parameters_metric_points : dict, optional
-            _description_, by default {}
+            _description_  It is all the arguments which should be used with the metric_points when it is a function, by default {}
         """
         self.X = X
         if not (parameters_metric_points):
@@ -30,11 +30,12 @@ class Distances_between_points:
         if callable(metric_points):
             if X is None:
                 print("Metric between points is callable and no dataset given")
-
+            # the method which returns the distance becomes metric_points
             self.get_distance = metric_points
             self_distance_matrix_points = None
 
         else:
+            # if metric_points is a distance matrix, the method to get the distance becomes dist_matrix_points
             self.get_distance = self.dist_matrix_points
             self.distance_matrix_points = metric_points
 
@@ -42,43 +43,44 @@ class Distances_between_points:
 
     def compute_distance_points(self, point_1, point_2):
         """_summary_
-
+        Method which calls the get_distance method with all the demanded parameters
         Parameters
         ----------
-        point_1 : _type_
-            _description_
-        point_2 : _type_
-            _description_
+        point_1 : _type_ int or numpy darray
+            _description_ Corresponds to the index of a point in the dataset or to the vector directly
+        point_2 : _type_ int or numpy darray
+            _description_ Corresponds to the index of a point in the dataset or to the vector directly
 
         Returns
         -------
-        _type_
-            _description_
+        _type_ float
+            _description_ Returns the distances between the two points
         """
         return self.get_distance(point_1, point_2, **self.parameters_metric_points)
 
  
     def dist_matrix_points(self, point_1, point_2):
         """_summary_
-
+        Method which returns the distance between two indices inside the distance matrix
         Parameters
         ----------
-        point_1 : _type_
-            _description_
-        point_2 : _type_
-            _description_
+        point_1 : _type_ int 
+            _description_ index of the first point
+        point_2 : _type_ int
+            _description_ index of the second point
 
         Returns
         -------
-        _type_
-            _description_
+        _type_ float
+            _description_ Returns the distance between the two points
         """
         return self.distance_matrix_points[point_1][point_2]
 
 
 
-class Distances_between_clusters:
+class DistancesBetweenClusters:
     """_summary_
+    Class which computes/gives access to the distances between clusters
     """
     def __init__(
         self,
@@ -92,14 +94,14 @@ class Distances_between_clusters:
 
         Parameters
         ----------
-        metric_clusters : str, optional
-            _description_, by default "average"
+        metric_clusters : str, callable or numpy darray, optional
+            _description_  metric_clusters corresponds to a method computing the distances between clusters, a distance matrix or a str corresponding to the method implemented in the class , by default "average"
         parameters_metric_clusters : dict, optional
-            _description_, by default {}
-        clusters : _type_, optional
-            _description_, by default None
-        distance_points : _type_, optional
-            _description_, by default None
+            _description_ It is all the arguments which should be used with the metric_clusters when it is a function , by default {}
+        clusters : _type_ list or numpy array, optional
+            _description_ List of clusters. It is a list in which each element in a list of indices. Each list of indices corresponds to a cluster, by default None
+        distance_points : _type_ DistanceBetweenPoints, optional
+            _description_  Object letting DistanceBetweenClusters access the distances between points. Should be None in case metric_clusters is a distance matrix, by default None
         data_preparation : str, optional
             _description_, by default "usual"
 
@@ -117,6 +119,7 @@ class Distances_between_clusters:
         
 
         self.get_clusters = self.get_clusters_identity
+        self.subsample_ = None
 
         self.distance_points = distance_points
         if not (parameters_metric_clusters):
@@ -219,40 +222,47 @@ class Distances_between_clusters:
     def get_subsampled_clusters(self) :
         return self.subsample_.subsampled_clusters
     
+    def subsample(self, perc, seed = None  ) :
+        self.subsample_ = Subsampling( self.clusters, seed = seed )
+        self.get_clusters = self.get_subsampled_clusters
+    
 
 
     def compute_distance_clusters(self, parameters):
         """_summary_
+        Method which from a list of parameters (often representings a list of clusters under different possible representation) returns the distances between the two clusters.
+        This method applies get_distance with the clusters and the additionnal parameters defined in parameters_metric_clusters
 
         Parameters
         ----------
-        parameters : _type_
-            _description_
+        parameters : _type_ list
+            _description_ Corresponds to a list in which there is what data_preparation returns. In most cases it will correspond to the two clusters hence a list of indices or a two restricted datasets to the clusters
 
         Returns
         -------
-        _type_
-            _description_
+        _type_ float
+            _description_ Returns the distance between two clusters
         """
-        return self.get_distance(*parameters, **self.parameters_metric_clusters)
+        return self.get_distance( *parameters, **self.parameters_metric_clusters)
 
         
     def mean_dist(self, X_1, X_2, distance_points=None):
         """_summary_
+        Method which computes the distances between X_1 and X_2 two clusters.
 
         Parameters
         ----------
-        X_1 : _type_
-            _description_
-        X_2 : _type_
-            _description_
+        X_1 : _type_ numpy darray
+            _description_ Dataset restricted to the indices of the first cluster
+        X_2 : _type_ numpy darray
+            _description_ Dataset restricted to the indices of the second cluster
         distance_points : _type_, optional
             _description_, by default None
 
         Returns
         -------
-        _type_
-            _description_
+        _type_ float
+            _description_ returns the average distance between X_1 and X_2
         """
         if not (distance_points):
             distance_points = self.distance_points
@@ -270,20 +280,21 @@ class Distances_between_clusters:
    
     def min_dist(self, X_1, X_2, distance_points=None):
         """_summary_
-
+        Method which computes the minimum distance between X_1 and X_2 two clusters.
+        
         Parameters
         ----------
-        X_1 : _type_
-            _description_
-        X_2 : _type_
-            _description_
+        X_1 : _type_ numpy darray
+            _description_ Dataset restricted to the indices of the first cluster
+        X_2 : _type_ numpy darray
+            _description_ Dataset restricted to the indices of the second cluster
         distance_points : _type_, optional
             _description_, by default None
 
         Returns
         -------
-        _type_
-            _description_
+        _type_ float
+            _description_ returns the minimum distance between X_1 and X_2
         """
         if not (distance_points):
             distance_points = self.distance_points
@@ -301,20 +312,21 @@ class Distances_between_clusters:
 
     def max_dist(self, X_1, X_2, distance_points=None):
         """_summary_
-
+        Method which computes the max distance between X_1 and X_2 two clusters.
+        
         Parameters
         ----------
-        X_1 : _type_
-            _description_
-        X_2 : _type_
-            _description_
+        X_1 : _type_ numpy darray
+            _description_ Dataset restricted to the indices of the first cluster
+        X_2 : _type_ numpy darray
+            _description_ Dataset restricted to the indices of the second cluster
         distance_points : _type_, optional
             _description_, by default None
 
         Returns
         -------
-        _type_
-            _description_
+        _type_ float
+            _description_ returns the maximum distance between X_1 and X_2
         """
         if not (distance_points):
             distance_points = self.distance_points
@@ -331,23 +343,25 @@ class Distances_between_clusters:
 
     def EMD_for_two_clusters(self, X_1, X_2, distance_points=None, normalize=True):
         """_summary_
-
+        Method which computes the Earth Mover distance between X_1 and X_2 two clusters.
+        
         Parameters
         ----------
-        X_1 : _type_
-            _description_
-        X_2 : _type_
-            _description_
+        X_1 : _type_ numpy darray
+            _description_ Dataset restricted to the indices of the first cluster
+        X_2 : _type_ numpy darray
+            _description_ Dataset restricted to the indices of the second cluster
         distance_points : _type_, optional
             _description_, by default None
-        normalize : bool, optional
-            _description_, by default True
+        normalize : _type_ bool, optional
+        _description_ If True the distance will be normalized by the number of distances computed, by default True
 
         Returns
         -------
-        _type_
-            _description_
+        _type_ float
+            _description_ returns the Eart Moving distance between X_1 and X_2
         """
+
         if not (distance_points):
             distance_points = self.distance_points
 
@@ -502,7 +516,7 @@ class Distances_between_clusters:
         return (cluster_1, cluster_2)
 
         
-    def choose_distance(self, metric):
+    def choose_distance(self, metric_clusters):
         """_summary_
 
         Parameters
@@ -516,8 +530,8 @@ class Distances_between_clusters:
             _description_
         """
         # IF METRIC IS NOT CALLABLE THEN IT SHOULD BE A DISTANCE MATRIX
-        if callable(metric):
-            return metric
+        if callable(metric_clusters):
+            return metric_clusters
 
         # If metric cluster is a string then we associate the good function
         elif isinstance(metric_clusters, str):
@@ -600,18 +614,18 @@ class Distances_between_clusters:
 
 
 
-class Creation_distances:
+class CreationDistances:
     """_summary_
     """
     def __init__(
         self,
-        # Parameters connected with Distance_between_clusters
+        # Parameters connected with DistanceBetweenClusters
         metric_clusters="average",
         parameters_metric_clusters={},
         clusters=None,
         distance_points=None,
         data_preparation="usual",
-        # Parameters connected with Distance_between_points
+        # Parameters connected with DistanceBetweenPoints
         metric_points=sp.euclidean,
         parameters_metric_points={},
         X=None,
@@ -639,7 +653,7 @@ class Creation_distances:
         """
         # if metric is a function then we need to create the object distance between points
         if callable(metric_clusters) or isinstance(metric_clusters, str):
-            self.distance_points_ = Distances_between_points(
+            self.distance_points_ = DistancesBetweenPoints(
                 metric_points=metric_points,
                 parameters_metric_points=parameters_metric_points,
                 X=X,
@@ -648,7 +662,7 @@ class Creation_distances:
         else:
             distance_points_ = None
 
-        self.distance_clusters_ = Distances_between_clusters(
+        self.distance_clusters_ = DistancesBetweenClusters(
             metric_clusters=metric_clusters,
             parameters_metric_clusters=parameters_metric_clusters,
             clusters=clusters,

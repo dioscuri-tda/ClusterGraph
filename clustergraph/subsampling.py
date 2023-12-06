@@ -1,13 +1,12 @@
 
 import networkx as nx
 import numpy as np
-import random
 
 class Subsampling :
 
-    def __init__ ( self, clusters , variable_clusters = "points_covered", perc = 0.5 ) :
+    def __init__ ( self, clusters , variable_clusters = "points_covered", perc = 0.5, seed= None ) :
         if perc < 0 or perc > 1:
-            raise ValueError("Percentage should belong to the interval 0 ,1 ")
+            raise ValueError("Percentage should belong to the interval 0, 1 ")
         
         self.perc = perc
 
@@ -19,6 +18,8 @@ class Subsampling :
 
         self.subsampling_clusters()
 
+        if( seed is not None ) :
+            np.random.seed(seed)
 
 
 
@@ -31,7 +32,9 @@ class Subsampling :
         for sublist in self.clusters :
             sublist_size = len(sublist)
             sample_size = max(1, int(sublist_size * self.perc) )
-            sampled_items = random.sample(sublist, sample_size)
+            # rng = np.random.default_rng(seed=42)
+            sampled_items = np.random.choice(sublist, size=sample_size, replace=False)
+
             subclusters.append(sampled_items)
 
         self.subsampled_clusters = np.array( subclusters )
