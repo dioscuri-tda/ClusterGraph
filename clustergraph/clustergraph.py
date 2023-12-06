@@ -4,94 +4,11 @@ import networkx as nx
 from .utils import get_corresponding_edges
 import matplotlib.pyplot as plt
 from .distances import CreationDistances
-
-
-def get_clusters_from_scikit(prediction):
-    """_summary_
-    From a list of prediction returns a list of clusters with each cluster being a list of indices
-    Parameters
-    ----------
-    prediction : _type_
-        _description_
-
-    Returns
-    -------
-    _type_
-        _description_
-    """
-    clusters = np.unique(prediction)
-    print(clusters)
-    dictionary = {}
-    list_clusters = []
-    for i in range(len(clusters)):
-        dictionary[int(clusters[i])] = i 
-        list_clusters.append([])
-
-    count = 0
-    for i in prediction:
-        list_clusters[dictionary[int(i)] ].append(count)
-        count += 1
-    return list_clusters
+from pyballmapper import BallMapper
 
 
 
-def get_clusters_from_BM(bm):
-    """_summary_
-    From a BallMapper object returns a list of clusters with each cluster being a list of indices corresponding to the points covered
 
-    Parameters
-    ----------
-    bm : _type_ BallMapper
-        _description_
-
-    Returns
-    -------
-    _type_
-        _description_
-    """
-    clusters = list(bm.points_covered_by_landmarks)
-    nb_clusters = len(clusters)
-    list_clusters = []
-    nb_nodes = 0
-    list_clusters = []
-    # Creation of the list for keys to be ordered
-    for i in clusters:
-        list_clusters.append([])
-
-    for i in clusters:
-        list_clusters[nb_nodes] = bm.points_covered_by_landmarks[i]
-        nb_nodes += 1
-    return list_clusters
-
-
-
-def get_clusters_from_Mapper(graph):
-    """_summary_
-    From a Mapper object returns a list of clusters with each cluster being a list of indices corresponding to the points covered 
-
-    Parameters
-    ----------
-    graph : _type_
-        _description_
-
-    Returns
-    -------
-    _type_
-        _description_
-    """
-    clusters = list(graph["nodes"])
-    nb_clusters = len(clusters)
-    list_clusters = []
-    nb_nodes = 0
-    list_clusters = []
-    # Creation of the list for keys to be ordered
-    for i in clusters:
-        list_clusters.append([])
-
-    for i in graph["nodes"]:
-        list_clusters[nb_nodes] = graph["nodes"][i]
-        nb_nodes += 1
-    return list_clusters
 
 
 
@@ -117,12 +34,28 @@ class ClusterGraph:
         distance_clusters : _type_
             _description_
         """
+
+        if(clusters is not None) :
+            if(type(clusters) is BallMapper ) :
+                self.get_clusters_from = self.get_clusters_from_BM
+
+            # working for every dictionary ?
+            elif ( type(clusters) is dict   ) :
+                self.get_clusters_from = self.get_clusters_from_Mapper
+            #should be a list or np array how to make difference between a prediction and a good format (already given) clusters
+            else :
+                self.get_clusters_from = self.get_clusters_from_scikit
+
+            clusters = self.get_clusters_from(clusters)
+
+
+
         # Get a DistancesBetweenClusters object
         self.distance_clusters = CreationDistances(  metric_clusters= metric_clusters,
         parameters_metric_clusters= parameters_metric_clusters ,  clusters= clusters , distance_points= distance_points , 
         data_preparation=data_preparation ,
         # Parameters connected with Distance_between_points
-        metric_points= metric_points, parameters_metric_points= parameters_metric_points ,  X=X  )
+        metric_points= metric_points, parameters_metric_points= parameters_metric_points ,  X=X  ).get_distance_cluster()
 
         # Creation of the ClusterGraph 
         self.graph = nx.Graph()
@@ -359,3 +292,96 @@ class ClusterGraph:
             )
 
         return self.my_graph
+    
+
+
+
+    # GET CLUSTERS IS THE GOOD FORMAT
+
+
+    def get_clusters_from_scikit(self, prediction):
+        """_summary_
+        From a list of prediction returns a list of clusters with each cluster being a list of indices
+        Parameters
+        ----------
+        prediction : _type_
+            _description_
+
+        Returns
+        -------
+        _type_
+            _description_
+        """
+        clusters = np.unique(prediction)
+        print(clusters)
+        dictionary = {}
+        list_clusters = []
+        for i in range(len(clusters)):
+            dictionary[int(clusters[i])] = i 
+            list_clusters.append([])
+
+        count = 0
+        for i in prediction:
+            list_clusters[dictionary[int(i)] ].append(count)
+            count += 1
+        return list_clusters
+
+
+
+    def get_clusters_from_BM(self, bm):
+        """_summary_
+        From a BallMapper object returns a list of clusters with each cluster being a list of indices corresponding to the points covered
+
+        Parameters
+        ----------
+        bm : _type_ BallMapper
+            _description_
+
+        Returns
+        -------
+        _type_
+            _description_
+        """
+        clusters = list(bm.points_covered_by_landmarks)
+        nb_clusters = len(clusters)
+        list_clusters = []
+        nb_nodes = 0
+        list_clusters = []
+        # Creation of the list for keys to be ordered
+        for i in clusters:
+            list_clusters.append([])
+
+        for i in clusters:
+            list_clusters[nb_nodes] = bm.points_covered_by_landmarks[i]
+            nb_nodes += 1
+        return list_clusters
+
+
+
+    def get_clusters_from_Mapper(self, graph):
+        """_summary_
+        From a Mapper object returns a list of clusters with each cluster being a list of indices corresponding to the points covered 
+
+        Parameters
+        ----------
+        graph : _type_
+            _description_
+
+        Returns
+        -------
+        _type_
+            _description_
+        """
+        clusters = list(graph["nodes"])
+        nb_clusters = len(clusters)
+        list_clusters = []
+        nb_nodes = 0
+        list_clusters = []
+        # Creation of the list for keys to be ordered
+        for i in clusters:
+            list_clusters.append([])
+
+        for i in graph["nodes"]:
+            list_clusters[nb_nodes] = graph["nodes"][i]
+            nb_nodes += 1
+        return list_clusters
