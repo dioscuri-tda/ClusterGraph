@@ -14,9 +14,29 @@ import random
 
 class Metric_distortion :
     
-    def __init__(self, cg, knn_g , X, sample = 1,  k_n = 2 ,   weight_knn_g = 'label', k_compo = 2, merged_knn = False, dist_weight = True ) :
-        self.cg = cg
-        print("NEW WEIGHT")
+    def __init__(self, graph, knn_g , X, sample = 1,  k_n = 2 ,   weight_knn_g = 'label', k_compo = 2, merged_knn = False, dist_weight = True, speed ="best" ) :
+        """_summary_
+
+        Parameters
+        ----------
+        cg : _type_ networkx.Graph
+            _description_ graph which will be pruned
+        knn_g : _type_
+        _description_
+        X : _type_ numpy darray
+            _description_ the dataset 
+        sample : _type_ float
+        _description_ percentage of samples kept per cluster in order to compute faster
+        k_n : _type_
+            _description_ number of neighbors in case we need to create a KNN graph (when subsampling)
+        weight_knn_g : _type_ str
+        _description_ name of the variable giving access to the distance between two nodes in the knn graph
+        k_compo : _type_
+            _description_ number of edges which will be added in order to merge disconnected components
+        cg : _type_
+        _description_
+        """
+        self.graph = graph
         self.knn_g = knn_g
         self.X = X
         self.weight_knn_g = weight_knn_g 
@@ -24,6 +44,12 @@ class Metric_distortion :
         self.new_knn = False
         self.nb_points_disco = 0
         self.nb_points_should_be_evaluated =0
+
+        if(speed =="best") :
+            self.prune = self.prune_edges_BF
+        elif(speed == "medium") :
+            self.prune = self.prune_edges_PS
+
 
         if(dist_weight ) :
             self.distortion_graph = self.distortion_graph_weight 
@@ -39,13 +65,16 @@ class Metric_distortion :
         self.dijkstra_length_dict = dict(nx.all_pairs_dijkstra_path_length( self.knn_g  , weight = weight_knn_g   ))
         
         # CREATION OF THE INTRINSIC CLUSTERGRAPH
-        self.intri_cg = copy.deepcopy( cg.graph )
+        self.intri_cg = copy.deepcopy( graph )
         nodes = list(self.intri_cg.nodes())
 
         # Ajouter des aretes entre chaque paire de noeuds
         for i in range(len(nodes)):
             for j in range(i+1, len(nodes)):
                 self.intri_cg.add_edge(nodes[i], nodes[j])
+
+
+        self.intrin_dist_cg()
 
      
         
@@ -198,8 +227,8 @@ class Metric_distortion :
         self.nb_compo_cluster = {}
         for i in range(nb_compo) :
             compo_clusters[i] = []
-        for n in self.cg.graph.nodes :
-            compo, nb = self.associate_cluster_one_compo(  self.cg.graph.nodes[n][ self.label_points_covered_intr ]   )
+        for n in self.graph.nodes :
+            compo, nb = self.associate_cluster_one_compo(  self.graph.nodes[n][ self.label_points_covered_intr ]   )
             compo_clusters[compo].append( n )
             self.nb_compo_cluster[n] = nb
  
@@ -210,7 +239,7 @@ class Metric_distortion :
         compo_clusters = self.associate_clusters_compo ( )
         keys = list( compo_clusters )
         edges_in_between = []
-        for e in self.cg.graph.edges :
+        for e in self.graph.edges :
             found = False
             for k in keys :
                 if( (e[0] in  compo_clusters[k]) and (e[1] in  compo_clusters[k])  ) :
@@ -218,7 +247,7 @@ class Metric_distortion :
                     break
                     
             if( not( found ) ) :
-                data = copy.deepcopy( self.cg.graph.edges[e] )
+                data = copy.deepcopy( self.graph.edges[e] )
                 edges_in_between.append ( [e[0] , e[1], data    ]     )
                 graph.remove_edge( e[0], e[1] )
             
@@ -226,16 +255,19 @@ class Metric_distortion :
 
     
     # FUNCTION WHICH RETURN THE GRAPH PRUNED WITH CHANGING THE CONNECTIVITY 
-    def prune_edges(self, store_all_md = True ) :
+    def prune_edges_BF(self, graph,  nb_edges_pruned = -1 ,  md_plot = True ) :
     
-        temp_graph = copy.deepcopy(self.cg.graph)
+        temp_graph = copy.deepcopy(graph)
         edges_between_compos, temp_graph = self.remove_edges( temp_graph)
         self.edges_between_compo = edges_between_compos
         nb_cc = nx.number_connected_components(temp_graph)
         f = list( temp_graph.edges )
-        nb_edges_pruned = len(f)
-        #print("NB OF EDGES IN GRAPH : ", nb_edges_pruned  )
-        if( store_all_md  ) :
+        if(nb_edges_pruned <= 0 ) :
+             nb_edges_pruned = len(f)
+        else : 
+            nb_edges_pruned = min( len(f), nb_edges_pruned )
+
+        if( md_plot  ) :
             self.temp_list_md = [self.distortion_graph( temp_graph, self.intri_cg )]
 
         for i in range(nb_edges_pruned) :
@@ -271,24 +303,26 @@ class Metric_distortion :
                         break
 
                 temp_graph.remove_edge( e_smallest[0], e_smallest[1] ) 
-                if(store_all_md  ) :
+                if(md_plot  ) :
                     self.temp_list_md.append( md_smallest )
 
             else :
-                #print(" BREAK ")
                 break
+        if( md_plot  ) :
+            return temp_graph, self.temp_list_md
 
-        return temp_graph
+        else :
+            return temp_graph
     
-    def prune_edges_PS(self, store_all_md = True , nb_edges_pruned = None) :
-        graph = copy.deepcopy(self.cg.graph)
+    def prune_edges_PS(self, g, md_plot = True , nb_edges_pruned = None) :
+        graph = copy.deepcopy( g)
         edges_between_compos, temp_graph = self.remove_edges( graph)
         self.edges_between_compo = edges_between_compos
         nb_cc = nx.number_connected_components( graph)
         f = list( graph.edges )
         if(nb_edges_pruned is None) :
             nb_edges_pruned = len(f)
-        if( store_all_md  ) :
+        if( md_plot  ) :
             self.temp_list_md = [self.distortion_graph( graph, self.intri_cg )]
             
         for i in range(nb_edges_pruned) :
@@ -322,14 +356,14 @@ class Metric_distortion :
                             break
                 graph.remove_edge( e_smallest[0], e_smallest[1] )
             
-                if( store_all_md  ) :
+                if( md_plot  ) :
                     self.temp_list_md.append (self.distortion_graph( graph, self.intri_cg ) )
                         
         return graph 
     
 
     def greedy_pruning(self, alpha = 0.5, nb_edges = -1, weight = "distortion") :
-        graph =  copy.deepcopy(self.cg.graph)
+        graph =  copy.deepcopy(self.graph)
         edges_between_compos, graph = self.remove_edges( graph )
         self.edges_between_compo = edges_between_compos
         graph = self.set_distortion_edges(graph, weight = weight)
@@ -359,8 +393,8 @@ class Metric_distortion :
                 if( i>=nb_edges) :
                     break
     
-        #for n in self.cg.graph.nodes :
-            #print("N 2 : ", self.cg.graph.nodes[n]  )
+        #for n in self.graph.nodes :
+            #print("N 2 : ", self.graph.nodes[n]  )
         return graph
     
     
@@ -387,14 +421,14 @@ class Metric_distortion :
 
     def distortion_each_edge(self ) :
         for e in self.intri_cg.edges :
-            self.cg.graph.edges[e]["distortion"] = self.cg.graph.edges[e]["label"] / self.intri_cg.edges[e]["intr_dist"]
+            self.graph.edges[e]["distortion"] = self.graph.edges[e]["label"] / self.intri_cg.edges[e]["intr_dist"]
 
 
 
 
     def get_distance_matrix_ccompo( self, pruned_graph  ) :
-        #connected_components = [ self.cg.graph.subgraph(c).copy() for c in nx.connected_components( self.cg.graph  )]
-        nodes = list( self.cg.graph.nodes ) 
+        #connected_components = [ self.graph.subgraph(c).copy() for c in nx.connected_components( self.graph  )]
+        nodes = list( self.graph.nodes ) 
         nodes.sort()
         min_n = nodes[0]
         nb_nodes = len( nodes )
@@ -403,8 +437,8 @@ class Metric_distortion :
 
         # max ambient distance in cg
         edge_max = -1 
-        for e in self.cg.graph.edges :
-            dist = self.cg.graph.edges[e]['label']
+        for e in self.graph.edges :
+            dist = self.graph.edges[e]['label']
             if(dist > edge_max) :
                 edge_max = dist
 
@@ -419,7 +453,7 @@ class Metric_distortion :
                             dist = paths[n1][n2]
                             dist = maxi 
                         except :
-                            dist = self.cg.graph.edges[ (n1, n2) ]["label"]
+                            dist = self.graph.edges[ (n1, n2) ]["label"]
 
                         dist_mat[n1-min_n][n2-min_n] = dist
                         dist_mat[n2-min_n][n1-min_n] = dist
@@ -448,7 +482,7 @@ class Metric_distortion :
     
 
     def pruned_merged_graph_creation( self, plot = True ) :
-        min_node = min( list (self.cg.graph.nodes)  ) 
+        min_node = min( list (self.graph.nodes)  ) 
         pruned_gg = self.prune_edges()
         if(plot) :
             self.plt_md_prune_computed()
@@ -468,7 +502,7 @@ class Metric_distortion :
         nx.draw_networkx(graph_missing_edges)
         plt.show()
         for e in graph_missing_edges.edges :
-            pruned_gg.add_edge( e[0] + min_node, e[1]+ min_node,  **self.cg.graph.get_edge_data( e[0]+min_node , e[1]+min_node ) )
+            pruned_gg.add_edge( e[0] + min_node, e[1]+ min_node,  **self.graph.get_edge_data( e[0]+min_node , e[1]+min_node ) )
             
         self.pruned_g = copy.deepcopy(pruned_gg)
 
@@ -478,12 +512,12 @@ class Metric_distortion :
     def sample_clusters( self, sample ) :
         self.label_points_covered_intr = "sample_points_covered"
         self.new_clusters = []
-        for n in self.cg.graph.nodes :
-            print("N : ", n, self.cg.graph[ n ])
-            points =  self.cg.graph.nodes[ n ][ "points_covered"]
+        for n in self.graph.nodes :
+            print("N : ", n, self.graph[ n ])
+            points =  self.graph.nodes[ n ][ "points_covered"]
             nb_elt_s = int(len(points) * sample  )
             elt_s = random.sample( points , nb_elt_s )
-            self.cg.graph.nodes[ n ][ self.label_points_covered_intr ] = elt_s
+            self.graph.nodes[ n ][ self.label_points_covered_intr ] = elt_s
             self.new_clusters.extend( elt_s )
         
         self.new_clusters.sort()
@@ -519,7 +553,7 @@ class Metric_distortion :
 
     def add_edges(self, edges_in_between, graph) :
         for e in edges_in_between :
-            graph.add_edge(  e[0], e[1],  **self.cg.graph.edges[(e[0],e[1])]   ) 
+            graph.add_edge(  e[0], e[1],  **self.graph.edges[(e[0],e[1])]   ) 
         return graph
 
 

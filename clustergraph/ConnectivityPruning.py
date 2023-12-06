@@ -8,7 +8,6 @@ class ConnectivityPruning :
 
     def __init__(self,  algo ="bf", weight = "label" ) :
         self.weight = weight
-
         if(algo == "bf") :
             self.prune = self.BF_edge_choice
 
@@ -41,7 +40,7 @@ class ConnectivityPruning :
 
 
     # Algorithm from which, each edge is deleted if it is the one with the lowest impact on the whole graph    
-    def BF_edge_choice(self, g, nb_edge_pruned = -1, conn_plot = False ) :
+    def BF_edge_choice(self, g, nb_edge_pruned = -1, score = False ) :
         graph =  copy.deepcopy(g)
         f = list( graph.edges )
         M = []
@@ -98,17 +97,16 @@ class ConnectivityPruning :
                 #print("REMOVE", e_largest)
                 graph.remove_edge( e_largest[0], e_largest[1] )
                 
-        if(not(conn_plot) ):
+        if(not(score) ):
             return graph 
         else :
-            plt.scatter(range(len(conn_prune) ), conn_prune )
             return graph, conn_prune
         
 
 
 
     # Each round, the less useful edge (for the two nodes it directly connects) is deleted (we don't measure the impact of that on the whole graph)          
-    def PS_edge_choice(g, nb_edge_pruned,  conn_plot = False) :
+    def PS_edge_choice(g, nb_edge_pruned,  score = False) :
         graph =  copy.deepcopy(g)
         f = list( graph.edges )
         M = []
@@ -186,7 +184,7 @@ class ConnectivityPruning :
                 print( "EMERGENCY" )
                 raise(Exception)
             
-        if(not(conn_plot) ) :
+        if(not(score) ) :
             return graph 
         else :
             plt.scatter(range(len(lost_prune) ), lost_prune )
