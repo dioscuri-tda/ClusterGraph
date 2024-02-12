@@ -232,7 +232,7 @@ class ClusterGraph:
         for i in range(len(self.edges)):
             lengths.append(self.edges[i][2])
 
-        plt.plot(nb, lengths)
+        plt.scatter(nb, lengths)
         plt.show()
 
 

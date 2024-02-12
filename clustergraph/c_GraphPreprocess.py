@@ -13,6 +13,16 @@ class GraphPreprocess :
         self.renderer = renderer
          
     def fit_graph(self) : 
+        """_summary_
+    Method which calls the get_distance method with all the demanded parameters
+    Parameters
+    ----------
+    point_1 : _type_ int or numpy darray
+        _description_ Corresponds to the index of a point in the dataset or to the vector directly
+    point_2 : _type_ int or numpy darray
+        _description_ Corresponds to the index of a point in the dataset or to the vector directly
+
+    """
         self.fit_nodes()
         self.fit_edges() 
 

@@ -6,7 +6,12 @@ import pandas as pd
 
 
 
+"""
 
+"weight_plot" in the label for normalized edges
+
+
+"""
 
 class EdgeStrategy :
     

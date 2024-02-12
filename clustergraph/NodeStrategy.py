@@ -9,7 +9,7 @@ import pandas as pd
 
 class NodeStrategy :
     
-    def __init__(self, graph, size_strategy = "log", type_coloring = "label", palette = None , color_labels = None, 
+    def __init__(self, graph, size_strategy = "lin", type_coloring = "label", palette = None , color_labels = None, 
                  X = None, variable = None,  choiceLabel = "max" , coloring_strategy_var = 'lin', MIN_SIZE_NODE = 0.1 ) :
         
         self.myPalette = palette

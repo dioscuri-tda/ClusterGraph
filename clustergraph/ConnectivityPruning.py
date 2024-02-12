@@ -1,7 +1,7 @@
 
 import networkx as nx
-import copy
 import matplotlib.pyplot as plt
+from copy import deepcopy
 
 
 class ConnectivityPruning :
@@ -16,6 +16,17 @@ class ConnectivityPruning :
 
     
     def connectivity_graph(self,  graph ) :
+        """_summary_
+    Method which returns the global connectivity of a given graph.
+    Parameters
+    ----------
+    graph : _type_ networkx graph
+        _description_ Graph for which the global connectivity is computed.
+    Returns
+    -------
+    _type_ float
+        _description_ Returns the global connectivity of the graph.
+"""
         nodes = list(graph.nodes)
         short_paths= dict(nx.all_pairs_dijkstra_path_length(graph, weight= self.weight ) )
         nb_nodes = len(nodes)
@@ -38,23 +49,39 @@ class ConnectivityPruning :
         return C_V_E
     
 
+    # THE DIFFERENT PRUNING ALGORITHMS
 
-    # Algorithm from which, each edge is deleted if it is the one with the lowest impact on the whole graph    
-    def BF_edge_choice(self, g, nb_edge_pruned = -1, score = False ) :
-        graph =  copy.deepcopy(g)
+    def BF_edge_choice(self, g, nb_edges = -1, score = False ) :
+        """_summary_
+    Method which prunes a given number of edges by using the Brute Force algorithm based on the connectivity.
+    Parameters
+    ----------
+    g : _type_ networkx graph
+        _description_ Graph for which the edges are pruned.
+    nb_edges : _type_ int
+        _description_ Number of edges to be pruned
+    score : _type_ bool
+        _description_ If True, the method also returns the evolution of the connectivity.
+
+    Returns
+    -------
+    _type_ networkx graph , list
+        _description_ Returns pruned graph and if the parameter score is True, returns also a list of float which corresponds to the evolution of the connectivity kept after each pruned edge compared to the original graph.
+"""
+        graph =  g.copy()
         f = list( graph.edges )
         M = []
         conn_prune = [1]
         
-        if(nb_edge_pruned==-1) :
-            nb_edge_pruned = len(f)
+        if(nb_edges==-1) :
+            nb_edges = len(f)
             
-        for i in range(nb_edge_pruned) :
+        for i in range(nb_edges) :
             rk_largest = float('-inf')
             e_largest = False
 
             # GET F\M
-            f_minus_M = copy.deepcopy(f) 
+            f_minus_M = deepcopy(f) 
             if( len(f_minus_M) != len(f)  ) :
                 raise(Exception)
                 
@@ -67,8 +94,8 @@ class ConnectivityPruning :
             c_fix_loop = self.connectivity_graph(graph)
             
             for edge in f_minus_M :
-                edge_data = copy.deepcopy( graph.get_edge_data( edge[0] , edge[1] ) )
-                edge_err = copy.deepcopy( edge_data['label'] )
+                edge_data = deepcopy( graph.get_edge_data( edge[0] , edge[1] ) )
+                edge_err = deepcopy( edge_data['label'] )
                 
                 #print('REMOVE', edge)
                 graph.remove_edge( edge[0], edge[1] )
@@ -106,17 +133,35 @@ class ConnectivityPruning :
 
 
     # Each round, the less useful edge (for the two nodes it directly connects) is deleted (we don't measure the impact of that on the whole graph)          
-    def PS_edge_choice(g, nb_edge_pruned,  score = False) :
-        graph =  copy.deepcopy(g)
+    def PS_edge_choice(self, g, nb_edges,  score = False) :
+        """_summary_
+        Method which prunes a given number of edges by using the PS algorithm based ...
+        Parameters
+        ----------
+        g : _type_ networkx graph
+            _description_ Graph for which the edges are pruned.
+        nb_edges : _type_ int
+            _description_ Number of edges to be pruned
+        score : _type_ bool
+            _description_ If True, the method also returns the evolution of the evaluation criteria.
+
+        Returns
+        -------
+        _type_ networkx graph , list
+            _description_ Returns pruned graph and if the parameter score is True, 
+            returns also a list of float which corresponds to the evolution of the evaluation criteria.
+        """
+
+        graph =  g.copy()
         f = list( graph.edges )
         M = []
         lost_prune = []
-        for i in range(nb_edge_pruned) :
+        for i in range(nb_edges) :
             k_largest = float('-inf')
             e_largest = False
             
             # GET F\M
-            f_minus_M = copy.deepcopy(f) 
+            f_minus_M = deepcopy(f) 
             if( len(f_minus_M) != len(f)  ) :
                 #print("MIN", f_minus_M)
                 #print( "F", f)
@@ -132,8 +177,8 @@ class ConnectivityPruning :
                         
                         
             for edge in f_minus_M :
-                edge_data = copy.deepcopy( graph.get_edge_data( edge[0] , edge[1] ) )
-                edge_err = copy.deepcopy( edge_data['label'] )
+                edge_data = deepcopy( graph.get_edge_data( edge[0] , edge[1] ) )
+                edge_err = deepcopy( edge_data['label'] )
                 
                 #print('REMOVE', edge)
                 graph.remove_edge( edge[0], edge[1] )
@@ -168,7 +213,7 @@ class ConnectivityPruning :
                 
                 if ( k > k_largest  ) :
                     k_largest = k
-                    e_largest = copy.deepcopy( edge )
+                    e_largest = deepcopy( edge )
                 
 
             if( not(isinstance(e_largest, bool) ) ) :

@@ -215,15 +215,41 @@ class DistancesBetweenClusters:
                 self.clusters = clusters
 
 
-
+    # METHODS  get_clusters, the methodd which gives access to the clusters. It is used to compute the distances between clusters
     def get_clusters_identity(self) :
+        """_summary_
+    Method which gives access to the original clusters (as given in he initialization)
+
+    Returns
+    -------
+    _type_ list
+        _description_ Returns the list of clusters as originally given.
+    """
         return self.clusters
     
     def get_subsampled_clusters(self) :
+        """_summary_
+    Method which gives access to the subsampled clusters
+
+    Returns
+    -------
+    _type_ list
+        _description_ Returns the list of clusters after the subsampling.
+    """
         return self.subsample_.subsampled_clusters
     
-    def subsample(self, perc, seed = None  ) :
-        self.subsample_ = Subsampling( self.clusters, seed = seed )
+    def subsample(self, perc, random_state = None  ) :
+        """_summary_
+    Method which randomly subsample each cluster with the given percentage.
+    Parameters
+    ----------
+    perc : _type_ float
+        _description_ Percentage of points which will be kept inside each cluster. The value should be between 0 and 1.
+    random_state : _type_ int 
+        _description_ The random state which will be used to randomly pick the points inside each cluster. If the value is None, the picked points will change at each call of the method.
+
+"""
+        self.subsample_ = Subsampling( self.clusters, seed = random_state )
         self.get_clusters = self.get_subsampled_clusters
     
 

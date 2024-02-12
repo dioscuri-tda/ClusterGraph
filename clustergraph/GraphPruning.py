@@ -27,7 +27,7 @@ class GraphPruning :
             self.prunedStrategy =  ConnectivityPruning(algo = algo, weight=weight )
         
         elif( type_pruning == "md" ) :
-            self.prunedStrategy =  Metric_distortion( graph =  graph, knn_g = knn_g , X = X, k_n = 2 ,   weight_knn_g = weight_knn_g , k_compo = k_compo , dist_weight = dist_weight)
+            self.prunedStrategy =  Metric_distortion( graph =  graph, knn_g = knn_g , X = X, k_n = 2 ,   weight_knn_g = weight_knn_g , k_compo = k_compo , dist_weight = dist_weight, algo =algo)
         
     
     
@@ -35,7 +35,7 @@ class GraphPruning :
         if(graph is None) :
             graph = self.original_graph
 
-        return self.prunedStrategy.prune(  graph , nb_edge_pruned, score   )
+        return self.prunedStrategy.prune(  graph , nb_edge_pruned , score   )
 
 
 
