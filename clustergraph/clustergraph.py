@@ -31,8 +31,26 @@ class ClusterGraph:
 
         Parameters
         ----------
-        distance_clusters : _type_
-            _description_
+        clusters : _type_, optional
+            _description_, by default None
+        X : _type_, optional
+            _description_, by default None
+        sample : int, optional
+            _description_, by default 1
+        metric_clusters : str, optional
+            _description_, by default "average"
+        parameters_metric_clusters : dict, optional
+            _description_, by default {}
+        distance_points : _type_, optional
+            _description_, by default None
+        data_preparation : str, optional
+            _description_, by default "usual"
+        metric_points : _type_, optional
+            _description_, by default sp.euclidean
+        parameters_metric_points : dict, optional
+            _description_, by default {}
+        seed : _type_, optional
+            _description_, by default None
         """
 
         if(clusters is not None) :
@@ -131,53 +149,6 @@ class ClusterGraph:
     
 
     
-  
-    def normalize_edges_diameter(
-        self,
-        metric_clusters=None,
-        distance_points=None,
-        data_preparation=None,
-        parameters_metric_clusters=None,
-    ):
-        """_summary_
-
-        Parameters
-        ----------
-        metric_clusters : _type_, optional
-            _description_, by default None
-        distance_points : _type_, optional
-            _description_, by default None
-        data_preparation : _type_, optional
-            _description_, by default None
-        parameters_metric_clusters : _type_, optional
-            _description_, by default None
-
-        Returns
-        -------
-        _type_
-            _description_
-        """
-        self.list_diameters = self.distance_clusters.diameter_clusters(
-            metric_clusters,
-            distance_points,
-            data_preparation,
-            parameters_metric_clusters,
-        )
-
-        maxi_diameter = 0
-        maxi_edge = self.edges[-1][2]
-
-        for i in range(len(self.list_diameters)):
-            if self.list_diameters[i][1] > maxi_diameter:
-                maxi_diameter = self.list_diameters[i][1]
-
-        for j in range(len(self.edges)):
-            self.edges[j][2] = self.edges[j][2] / maxi_diameter
-
-        self.graph.remove_edges_from(list(self.graph.edges()))
-        return self.edges
-
-
     def ends_avg_cluster(self):
         """_summary_
 
@@ -222,95 +193,21 @@ class ClusterGraph:
         return node_mini, node_maxi
 
 
-    def draw_edges(self):
-        """_summary_
-        """
-        nb = list(range(1, len(self.edges) + 1))
-
-        lengths = []
-        plt.close("all")
-        for i in range(len(self.edges)):
-            lengths.append(self.edges[i][2])
-
-        plt.scatter(nb, lengths)
-        plt.show()
-
-
-
-    def personnalize_graph(self, vertices=False, nb_edges=-1, edges=None):
-        """_summary_
-
-        Parameters
-        ----------
-        vertices : bool, optional
-            _description_, by default False
-        nb_edges : int, optional
-            _description_, by default -1
-        edges : _type_, optional
-            _description_, by default None
-
-        Returns
-        -------
-        _type_
-            _description_
-        """
-        if isinstance(vertices, np.ndarray) or isinstance(vertices, list):
-            vertices = np.sort(vertices)
-
-        self.my_graph = nx.Graph()
-
-        # ADDING VERTICES
-        # IF no vertices given we add them all
-        if not (isinstance(vertices, np.ndarray) or isinstance(vertices, list)):
-            self.my_graph.add_nodes_from(self.graph.nodes(data=True))
-            vertices = self.graph.nodes
-
-        else:
-            # We add the wanted vertices
-            for i in vertices:
-                self.my_graph.add_node(i, **self.graph.nodes(data=True)[i])
-
-        # ADDING EDGES
-        # If no edges given we add
-        if not (edges):
-            edges = self.edges
-            # Get ordered edges corresponding
-            corres_edges = get_corresponding_edges(vertices, edges)
-
-        # IF given edges we add them all if demanded
-        else:
-            # maybe here add a test to add only edges which connect, wanted vertices
-            corres_edges = edges
-
-        # IF EDGES NEGATIVE WE ADD ALL EDGES CORRESPONDING
-        if nb_edges < 0:
-            nb_edges = len(corres_edges)
-
-        for i in range(nb_edges):
-            self.my_graph.add_edge(
-                corres_edges[i][0], corres_edges[i][1], label=corres_edges[i][2]
-            )
-
-        return self.my_graph
-    
-
-
 
     # GET CLUSTERS IS THE GOOD FORMAT
-
 
     def get_clusters_from_scikit(self, prediction):
         """_summary_
         From a list of prediction returns a list of clusters with each cluster being a list of indices
         Parameters
         ----------
-        prediction : _type_
-            _description_
+        prediction : _type_ list or numpy array
+            _description_ List of clusters. At each index there is a label corresponding to the cluster of the data point. 
 
         Returns
         -------
-        _type_
-            _description_
+        _type_ list
+            _description_ Returns a list of clusters. Each element of the list is also a list in which all indices of the points coverd by this cluster are stored.
         """
         clusters = np.unique(prediction)
         print(clusters)
@@ -339,8 +236,8 @@ class ClusterGraph:
 
         Returns
         -------
-        _type_
-            _description_
+        _type_ list
+            _description_ Returns a list of clusters. Each element of the list is also a list in which all indices of the points coverd by this cluster are stored.
         """
         clusters = list(bm.points_covered_by_landmarks)
         nb_clusters = len(clusters)
@@ -369,8 +266,8 @@ class ClusterGraph:
 
         Returns
         -------
-        _type_
-            _description_
+        _type_ list
+            _description_ Returns a list of clusters. Each element of the list is also a list in which all indices of the points coverd by this cluster are stored.
         """
         clusters = list(graph["nodes"])
         nb_clusters = len(clusters)

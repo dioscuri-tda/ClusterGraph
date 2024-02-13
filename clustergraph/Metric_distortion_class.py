@@ -1,7 +1,7 @@
 from scipy.spatial.distance import euclidean
 from networkx import add_path
 import networkx as nx
-import copy
+from copy import deepcopy
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.neighbors import NearestNeighbors
@@ -56,12 +56,6 @@ class Metric_distortion :
         else : 
             self.distortion_graph = self.distortion_graph_no_weight 
 
-        """   
-        if(sample < 1 ) :
-            self.sample_clusters( sample )
-            self.set_knn_intri( k_n )
-
-        """
 
         self.k_nn_compo = k_compo 
         self.dijkstra_length_dict = dict(nx.all_pairs_dijkstra_path_length( self.knn_g  , weight = weight_knn_g   ))
@@ -280,42 +274,18 @@ class Metric_distortion :
         return np.argmax( number_per_compo  ), max(number_per_compo)
     
 
-    # We return the number of points which belong in the most represented cluster for the two nodes
-    # they are supposed to have the same most representative component
-    def get_weight_n1_n2(self, graph, n1, n2 ) :
-        nodes = [n1,n2]
-        connected_components = [ self.knn_g.subgraph(c).copy() for c in nx.connected_components( self.knn_g  )   ]
-        weight = 0
-        for n in nodes :
-            cluster = graph.nodes[n][self.label_points_covered_intr]
-            number_per_compo = []
-            for cc in connected_components :
-                nodes = list( cc.nodes )
-                count =  0
-                for pt in cluster :
-                    if ( pt in nodes ) :
-                        count +=1
-                number_per_compo.append( count )
-
-            weight += max( number_per_compo  )
-        
-        return weight
-
-
+    
     def associate_clusters_compo (self ) :
         """_summary_
-    Method which plots into an interactive matplotlib window the graph g with a slider in order to choose the number of edges.
-    ----------
-    g : _type_ networkx graph
-        _description_ The graph which is displayed.
-    reverse : _type_ bool 
-        _description_ If reverse is True, the edges will be dispalyed from longest to shortest. 
+        Method which associates to each node a connected component in the k-nearest neighbors graph. 
+        Each cluster is associated with the component which is the most represented in its points covered.
 
-    Returns
-    -------
-    _type_ Slider
-        _description_ The slider which is displayed.
-    """
+        Returns
+        -------
+        _type_ dict
+            _description_ Returns a dictionnary with the indices of the connected components in the k-nearest neighbors graph as keys and a list of the nodes (clusters) which belong to each component as value. 
+            
+        """
         nb_compo = nx.number_connected_components( self.knn_g  )
         compo_clusters = {}
         self.nb_compo_cluster = {}
@@ -331,18 +301,18 @@ class Metric_distortion :
 
     def remove_edges (self, graph) :
         """_summary_
-    Method which plots into an interactive matplotlib window the graph g with a slider in order to choose the number of edges.
-    ----------
-    g : _type_ networkx graph
-        _description_ The graph which is displayed.
-    reverse : _type_ bool 
-        _description_ If reverse is True, the edges will be dispalyed from longest to shortest. 
+        Method which removes all edges which are connecting two nodes in the graph which belong to two different disconnected component in the k-nearest neighbors graph.
 
-    Returns
-    -------
-    _type_ Slider
-        _description_ The slider which is displayed.
-    """
+        Parameters
+        ----------
+        graph : _type_ networkx Graph
+            _description_ The graph for which, the edges connecting two disconnected components should be removed.
+
+        Returns
+        -------
+        _type_ list, networkx Graph
+            _description_ Returns a list of edges for which each value is as followed [ node_i, node_j, data ]. With "data" being the dictionary of all labels attached to a given edge.
+        """
         compo_clusters = self.associate_clusters_compo ( )
         keys = list( compo_clusters )
         edges_in_between = []
@@ -354,7 +324,7 @@ class Metric_distortion :
                     break
                     
             if( not( found ) ) :
-                data = copy.deepcopy( self.graph.edges[e] )
+                data = deepcopy( self.graph.edges[e] )
                 edges_in_between.append ( [e[0] , e[1], data    ]     )
                 graph.remove_edge( e[0], e[1] )
             
@@ -363,12 +333,12 @@ class Metric_distortion :
     
     # FUNCTION WHICH RETURN THE GRAPH PRUNED WITH CHANGING THE CONNECTIVITY 
     def prune_edges_BF(self, graph,  nb_edges_pruned = -1 ,  md_plot = True ) :
-    
-        temp_graph = copy.deepcopy(graph)
+        temp_graph = deepcopy(graph)
         edges_between_compos, temp_graph = self.remove_edges( temp_graph)
         self.edges_between_compo = edges_between_compos
         nb_cc = nx.number_connected_components(temp_graph)
         f = list( temp_graph.edges )
+
         if(nb_edges_pruned <= 0 ) :
              nb_edges_pruned = len(f)
         else : 
@@ -378,17 +348,12 @@ class Metric_distortion :
             self.temp_list_md = [self.distortion_graph( temp_graph, self.intri_cg )]
 
         for i in range(nb_edges_pruned) :
-            #print("i : ", i)
             e_smallest = False
             md_smallest = self.distortion_graph( temp_graph, self.intri_cg )
-            #print("MD TO BEAT : ", md_smallest)
-
-            # GET F\M   with F list of all edges
-            f_minus_M = copy.deepcopy(f) 
+            f_minus_M = deepcopy(f) 
             
-            #print("FMINUS M : ", f_minus_M , "size  : ", len(f_minus_M) )
             for edge in f_minus_M :
-                edge_data = copy.deepcopy( temp_graph.get_edge_data( edge[0] , edge[1] ) )                
+                edge_data = deepcopy( temp_graph.get_edge_data( edge[0] , edge[1] ) )                
                 temp_graph.remove_edge( edge[0], edge[1] )
                 nb_compo = nx.number_connected_components(temp_graph)
 
@@ -400,7 +365,6 @@ class Metric_distortion :
 
                 temp_graph.add_edge( edge[0], edge[1], **edge_data )
 
-            #print("MD SMALLEST : " ,md_smallest )
             if( not(isinstance(e_smallest, bool) ) ) :
 
                 # DELETE THE smallest FROM THE GRAPH          
@@ -420,9 +384,10 @@ class Metric_distortion :
 
         else :
             return temp_graph
+        
     
     def prune_edges_PS(self, g, md_plot = True , nb_edges_pruned = None) :
-        graph = copy.deepcopy( g)
+        graph = deepcopy( g)
         edges_between_compos, temp_graph = self.remove_edges( graph)
         self.edges_between_compo = edges_between_compos
         nb_cc = nx.number_connected_components( graph)
@@ -437,9 +402,9 @@ class Metric_distortion :
             md_smallest = np.float('inf')
             
             # GET F\M
-            f_minus_M = copy.deepcopy(f) 
+            f_minus_M = deepcopy(f) 
             for edge in f_minus_M :
-                edge_data = copy.deepcopy( temp_graph.get_edge_data( edge[0] , edge[1] ) )                
+                edge_data = deepcopy( temp_graph.get_edge_data( edge[0] , edge[1] ) )                
                 graph.remove_edge( edge[0], edge[1] )
                 nb_compo = nx.number_connected_components(graph)
 
@@ -471,7 +436,7 @@ class Metric_distortion :
     
 
     def greedy_pruning(self, alpha = 0.5, nb_edges = -1, weight = "distortion") :
-        graph =  copy.deepcopy(self.graph)
+        graph =  deepcopy(self.graph)
         edges_between_compos, graph = self.remove_edges( graph )
         self.edges_between_compo = edges_between_compos
         graph = self.set_distortion_edges(graph, weight = weight)
@@ -484,15 +449,12 @@ class Metric_distortion :
         i = 0
         nb_compo = nx.number_connected_components(graph)
         for e in sorted_edges :
-            #print( "EDGEEE : ", e )
-            #print("Dist : ", graph.edges[ (e[0], e[1])  ]["distortion"] )
             if( graph.edges[ (e[0], e[1])  ]["distortion"] < alpha ) :
-                edge = copy.deepcopy( graph.edges[ (e[0], e[1])  ] )
+                edge = deepcopy( graph.edges[ (e[0], e[1])  ] )
                 print("edge ", edge)
                 graph.remove_edge( e[0], e[1] )
 
                 if( nx.number_connected_components(graph) > nb_compo ) : 
-                    #print("EDGE : ", edge )
                     graph.add_edge( e[0], e[1] , **edge )
                 else :
                     i +=1 
@@ -501,12 +463,25 @@ class Metric_distortion :
                 if( i>=nb_edges) :
                     break
     
-        #for n in self.graph.nodes :
-            #print("N 2 : ", self.graph.nodes[n]  )
         return graph
     
     
     def set_distortion_edges(self, graph, weight = 'distortion') :
+        """_summary_
+        Method which locally computes the distortion for each edge by computing the ratio between its length and the intrinsic distance between the two nodes.
+
+        Parameters
+        ----------
+        graph : _type_ networkx Graph
+            _description_
+        weight : str, optional
+            _description_ Label underwhich the distortion will be stored in the graph for each edge. , by default 'distortion'
+
+        Returns
+        -------
+        _type_ networkx Graph
+            _description_ Returns the graph for which the distortion has been added to each edge as a new label.
+        """
         for e in graph.edges :
             graph.edges[e][weight] =  abs(np.log10(graph.edges[e]["label"] /self.intri_cg.edges[e]["intr_dist"] ))
         
@@ -515,8 +490,7 @@ class Metric_distortion :
 
     def plt_md_prune_computed(self, save = None) :
         indices = list(range(len(self.temp_list_md)))
-        # Tracer le graphique
-        plt.plot(indices, self.temp_list_md, marker= 'o')  # Utilisez 'mamder' pour ajouter des points sur le graphique
+        plt.plot(indices, self.temp_list_md, marker= 'o')
         plt.xlabel('Number of edges pruned')
         plt.ylabel('Metric distortion')
         plt.title('Metric distortion depending on the number of pruned edges')
@@ -527,15 +501,21 @@ class Metric_distortion :
             plt.show()
 
 
-    def distortion_each_edge(self ) :
-        for e in self.intri_cg.edges :
-            self.graph.edges[e]["distortion"] = self.graph.edges[e]["label"] / self.intri_cg.edges[e]["intr_dist"]
-
-
-
-
     def get_distance_matrix_ccompo( self, pruned_graph  ) :
-        #connected_components = [ self.graph.subgraph(c).copy() for c in nx.connected_components( self.graph  )]
+        """_summary_
+        Method which returns a distance matrix between all nodes in the given graph. The real distance is used when nodes belong to different components in the graph. Otherwise, the distance is set to the maximum one.
+        It is done in order to merge the graph with the smallest distances between disconnected nodes.
+
+        Parameters
+        ----------
+        pruned_graph : _type_ networkx Graph
+            _description_ The graph for which the distance matrix between nodes is computed.
+
+        Returns
+        -------
+        _type_ numpy darray
+            _description_ Returns the distance matrix between all nodes. If the nodes belong to the same connected component, the value is set to the maximum distance in the graph. 
+        """
         nodes = list( self.graph.nodes ) 
         nodes.sort()
         min_n = nodes[0]
@@ -543,7 +523,6 @@ class Metric_distortion :
         print("NB ",  nb_nodes )
         dist_mat = np.array( [0]*(nb_nodes**2) ).reshape(nb_nodes,nb_nodes)
 
-        # max ambient distance in cg
         edge_max = -1 
         for e in self.graph.edges :
             dist = self.graph.edges[e]['label']
@@ -557,7 +536,6 @@ class Metric_distortion :
                 for n2 in nodes :
                     if( n1 < n2 ) :
                         try : 
-                            # becomes maxi to avoid adding nodes belonging in the same component in the knn graph after
                             dist = paths[n1][n2]
                             dist = maxi 
                         except :
@@ -572,10 +550,24 @@ class Metric_distortion :
 
 
     def create_knn_graph_merge_compo_CG(self, distance_matrix, k):
+        """_summary_
+        Method which creates the k-nearest neighbors graph corresponding to the given distance matrix.
+        In the class, this methods is used to know which edges should be added in order to connect disconnected components.
+
+        Parameters
+        ----------
+        distance_matrix : _type_ numpy darray
+            _description_ Distance matrix
+        k : _type_ int
+            _description_ Number of neighbors in the k-nearest neighbors graph.
+
+        Returns
+        -------
+        _type_ networkx Graph
+            _description_ Returns the k-nearest neighbors graph corresponding to the given distance matrix.
+        """
         
         num_nodes = distance_matrix.shape[0]
-
-        # Step 1: Use scikit-learn's NearestNeighbors to find the k nearest neighbors
         nn = NearestNeighbors(n_neighbors=k, metric='precomputed')
         nn.fit(distance_matrix)
 
@@ -590,59 +582,19 @@ class Metric_distortion :
         return nn_Graph
     
 
-    
-    """
-    def sample_clusters( self, sample ) :
-        self.label_points_covered_intr = "sample_points_covered"
-        self.new_clusters = []
-        for n in self.graph.nodes :
-            print("N : ", n, self.graph[ n ])
-            points =  self.graph.nodes[ n ][ "points_covered"]
-            nb_elt_s = int(len(points) * sample  )
-            elt_s = random.sample( points , nb_elt_s )
-            self.graph.nodes[ n ][ self.label_points_covered_intr ] = elt_s
-            self.new_clusters.extend( elt_s )
-        
-        self.new_clusters.sort()
-    
-   
-
-
-    # NEED TO CHANGE THE NODES LABELS
-    def set_knn_intri(self, k ) :
-        neigh = NearestNeighbors(n_neighbors = k,  radius = 1)
-        neigh.fit(X= self.get_X()   )
-        nn_adjacency = neigh.kneighbors_graph(X= self.get_X() , n_neighbors = k, mode='distance')
-
-        nn_Graph = nx.from_scipy_sparse_array(nn_adjacency, edge_attribute = 'label')
-        for node in nn_Graph.nodes:
-            nn_Graph.remove_edge(node,node)
-
-        self.knn_g = copy.deepcopy( nn_Graph )
-        self.new_knn = True
-
-
-    def get_X(self) :
-        if( self.new_knn ) :
-            return self.X[self.new_clusters,:]
-
-        else :
-            return self.X
-
-    """
-        
-
-
-
-#      MERGE DISCONNECTED COMPONENTS
-
-    def add_edges(self, edges_in_between, graph) :
-        for e in edges_in_between :
-            graph.add_edge(  e[0], e[1],  **self.graph.edges[(e[0],e[1])]   ) 
-        return graph
-
 
     def connectivity_graph(self, graph ) :
+        """_summary_
+            Method which returns the global connectivity of a given graph.
+            Parameters
+            ----------
+            graph : _type_ networkx graph
+                _description_ Graph for which the global connectivity is computed.
+            Returns
+            -------
+            _type_ float
+                _description_ Returns the global connectivity of the graph.
+        """
         nodes = list(graph.nodes)
         short_paths= dict(nx.all_pairs_dijkstra_path_length(graph, weight='label') )
         nb_nodes = len(nodes)
@@ -677,17 +629,22 @@ class Metric_distortion :
         plt.title('Connectivity depending on the number of pruned edges')
         plt.grid(True)
         plt.show()
-
-
-    def remove_edges_between_pruned(self, g ) :
-        new_edges_bet = []
-        for e in self.edges_between_compo :
-            if( g.has_edge(e[0], e[1]) ) :
-                new_edges_bet.append( copy.deepcopy(e) )
-        return new_edges_bet
     
     # methods adding the nearest neighbors edges in between components
     def merge_components( self, pruned_gg ) :
+        """_summary_
+        Method which adds edges to the given graph, in order to have a graph with less disconnected components. The merge is achieved by connecting each node to its k_nn_compo nearest node which are in another components.
+
+        Parameters
+        ----------
+        pruned_gg : _type_ networkx Graph
+            _description_ Disconnected Graph which will be merged.
+
+        Returns
+        -------
+        _type_ networkx Graph
+            _description_ Returns the given graph for which nodes in between components have been added. 
+        """
         min_node = min( list (self.graph.nodes)  ) 
         dist_mat = self.get_distance_matrix_ccompo(  pruned_gg  )
         graph_missing_edges = self.create_knn_graph_merge_compo_CG( dist_mat, self.k_nn_compo )
@@ -698,12 +655,27 @@ class Metric_distortion :
     
 
     def conn_prune_merged_graph(self, pruned_gg, nb_edges_pruned = None ) :
+        """_summary_
+        Method which after merging the disconnected components in the graph, prune a given number of edges in order to get a less noisy graph.
+
+        Parameters
+        ----------
+        pruned_gg : _type_ networkx Graph
+            _description_
+        nb_edges_pruned : _type_ int, optional
+            _description_ The maximum number of edges which should be pruned. If the value is None, all possible edges will be pruned. , by default None
+
+        Returns
+        -------
+        _type_ networkx Graph
+            _description_ Returns the merged and pruned graph.
+        """
         pruned_gg = self.merge_components(  pruned_gg )
         if(nb_edges_pruned is None) :
             nb_edges_pruned = len(list(pruned_gg.edges))
 
         best_g = None
-        graph =  copy.deepcopy(pruned_gg)
+        graph =  deepcopy(pruned_gg)
         f = list( graph.edges )
         M = []
         based_rk = self.connectivity_graph(graph)
@@ -713,7 +685,7 @@ class Metric_distortion :
             e_largest = False
 
             # GET F\M
-            f_minus_M = copy.deepcopy(f) 
+            f_minus_M = deepcopy(f) 
             if( len(f_minus_M) != len(f)  ) :
                 raise(Exception)
 
@@ -726,8 +698,8 @@ class Metric_distortion :
             c_fix_loop = self.connectivity_graph(graph)
 
             for edge in f_minus_M :
-                edge_data = copy.deepcopy( graph.get_edge_data( edge[0] , edge[1] ) )
-                edge_err = copy.deepcopy( edge_data['label'] )
+                edge_data = deepcopy( graph.get_edge_data( edge[0] , edge[1] ) )
+                edge_err = deepcopy( edge_data['label'] )
 
                 #print('REMOVE', edge)
                 graph.remove_edge( edge[0], edge[1] )
