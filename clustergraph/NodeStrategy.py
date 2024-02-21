@@ -11,10 +11,55 @@ class NodeStrategy :
     
     def __init__(self, graph, size_strategy = "lin", type_coloring = "label", palette = None , color_labels = None, 
                  X = None, variable = None,  choiceLabel = "max" , coloring_strategy_var = 'lin', MIN_SIZE_NODE = 0.1 ) :
+        """_summary_
+
+        Parameters
+        ----------
+        graph : _type_ networkx Graph
+            _description_ Graph which will be preprocessed by adding colors to nodes, normalizing their size and other properties.
+        size_strategy : str, optional
+            _description_ Defines the formula which is used to normalize the size of nodes. It can be "lin", "log", "exp" or "id". , by default "lin"
+        type_coloring : str, optional
+            _description_ Defines the way to add colors to nodes. It can be with "label" or with "variable". For "label", colors are added from a given list or dictionary. 
+            If "variable" is chosen, the color is chosen depending from a feature of the dataset. It can be the average of a given feature inside each node for example. , by default "label"
+        palette : _type_ matplotlib.colors.ListedColormap , optional
+            _description_ The colormap from which color will be chosen for nodes. , by default None
+        color_labels : _type_ list, dict or numpy array, optional
+            _description_ Object from which the colors of nodes will be retrieved. The exact colors can be chosen by giving hexadecimal values.
+            If a list or a numpy array is given and has the same length than the number of nodes, each node will be associated to a label. If the list is longer, the label associated to each node will depend on the which labels are represented inside each nodes by the points covered.
+            If a dictionary is chosen, the keys should be the nodes and the values the labels on which the color will be chosen. 
+            , by default None
+        X : _type_ numpy darray, optional
+            _description_ The dataset from which the value inside each node will be taken if the type_coloring is set to "variable"., by default None
+        variable : _type_ str or int , optional
+            _description_ If the parameter type_coloring is set to "variable", this parameter is giving access to the good feature in the dataset. It can be an index or the name of the variable.
+              , by default None
+        choiceLabel : str, optional
+            _description_ Can be "max" or "min". When the parameter "type_coloring" is set to "label", it defines the way to choose the label inside each node to color them. If "max" is chosen, the most represented label inside each node will be chosen. If "min" is chosen it will be the least represented label.
+            , by default "max"
+        coloring_strategy_var : str, optional
+            _description_ Can be "log", "lin" or "exp". When the parameter "type_coloring" is set to "variable", this parameter represents how fast color will changed between nodes depending on the variable's average value inside each node. 
+            For example if "exp" is chosen, a slight change of average value between two nodes will represent an important change of colors.
+            , by default 'lin'
+        MIN_SIZE_NODE : float, optional
+            _description_, by default 0.1
+
+        Raises
+        ------
+        ValueError
+            _description_
+        ValueError
+            _description_
+        ValueError
+            _description_
+        ValueError
+            _description_
+        ValueError
+            _description_
+        """
         
         self.myPalette = palette
         self.color_labels = color_labels
-        #print("COLOR LBELS 1", self.color_labels)
         self.dictLabelsCol = None
         self.MAX_VALUE_COLOR = None
         self.MIN_VALUE_COLOR = None
@@ -23,25 +68,19 @@ class NodeStrategy :
         self.variable = variable
         self.MIN_SIZE_NODE = MIN_SIZE_NODE
 
-        #print("INIT Done")
         
         if( choiceLabel == "max") :
-            #print("MAX")
             self.labelChoice = np.argmax
         elif( choiceLabel == "min") :
-            #print("min")
             self.labelChoice = np.argmin
         else :
             raise ValueError("The choice of label must be 'min' or 'max' ")
         
         if(size_strategy == "log" ) :
-            #print("log")
             self.get_size_node  = self.log_size
         elif(size_strategy == "lin"):
-            #print("lin")
             self.get_size_node  = self.linear_size
         elif(size_strategy == "exp"):
-            #print("exp")
             self.get_size_node = self.expo_size
         elif( size_strategy == "id") :
             self.get_size_node = self.id_size
@@ -52,9 +91,7 @@ class NodeStrategy :
         
         # WITH LABEL
         if( type_coloring== "label" ) :
-            #print("label")
             if(self.myPalette is None ) :
-                  #print("PALETTE LAB")
                   self.myPalette = cm.get_cmap(name="tab20c")
 
             self.fit_color = self.set_color_nodes_labels
@@ -64,12 +101,10 @@ class NodeStrategy :
             
              # Choice of function to set colors to each node 
             if(  color_labels is None  or  (len(color_labels) == len(list(self.graph.nodes))  )  ) :
-                #print("COLOR UNIQUE")
                 self.get_color_node = self.get_color_node_unique
                 self.getDictNodeHexa()
             
             elif ( len(color_labels) > len(list(self.graph.nodes))   ) :
-                #print("COLOR PERCENTAGE")
                 self.get_color_node = self.get_color_node_points_covered
                   
             else :
@@ -78,23 +113,18 @@ class NodeStrategy :
                 
         # WITH VARIABLE
         elif ( type_coloring == "variable") :
-            #print("VARIABLE")
             self.fit_color = self.set_color_nodes_variable
 
             if(self.myPalette is None ) :
-                  #print("PALETTE VAR")
-                  self.myPalette = cm.get_cmap(name="YlOrBr")  #cm.get_cmap(name="Blues") 
+                  self.myPalette = cm.get_cmap(name="YlOrBr") 
             
             if(coloring_strategy_var == 'log' ) :
-                #print("COLOR log")
                 self.get_color_var = self.get_color_var_log
                 
             elif(coloring_strategy_var == 'lin' ) :
-                #print("COLOR lin")
                 self.get_color_var = self.get_color_var_lin
                 
             elif(coloring_strategy_var == 'exp' ) : 
-                #print("COLOR exp")
                 self.get_color_var = self.get_color_var_exp
                 
             else :
@@ -106,7 +136,6 @@ class NodeStrategy :
                 elif isinstance(X, np.ndarray):
                     self.get_val_node = self.get_val_var_node_Xnum
             else :
-                #print("VARIABLE WITH GRAPH")
                 self.get_val_node = self.get_val_var_node_graph
                     
         else :
@@ -114,18 +143,23 @@ class NodeStrategy :
             
             
     def fit_nodes(self) :
+        """_summary_
+        Method which calls methods in order to set the size of nodes and their colors.
+        """
         self.set_size_nodes()
         self.fit_color()
             
-                                                        #################
-                                                        # SIZE OF NODES #
-                                                        #################
-                        
-            
-    # Method which gives the maxi and minimum size of nodes in the graph
+                                                    
     def get_mini_maxi(self) :
+        """_summary_
+        Method which returns the maximum and minimum sizes of nodes in the graph. 
+
+        Returns
+        -------
+        _type_ int, int
+            _description_ The maximum and minimum size of nodes of the graph.
+        """
         nodes = list( self.graph.nodes )
-        # Get the maximum and minimum sizes of nodes
         mini = len( self.graph.nodes[ nodes[0] ]["points_covered"] )
         maxi = mini
         for node in nodes :
@@ -136,8 +170,10 @@ class NodeStrategy :
                 mini = size
         return maxi, mini
     
-    """                                                                            SIZE OF NODES                                                                      """
     def set_size_nodes(self ) :
+        """_summary_
+        
+        """
         nodes = list( self.graph.nodes )
         max_size, min_size = self.get_mini_maxi()
         for node in nodes :
@@ -167,7 +203,6 @@ class NodeStrategy :
     """                                                                  COLOR WITH GIVEN LABELS                                                                       """
                     
     def set_color_nodes_labels( self ) :
-        #print("COLOR LBELS 1.5", self.color_labels)
         # set labels and their corresponding hexa colors
         for node in self.graph.nodes :
             #get_color_node depends on the number of points in the label
@@ -182,9 +217,7 @@ class NodeStrategy :
 
     # LABELS PREPARATION 
     def get_labels(self) :
-        #print("COLOR LBELS 3", self.color_labels)
         if(self.color_labels is None) :
-            #print("NO COLOR GIVEN")
             self.color_labels = list( self.graph.nodes )
 
         
@@ -192,11 +225,8 @@ class NodeStrategy :
     # GET HEXADECIMAL VALUE FOR EACH NODE
     def get_labels_into_hexa(self) :
         if( type(self.color_labels ) is dict  ) :
-            #print("DICT")
             keys = list( self.color_labels )
-            #print("KEYKS DICT", keys)
         else :
-            #print("NOT DICT")
             keys = range( len(self.color_labels) )
         
         # TEST IF WE NEED TO TRANSFORM LABELS INTO HEXADECIMAL VALUES
@@ -204,21 +234,18 @@ class NodeStrategy :
         for k in keys :
             if( not( is_color_like( self.color_labels[k] )  )   ) :
                 all_hex = False
-                #print("NOT HEXA COLORS : " , k, "  ", self.color_labels[k] )
                 break
         
         if( type(self.color_labels ) is dict ) :
         
             #  if color_labels is a dictionary and values are not hexadecimals we transform them
             if ( not(all_hex) ) :
-                #print("NOT HEXA AND DICT")
                 # Function to transform labels to hexa
                 self.labColors = self.dictLabelToHexa()
                 # Function to get the dictionary Node Hexa
                 self.getDictNodeHexa = self.nodeColHexa_dictLabHexa
 
             else :
-                #print("ALL ARE HEXA AND DICT")
                 self.labColors = self.color_labels
                 self.getDictNodeHexa = self.nodeColHexa_dictNodeHexa
             
@@ -234,29 +261,23 @@ class NodeStrategy :
 
             # Function to get the dictionary Node Hexa
             self.getDictNodeHexa = self.nodeColHexa_listHexa
-
-        #self.getDictNodeHexa()
     
 
 
     # FUNCTIONS WHICH  TRANSFORM LABELS INTO HEXADECIMALS 
     def dictLabelToHexa(self) :
-        #print("LABELS PREPARATION INTO HEXADECIMAL FROM DICT")
         values_labels = list( self.color_labels.values() )
         keys = list(self.color_labels)
         uniqueLabels = np.unique( values_labels )
         nbLabels = len( uniqueLabels )
-        #print("TRANSFORM TO HEXA DICT")
         hexLabels = [ to_hex(self.myPalette(i / nbLabels ) ) for i in range(nbLabels +1)  ]
         self.dictLabelsCol = dict( zip( uniqueLabels  , hexLabels)  )
         return self.dictLabelsCol
         
 
     def listLabelToHexa(self) :
-        #print("LABELS PREPARATION INTO HEXADECIMAL FROM LIST")
         uniqueLabels = np.unique( self.color_labels )
         nbLabels = len( uniqueLabels )
-        #print("TRANSFORM TO HEXA LIST")
         hexLabels = [ to_hex(self.myPalette(i / nbLabels ) ) for i in range(nbLabels +1)  ]
         self.dictLabelsCol = dict( zip( uniqueLabels  , hexLabels)  )
         listLabels = [ self.dictLabelsCol[e] for e in self.color_labels ]
@@ -272,12 +293,10 @@ class NodeStrategy :
     # if the dictionary has a hexadecimal value per node
     def nodeColHexa_dictNodeHexa(self) :
         # we create the dictionary node hexadecimal
-        #print("LABELS COLORS AFTER DICT IDENTITY PREPROCESS : ", self.labColors)
         self.NodeHexa = self.labColors
 
     # if the dictionary has a label per node
     def nodeColHexa_dictLabHexa(self) :
-        #print("LABELS COLORS AFTER  DICT PREPROCESS : ", self.labColors)
         keys = list( self.color_labels )
         # we create the dictionary node hexadecimal
         self.NodeHexa = {}
@@ -288,15 +307,11 @@ class NodeStrategy :
     # if color_labels is a list
     # labColors is a list with hexadecimal values
     def nodeColHexa_listHexa(self) :
-        #print("LABELS COLORS LIST AFTER PREPROCESS : ", self.labColors)
         nodes = list( self.graph.nodes )
         #mini_node = min( nodes )
-        #print("Mini node ", mini_node)
         # we create the dictionary node hexadecimal
         self.NodeHexa = {}
         for i,n in enumerate( nodes ) :
-            #print("N : ", n)
-            #print("I : ", i)
             self.NodeHexa[n] = self.labColors[i] #[   n - mini_node   ]
 
 #                                                                   COLOR WITH POINTS COVERED                                                                      
@@ -313,7 +328,7 @@ class NodeStrategy :
         # SET THE CHOSEN COLOR
         index_max = self.labelChoice(nb_each)
         label = label_in_node[index_max]
-        self.graph.nodes[n]["color"] = self.dictLabelsCol[label]   #self.labColors[label]  #self.dictLabelsCol[label] 
+        self.graph.nodes[n]["color"] = self.dictLabelsCol[label]   
 
         # ADD THE POSSIBILITY TO SEE PERCENTAGE OF EACH LABEL
         per_label = ""
@@ -332,7 +347,6 @@ class NodeStrategy :
 
     
     def ListLabelToDictHexa( self ) :
-        #print("LABELS PREPARATION INTO HEXADECIMAL FROM LIST")
         uniqueLabels = np.unique( self.color_labels )
         nbLabels = len( uniqueLabels )
         hexLabels = [ to_hex(self.myPalette(i / nbLabels ) ) for i in range(nbLabels +1)  ]
@@ -362,8 +376,6 @@ class NodeStrategy :
 
         self.MAX_VALUE_COLOR = MAX_VALUE
         self.MIN_VALUE_COLOR = MIN_VALUE
-        #print("MAX VAL NODES", self.MAX_VALUE_COLOR, type(self.MAX_VALUE_COLOR) )
-        #print("MIN VAL NODE", self.MIN_VALUE_COLOR, type(self.MIN_VALUE_COLOR)  )
 
 
 
@@ -383,7 +395,6 @@ class NodeStrategy :
             return self.X.iloc[ : ,self.variable][  self.graph.nodes[node]["points_covered"]  ].mean() 
         
     def get_val_var_node_graph( self, node ) : 
-        #print("graph get val")
         return self.graph.nodes[node][self.variable]
 
 
@@ -393,13 +404,8 @@ class NodeStrategy :
         return to_hex( self.myPalette( color_id ) )
 
     def get_color_var_log(self, val ) :
-        #print(" COLOR MIN ",self.MIN_VALUE_COLOR)
-        #print(" COLOR MAX ", self.MAX_VALUE_COLOR)
         color_id = (np.log10( val ) - np.log10(self.MIN_VALUE_COLOR))  / (np.log10(self.MAX_VALUE_COLOR) - np.log10(self.MIN_VALUE_COLOR))
-        #print("VAL : ", val)
-        #print("COL ID : ", color_id)
         hex = to_hex(self.myPalette(color_id))
-        #print("HEXA ", hex)
         return hex
 
     def get_color_var_lin(self, val) :

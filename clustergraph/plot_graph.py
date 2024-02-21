@@ -33,7 +33,7 @@ def plot_colored_graph(graph, nb_edges=None, variable="weight_plot", size_nodes 
 
     # Obtenir la taille des nœuds (multipliée par 100 pour une meilleure visualisation)
     node_sizes = [data['size_plot']*size_nodes for _, data in G.nodes(data=True)]
-    plt.figure(figsize=(10, 8))
+    plt.figure(figsize=(8, 6))
     # Créer le dessin du graphique
     pos = nx.spring_layout(G, seed= random_state ) 
     nx.draw_networkx(
