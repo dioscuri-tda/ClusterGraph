@@ -4,6 +4,45 @@ from ipywidgets import interact, IntSlider
 from IPython.display import display, HTML
 
 
+def plot_pie( graph, nb_edges=None, variable="weight_plot", size_nodes = 0.01, random_state = None, font_size =6 ) :
+    
+    G = graph.copy()
+    if nb_edges is not None:
+        edges = sorted(G.edges(data=True), key=lambda x: x[2].get("label", 0))[:nb_edges]
+        G.clear_edges()
+        G.add_edges_from(edges)
+        
+    edge_colors = [data['color'] for _, _, data in G.edges(data=True)]
+        
+    pos = nx.spring_layout( G, seed = random_state )
+    nx.draw_networkx_edges(G, pos=pos, edge_color = edge_colors)
+
+    for node in G.nodes:
+
+        attributes = G.nodes[node]['data_perc_labels']
+        keys = list(attributes)
+        attrs = [ attributes[k]  for k in keys ]
+
+        plt.pie(
+             attrs , # s.t. all wedges have equal size
+            center=pos[node], 
+            colors = [ k for k in keys ],
+            radius= size_nodes)
+        
+        
+    # Afficher les labels des arêtes
+    edge_labels = {(u, v): "{:.2f}".format(data[variable]) for u, v, data in G.edges(data=True)}
+    nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_color='red', font_size = font_size  )
+    
+    plt.xlim(-1, 1)
+    plt.ylim(-1, 1)   
+    plt.tight_layout()
+    
+    
+
+
+
+
 def plot_colored_graph(graph, nb_edges=None, variable="weight_plot", size_nodes = 1000, random_state = None ):
 
     """_summary_
