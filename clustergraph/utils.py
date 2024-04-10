@@ -2,6 +2,83 @@
 # ANNEXES FUNCTIONS #
 #####################
 
+import numpy as np
+
+
+def get_clusters_from_scikit(prediction):
+    """_summary_
+    From a list of prediction returns a list of clusters with each cluster being a list of indices
+    Parameters
+    ----------
+    prediction : _type_ list or numpy array
+        _description_ Cluster labels. At each index there is a label corresponding to the cluster of the data point.
+
+    Returns
+    -------
+    _type_ list
+        _description_ Returns a list of clusters. Each element of the list is numpy array in which all indices of the points coverd by this cluster are stored.
+    """
+
+    return [np.where(prediction == clustNum)[0] for clustNum in np.unique(prediction)]
+
+
+def get_clusters_from_BM(bm):
+    """_summary_
+    From a BallMapper object returns a list of clusters with each cluster being a list of indices corresponding to the points covered
+
+    Parameters
+    ----------
+    bm : _type_ BallMapper
+        _description_
+
+    Returns
+    -------
+    _type_ list
+        _description_ Returns a list of clusters. Each element of the list is also a list in which all indices of the points coverd by this cluster are stored.
+    """
+    clusters = list(bm.points_covered_by_landmarks)
+    nb_clusters = len(clusters)
+    list_clusters = []
+    nb_nodes = 0
+    list_clusters = []
+    # Creation of the list for keys to be ordered
+    for i in clusters:
+        list_clusters.append([])
+
+    for i in clusters:
+        list_clusters[nb_nodes] = bm.points_covered_by_landmarks[i]
+        nb_nodes += 1
+    return list_clusters
+
+
+def get_clusters_from_Mapper(graph):
+    """_summary_
+    From a Mapper object returns a list of clusters with each cluster being a list of indices corresponding to the points covered
+
+    Parameters
+    ----------
+    graph : _type_
+        _description_
+
+    Returns
+    -------
+    _type_ list
+        _description_ Returns a list of clusters. Each element of the list is also a list in which all indices of the points coverd by this cluster are stored.
+    """
+    clusters = list(graph["nodes"])
+    nb_clusters = len(clusters)
+    list_clusters = []
+    nb_nodes = 0
+    list_clusters = []
+    # Creation of the list for keys to be ordered
+    for i in clusters:
+        list_clusters.append([])
+
+    for i in graph["nodes"]:
+        list_clusters[nb_nodes] = graph["nodes"][i]
+        nb_nodes += 1
+    return list_clusters
+
 
 def replace_in_array(list_1, list_2, arr, val):
     """Function which in a numpy darray replace the crossing positions values for the lines list_1 and columns list_2 and inverse (symetric change) , by the value wanted
@@ -63,7 +140,6 @@ def insert_sorted_list(liste, element_to_insert):
     return liste
 
 
-
 def get_values(list_key_value):
     """_summary_
 
@@ -90,9 +166,6 @@ def get_values(list_key_value):
     return values
 
 
-
-
-
 def get_sorted_edges(graph, variable_length="label"):
     """_summary_
 
@@ -117,7 +190,6 @@ def get_sorted_edges(graph, variable_length="label"):
     return edges
 
 
-
 def get_corresponding_edges(vertices, edges):
     """_summary_
 
@@ -138,8 +210,6 @@ def get_corresponding_edges(vertices, edges):
         if edge[0] in vertices and edge[1] in vertices:
             corres_edges = insert_sorted_list(corres_edges, edge)
     return corres_edges
-
-
 
 
 def max_size_node_graph(graph, variable, nodes=None):

@@ -681,7 +681,7 @@ class Metric_distortion :
         based_rk = self.connectivity_graph(graph)
         self.list_rk = [1]
         for i in range(nb_edges_pruned) :
-            rk_largest =  np.float('-inf')
+            rk_largest =  -np.inf
             e_largest = False
 
             # GET F\M
