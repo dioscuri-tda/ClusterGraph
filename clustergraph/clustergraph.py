@@ -49,7 +49,7 @@ class ClusterGraph:
 
         # one node for each cluster
         self.graph.add_nodes_from(
-            [(i, dict(size=len(c))) for i, c in enumerate(clusters)]
+            [(i, dict(size=len(c), points_covered=c)) for i, c in enumerate(clusters)]
         )
 
         # compute all distances and add all edges
@@ -58,5 +58,6 @@ class ClusterGraph:
                 (i, j, self.distance_clusters(C_i, C_j, self.distance_points))
                 for i, C_i in enumerate(clusters[:-1])
                 for j, C_j in enumerate(clusters[i + 1 :], start=(i + 1))
-            ]
+            ],
+            weight="label",
         )
