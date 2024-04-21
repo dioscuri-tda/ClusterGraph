@@ -104,3 +104,7 @@ ENV/
 # IDE settings
 .vscode/
 .idea/
+
+
+*.pdf
+/examples/data/Gene_cancer

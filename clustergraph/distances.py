@@ -9,7 +9,7 @@ def average_dist(X_1, X_2, distance_points):
     return np.mean([distance_points(i, j) for i in X_1 for j in X_2])
 
 
-def min_dist(self, X_1, X_2, distance_points):
+def min_dist(X_1, X_2, distance_points):
     return np.min([distance_points(i, j) for i in X_1 for j in X_2])
 
 

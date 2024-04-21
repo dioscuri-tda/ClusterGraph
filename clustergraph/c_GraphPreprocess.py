@@ -59,7 +59,7 @@ class GraphPreprocess:
         palette=None,
         weight="label",
         variable=None,
-        norm_weight="lin",
+        norm_weight="id",
         type_coloring="label",
         color_labels=None,
         coloring_strategy_var="lin",

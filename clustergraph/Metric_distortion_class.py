@@ -425,7 +425,7 @@ class Metric_distortion:
 
         for i in range(nb_edges_pruned):
             e_smallest = False
-            md_smallest = np.float("inf")
+            md_smallest = np.inf
 
             # GET F\M
             f_minus_M = deepcopy(f)
@@ -557,12 +557,12 @@ class Metric_distortion:
 
         edge_max = -1
         for e in self.graph.edges:
-            dist = self.graph.edges[e]["weight"]
+            dist = self.graph.edges[e]["label"]
             if dist > edge_max:
                 edge_max = dist
 
         maxi = edge_max + 1
-        paths = dict(nx.all_pairs_dijkstra_path_length(pruned_graph, weight="weight"))
+        paths = dict(nx.all_pairs_dijkstra_path_length(pruned_graph, weight="label"))
 
         for n1 in nodes:
             for n2 in nodes:
@@ -571,7 +571,7 @@ class Metric_distortion:
                         dist = paths[n1][n2]
                         dist = maxi
                     except:
-                        dist = self.graph.edges[(n1, n2)]["weight"]
+                        dist = self.graph.edges[(n1, n2)]["label"]
 
                     dist_mat[n1 - min_n][n2 - min_n] = dist
                     dist_mat[n2 - min_n][n1 - min_n] = dist
@@ -604,7 +604,7 @@ class Metric_distortion:
         nn_adjacency = nn.kneighbors_graph(
             X=distance_matrix, n_neighbors=k, mode="distance"
         )
-        nn_Graph = nx.from_scipy_sparse_array(nn_adjacency, edge_attribute="weight")
+        nn_Graph = nx.from_scipy_sparse_array(nn_adjacency, edge_attribute="label")
         for n in nn_Graph.nodes:
             try:
                 nn_Graph.remove_edge(n, n)
@@ -626,7 +626,7 @@ class Metric_distortion:
             _description_ Returns the global connectivity of the graph.
         """
         nodes = list(graph.nodes)
-        short_paths = dict(nx.all_pairs_dijkstra_path_length(graph, weight="weight"))
+        short_paths = dict(nx.all_pairs_dijkstra_path_length(graph, weight="label"))
         nb_nodes = len(nodes)
         C_V_E = 0
         nb_not_existing_path = 0
@@ -732,7 +732,7 @@ class Metric_distortion:
 
             for edge in f_minus_M:
                 edge_data = deepcopy(graph.get_edge_data(edge[0], edge[1]))
-                edge_err = deepcopy(edge_data["weight"])
+                edge_err = deepcopy(edge_data["label"])
 
                 # print('REMOVE', edge)
                 graph.remove_edge(edge[0], edge[1])
