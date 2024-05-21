@@ -31,26 +31,26 @@ class ClusterGraph:
 
         Parameters
         ----------
-        clusters : _type_, optional
+        clusters : list, numpy array, dict or BallMapper, optional
             _description_, by default None
-        X : _type_, optional
-            _description_, by default None
-        sample : int, optional
-            _description_, by default 1
-        metric_clusters : str, optional
-            _description_, by default "average"
+        X : numpy darray, optional
+            X is the dataset. It can be None when metric_points is a distance matrix, by default None
+        sample : float, optional
+            Percentage of each cluster which should be kept during the computation of ClusterGraph, by default 1
+        metric_clusters : str in { "min", "max", "emd", "avg_ind" } , callable or numpy darray, optional
+            Function computing the distances between clusters or a distance matrix or a str corresponding to the method implemented in the class or a distance matrix, by default "average"
         parameters_metric_clusters : dict, optional
-            _description_, by default {}
-        distance_points : _type_, optional
-            _description_, by default None
+            It is all the arguments which should be used with the metric_clusters when it is a function, by default {}
+        distance_points : DistanceBetweenPoints, optional
+            Object letting DistanceBetweenClusters access the distances between points. Should be None in case metric_clusters is a distance matrix, by default None
         data_preparation : str, optional
             _description_, by default "usual"
-        metric_points : _type_, optional
-            _description_, by default sp.euclidean
+        metric_points : callable or squared numpy darray, optional
+            Function or distance matrix letting the possibility to access or compute the distance between two points , by default sp.euclidean
         parameters_metric_points : dict, optional
-            _description_, by default {}
-        seed : _type_, optional
-            _description_, by default None
+            It is all the arguments which should be used with the metric_points when it is a function., by default {}
+        seed : int, optional
+            Random state for the subsampling of clusters, by default None
         """
 
         if(clusters is not None) :
@@ -73,38 +73,30 @@ class ClusterGraph:
         parameters_metric_clusters= parameters_metric_clusters ,  clusters= clusters , distance_points= distance_points , 
         data_preparation=data_preparation ,
         # Parameters connected with Distance_between_points
-        metric_points= metric_points, parameters_metric_points= parameters_metric_points ,  X=X  ).get_distance_cluster()
+        metric_points= metric_points, parameters_metric_points= parameters_metric_points,  X=X  ).get_distance_cluster()
 
         # Creation of the ClusterGraph 
         self.graph = nx.Graph()
-        # List [ [node_1,node_2, length_edge_1] , ...]
+
+        # List [ [node_1, node_2, length_edge_1] , ...]
         self.edges = []
         # List of integers which correspond to the numbered clusters
         self.vertices = []
         self.central_vertice = False
         self.farthest_vertice = False
-        self.list_diameters = []
-        self.my_graph = nx.Graph()
 
         if(sample < 1) :
             self.distance_clusters.subsample( sample, seed )
         
-
-
    
     def distances_clusters(self):
         """_summary_
         Method which compute the distances between clusters and creates ClusterGraph.
 
-        Parameters
-        ----------
-        normalize : bool, optional
-            _description_, by default True
-
         Returns
         -------
-        _type_
-            _description_
+        networkx.Graph
+            Returns a graph which corresponds to a ClusterGraph, a graph in which nodes are clusters and the edges are weigthed by the distance between two clusters.
         """
         (
             self.vertices,
@@ -112,7 +104,9 @@ class ClusterGraph:
             nb_points_by_clusters,
         ) = self.distance_clusters.compute_all_distances()
 
-        self.update_graph(nb_points_by_clusters)
+        self.graph.clear()
+        self.graph_add_nodes_attributes(nb_points_by_clusters)
+        self.graph_add_edges()
         self.ends_avg_cluster()
 
         print("Central Vertice", self.central_vertice)
@@ -121,18 +115,16 @@ class ClusterGraph:
 
         return self.graph
 
+    def graph_add_edges(self):
+        """_summary_
+        Method adding the edges and their attribute to the graph.
 
-    
-    def update_graph(self, list_node_attributes=[], nb_edges=-1):
-        self.graph.clear()
-        self.graph_add_nodes_attributes(list_node_attributes)
-        self.graph_add_edges(nb_edges=nb_edges)
-        return self.graph
-
-    
-    def graph_add_edges(self, nb_edges=-1):
-        if nb_edges < 0:
-            nb_edges = len(self.edges)
+        Returns
+        -------
+        networkx.Graph
+            Returns the ClusterGraph with nodes, edges and their attributes.
+        """
+        nb_edges = len(self.edges)
         for i in range(nb_edges):
             self.graph.add_edge(
                 self.edges[i][0], self.edges[i][1], label=self.edges[i][2]
@@ -141,6 +133,20 @@ class ClusterGraph:
 
   
     def graph_add_nodes_attributes(self, list_node_attributes):
+        """_summary_
+        Method adding nodes and their attributes to the graph.
+
+        Parameters
+        ----------
+        list_node_attributes : list, optional
+            List in which each element contains the node's number, the size of the cluster and the list of the points covered (their indices) 
+            such as [ node, size, list of points_covered ]
+
+        Returns
+        -------
+        networkx.Graph
+            Returns the ClusterGraph with nodes, edges and their attributes.
+        """
         for i in list_node_attributes:
             self.graph.add_node(i[0], size=i[1], points_covered=i[2])
 
@@ -151,11 +157,12 @@ class ClusterGraph:
     
     def ends_avg_cluster(self):
         """_summary_
+        Method computing and returning the central node and the farthest away from the others.
 
         Returns
         -------
-        _type_
-            _description_
+        int, int
+            Returns the central nodes, the farthest way in the ClusterGraph
         """
         if len(self.edges) == 0:
             print("No edges saved")
@@ -201,13 +208,13 @@ class ClusterGraph:
         From a list of prediction returns a list of clusters with each cluster being a list of indices
         Parameters
         ----------
-        prediction : _type_ list or numpy array
-            _description_ List of clusters. At each index there is a label corresponding to the cluster of the data point. 
+        prediction : list or numpy array
+            List of clusters. At each index there is a label corresponding to the cluster of the data point. 
 
         Returns
         -------
-        _type_ list
-            _description_ Returns a list of clusters. Each element of the list is also a list in which all indices of the points coverd by this cluster are stored.
+        list
+            Returns a list of clusters. Each element of the list is also a list in which all indices of the points coverd by this cluster are stored.
         """
         clusters = np.unique(prediction)
         print(clusters)
@@ -231,13 +238,13 @@ class ClusterGraph:
 
         Parameters
         ----------
-        bm : _type_ BallMapper
-            _description_
+        bm : BallMapper
+            BallMapper in which clusters are stored.
 
         Returns
         -------
-        _type_ list
-            _description_ Returns a list of clusters. Each element of the list is also a list in which all indices of the points coverd by this cluster are stored.
+        list
+            Returns a list of clusters. Each element of the list is also a list in which all indices of the points coverd by this cluster are stored.
         """
         clusters = list(bm.points_covered_by_landmarks)
         nb_clusters = len(clusters)
@@ -261,13 +268,13 @@ class ClusterGraph:
 
         Parameters
         ----------
-        graph : _type_
-            _description_
+        graph : dict
+            Dictionary obtained by the"map" method of the Mapper object
 
         Returns
         -------
-        _type_ list
-            _description_ Returns a list of clusters. Each element of the list is also a list in which all indices of the points coverd by this cluster are stored.
+        list
+            Returns a list of clusters. Each element of the list is also a list in which all indices of the points covered by this cluster are stored.
         """
         clusters = list(graph["nodes"])
         nb_clusters = len(clusters)

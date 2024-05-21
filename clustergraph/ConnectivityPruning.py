@@ -7,6 +7,16 @@ from copy import deepcopy
 class ConnectivityPruning :
 
     def __init__(self,  algo ="bf", weight = "label" ) :
+        """_summary_
+
+        Parameters
+        ----------
+        algo : str {"bf", “ps”} , optional
+            Choice of the algorithm used to prune edges in the graph. “bf” correspond to the best and also the slowest algorithm (the brut force algorithm).
+              “ps” is the quickest but does not ensure the best pruning, by default "bf"
+        weight : str, optional
+            The key underwhich the weight/size of edges is stored in the graph, by default "label"
+        """
         self.weight = weight
         if(algo == "bf") :
             self.prune = self.BF_edge_choice
@@ -49,24 +59,22 @@ class ConnectivityPruning :
         return C_V_E
     
 
-    # THE DIFFERENT PRUNING ALGORITHMS
-
     def BF_edge_choice(self, g, nb_edges = -1, score = False ) :
         """_summary_
     Method which prunes a given number of edges by using the Brute Force algorithm based on the connectivity.
     Parameters
     ----------
-    g : _type_ networkx graph
-        _description_ Graph for which the edges are pruned.
-    nb_edges : _type_ int
-        _description_ Number of edges to be pruned
-    score : _type_ bool
-        _description_ If True, the method also returns the evolution of the connectivity.
+    g : networkx.Graph
+        Graph for which the edges are pruned.
+    nb_edges : int
+        Number of edges to be pruned
+    score : bool
+        If True, the method also returns the evolution of the connectivity.
 
     Returns
     -------
-    _type_ networkx graph , list
-        _description_ Returns pruned graph and if the parameter score is True, returns also a list of float which corresponds to the evolution of the connectivity kept after each pruned edge compared to the original graph.
+    networkx.Graph , list
+        Returns the pruned graph and if the parameter score is True, returns also a list of float which corresponds to the evolution of the connectivity kept after each pruned edge compared to the original graph.
 """
         graph =  g.copy()
         f = list( graph.edges )
@@ -135,20 +143,20 @@ class ConnectivityPruning :
     # Each round, the less useful edge (for the two nodes it directly connects) is deleted (we don't measure the impact of that on the whole graph)          
     def PS_edge_choice(self, g, nb_edges,  score = False) :
         """_summary_
-        Method which prunes a given number of edges by using the PS algorithm based ...
+        Method which prunes a given number of edges by using the Path Simplification algorithm. 
         Parameters
         ----------
-        g : _type_ networkx graph
-            _description_ Graph for which the edges are pruned.
-        nb_edges : _type_ int
-            _description_ Number of edges to be pruned
-        score : _type_ bool
-            _description_ If True, the method also returns the evolution of the evaluation criteria.
+        g : networkx.Graph
+            Graph for which the edges are pruned.
+        nb_edges : int
+            Number of edges to be pruned
+        score : bool
+            If True, the method also returns the evolution of the evaluation criteria.
 
         Returns
         -------
-        _type_ networkx graph , list
-            _description_ Returns pruned graph and if the parameter score is True, 
+        networkx.Graph , list
+            Returns pruned graph and if the parameter score is True, 
             returns also a list of float which corresponds to the evolution of the evaluation criteria.
         """
 

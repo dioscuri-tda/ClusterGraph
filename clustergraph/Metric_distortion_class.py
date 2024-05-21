@@ -10,6 +10,7 @@ import random
 
 class Metric_distortion:
 
+<<<<<<< Updated upstream
     def __init__(
         self,
         graph,
@@ -23,10 +24,19 @@ class Metric_distortion:
         dist_weight=True,
         algo="bf",
     ):
+=======
+
+
+
+class Metric_distortion :
+    
+    def __init__(self, graph, knn_g, X, weight_knn_g = 'label', k_compo = 2,  dist_weight = True, algo="bf" ) :
+>>>>>>> Stashed changes
         """_summary_
 
         Parameters
         ----------
+<<<<<<< Updated upstream
         cg : _type_ networkx.Graph
             _description_ graph which will be pruned
         knn_g : _type_
@@ -43,15 +53,40 @@ class Metric_distortion:
             _description_ number of edges which will be added in order to merge disconnected components
         cg : _type_
         _description_
+=======
+        graph : networkx.Graph
+            Graph to prune.
+        knn_g : networkx.Graph
+            The k-nearest neighbors graph from which the intrinsic distance between points of the dataset is retrieved.
+            The dataset should be the same than the one on which the “graph” was computed.
+        X : numpy darray
+            Dataset from which the k-nearest neighbors graph and the graph were computed.
+        weight_knn_g : str, optional
+            Key/label underwhich the weight of edges is store in the “graph”. The weight corresponds to the distance between two nodes, by default 'label'
+        k_compo : int, optional
+            Number of edges that will be added to each disconnected component to merge them after the metric distortion pruning process. 
+            The edges added are edges which are connecting disconnected components and the shortest are picked, by default 2
+        dist_weight : bool, optional
+            If “dist_weight” is set to True, the distortion will be computed with weight on edges and it will not be the case if it is set to False, by default True
+        algo : str in {"bf", "ps"}, optional
+            Choice of the algorithm used to prune edges in the graph. “bf” correspond to the best algorithm and also the slowest (the brut force algorithm). It prunes at each iteration the edge which is responsible for the most important decrease of metric distortion. 
+            “ps” is the quickest but does not ensure the best pruning, it prunes at each iteration the edge which has the highest metric distortion, by default "bf"
+>>>>>>> Stashed changes
         """
         self.graph = graph
         self.knn_g = knn_g  # the k nearest neighbors graph
         self.X = X
         self.weight_knn_g = weight_knn_g  # the weight/label used in knn_g
         self.label_points_covered_intr = "points_covered"
-        self.new_knn = False
         self.nb_points_disco = 0
+<<<<<<< Updated upstream
         self.nb_points_should_be_evaluated = 0
+=======
+        self.nb_points_should_be_evaluated =0
+        self.k_nn_compo = k_compo 
+        self.dijkstra_length_dict = dict(nx.all_pairs_dijkstra_path_length( self.knn_g  , weight = weight_knn_g   ))
+        
+>>>>>>> Stashed changes
 
         if algo == "bf":
             self.prune = self.prune_edges_BF
@@ -68,6 +103,11 @@ class Metric_distortion:
             nx.all_pairs_dijkstra_path_length(self.knn_g, weight=weight_knn_g)
         )
 
+<<<<<<< Updated upstream
+=======
+
+        
+>>>>>>> Stashed changes
         # CREATION OF THE INTRINSIC CLUSTERGRAPH
         self.intri_cg = graph.copy()
         nodes = list(self.intri_cg.nodes())
@@ -117,15 +157,15 @@ class Metric_distortion:
         This method computes the average intrinsic distance between two clusters. It ignores the disconnected points.
         Parameters
         ----------
-        c1 : _type_ list of integers
-            _description_ It is a cluster represented as a list of indices. Each index corresponds to the index inside the dataset of the point.
-        c2 : _type_ list of integers
-            _description_ It is a cluster represented as a list of indices. Each index corresponds to the index inside the dataset of the point.
+        c1 : list of integers
+            It is a cluster represented as a list of indices. Each index corresponds to the index inside the dataset of the point.
+        c2 : list of integers
+            It is a cluster represented as a list of indices. Each index corresponds to the index inside the dataset of the point.
 
         Returns
         -------
-        _type_ float
-            _description_ Returns the intrinsic distance between the two given clusters.
+        float
+            Returns the intrinsic distance between the two given clusters.
         """
         l_c1 = len(c1)
         l_c2 = len(c2)
@@ -147,15 +187,20 @@ class Metric_distortion:
         Method which computes the intrinsic distance between two data points (the shortest path between them), represented by their indices.
         Parameters
         ----------
-        i : _type_ int
-            _description_ Index of the first data point.
-        j : _type_
-            _description_ Index of the second data point.
+        i : int
+            Index of the first data point.
+        j : int
+            Index of the second data point.
 
         Returns
         -------
+<<<<<<< Updated upstream
         _type_ float
             _description_ Returns the value of the shortest path (or intrinsic distance) between the two data points.
+=======
+        float
+            Returns the value of the shortest path (or intrinsic distance) between the two data points. 
+>>>>>>> Stashed changes
             The value is -1, in case the two points do not belong to the same connected component.
         """
         try:
@@ -170,15 +215,22 @@ class Metric_distortion:
 
         Parameters
         ----------
+<<<<<<< Updated upstream
         graph : _type_ networkx Graph
             _description_ The graph for which the distortion is computed.
         intrinsic_graph : _type_ networkx Graph
             _description_ The graph in which the edges' labels are the intrinsic distance between clusters.
+=======
+        graph : networkx.Graph
+            The graph for which the distortion is computed.
+        intrinsic_graph : networkx.Graph
+            The graph in which the edges' labels are the intrinsic distance between clusters. 
+>>>>>>> Stashed changes
 
         Returns
         -------
-        _type_ float
-            _description_ Returns the distortion. The value is 0 in case, no edge could be evaluated.
+        float
+            Returns the distortion. The value is 0 in case, no edge could be evaluated.
         """
         connected_components = [
             graph.subgraph(c).copy() for c in nx.connected_components(graph)
@@ -222,15 +274,22 @@ class Metric_distortion:
 
         Parameters
         ----------
+<<<<<<< Updated upstream
         graph : _type_ networkx Graph
             _description_ The graph for which the distortion is computed.
         intrinsic_graph : _type_ networkx Graph
             _description_ The graph in which the edges' labels are the intrinsic distance between clusters.
+=======
+        graph : networkx.Graph
+            The graph for which the distortion is computed.
+        intrinsic_graph : networkx.Graph
+            The graph in which the edges' labels are the intrinsic distance between clusters. 
+>>>>>>> Stashed changes
 
         Returns
         -------
-        _type_ float
-            _description_ Returns the distortion. The value is 0 in case, no edge could be evaluated.
+        float
+            Returns the distortion. The value is 0 in case, no edge could be evaluated.
         """
         connected_components = [
             graph.subgraph(c).copy() for c in nx.connected_components(graph)
@@ -279,13 +338,13 @@ class Metric_distortion:
 
         Parameters
         ----------
-        cluster : _type_ List of int
-            _description_ Correspond to a cluster represented as a list of indices which are the indices of the points covered by this cluster.
+        cluster : List of int
+            Corresponds to a cluster represented as a list of indices which are the indices of the points covered by this cluster.
 
         Returns
         -------
-        _type_ int, int
-            _description_ Returns the index of dominating connected component in the k-nearest neighbors graph and the number of points which belong to this component.
+        int, int
+            Returns the index of dominating connected component in the k-nearest neighbors graph and the number of points which belong to this component.
               If most points in the cluster belong to the second connected components, the method returns 1 and the numbr of points which are in the second component.
         """
         connected_components = [
@@ -309,9 +368,15 @@ class Metric_distortion:
 
         Returns
         -------
+<<<<<<< Updated upstream
         _type_ dict
             _description_ Returns a dictionnary with the indices of the connected components in the k-nearest neighbors graph as keys and a list of the nodes (clusters) which belong to each component as value.
 
+=======
+        dict
+            Returns a dictionnary with the indices of the connected components in the k-nearest neighbors graph as keys and a list of the nodes (clusters) which belong to each component as value. 
+            
+>>>>>>> Stashed changes
         """
         nb_compo = nx.number_connected_components(self.knn_g)
         compo_clusters = {}
@@ -333,13 +398,13 @@ class Metric_distortion:
 
         Parameters
         ----------
-        graph : _type_ networkx Graph
-            _description_ The graph for which, the edges connecting two disconnected components should be removed.
+        graph : networkx.Graph
+            The graph for which, the edges connecting two disconnected components should be removed.
 
         Returns
         -------
-        _type_ list, networkx Graph
-            _description_ Returns a list of edges for which each value is as followed [ node_i, node_j, data ]. With "data" being the dictionary of all labels attached to a given edge.
+        list, networkx.Graph
+            Returns a list of edges for which each value is as followed [ node_i, node_j, data ]. With "data" being the dictionary of all labels attached to a given edge.
         """
         compo_clusters = self.associate_clusters_compo()
         keys = list(compo_clusters)
@@ -358,8 +423,31 @@ class Metric_distortion:
 
         return edges_in_between, graph
 
+<<<<<<< Updated upstream
     # FUNCTION WHICH RETURN THE GRAPH PRUNED WITH CHANGING THE CONNECTIVITY
     def prune_edges_BF(self, graph, nb_edges_pruned=-1, md_plot=True):
+=======
+    
+    # FUNCTION WHICH RETURN THE GRAPH PRUNED WITH CHANGING THE CONNECTIVITY 
+    def prune_edges_BF(self, graph,  nb_edges_pruned = -1 ,  md_plot = True ) :
+        """_summary_
+        Method which prunes the given number of edges iteratively by picking the edge lowing down the most the metric distortion at each iteration. 
+        This algorithm stops when the number of edges pruned is reached or when the lowest metric distortion is reached.
+        Parameters
+        ----------
+        graph : networkx.Graph
+            Graph to prune.
+        nb_edges_pruned : int, optional
+            Maximum number of edges to prune. If it is negative, the algorithm will prune as many edges as possible, by default -1
+        md_plot : bool, optional
+            If "md_plot" is set to True, the method will store and return a list with the metric distortion at each iteration, by default True
+
+        Returns
+        -------
+        networkx.Graph or networkx.Graph, list
+            The pruned graph and if "md_plot" is set to true, the evolution of the distortion at each iteration (at each edge pruned).
+        """
+>>>>>>> Stashed changes
         temp_graph = deepcopy(graph)
         edges_between_compos, temp_graph = self.remove_edges(temp_graph)
         self.edges_between_compo = edges_between_compos
@@ -411,10 +499,35 @@ class Metric_distortion:
 
         else:
             return temp_graph
+<<<<<<< Updated upstream
 
     def prune_edges_PS(self, g, md_plot=True, nb_edges_pruned=None):
         graph = deepcopy(g)
         edges_between_compos, temp_graph = self.remove_edges(graph)
+=======
+        
+    
+    def prune_edges_PS(self, g,  nb_edges_pruned = None, md_plot = True ) :
+        """_summary_
+        Method which prunes the given number of edges iteratively by picking the edge with the highest metric distortion at each iteration. 
+
+        Parameters
+        ----------
+        g : networkx.Graph
+            Graph to prune.
+        nb_edges_pruned : int, optional
+            Maximum number of edges to prune. If it is negative, the algorithm will prune as many edges as possible, by default -1
+        md_plot : bool, optional
+            If "md_plot" is set to True, the method will store and return a list with the metric distortion at each iteration, by default True
+
+        Returns
+        -------
+        networkx.Graph or networkx.Graph, list
+            The pruned graph and if "md_plot" is set to true, the evolution of the distortion at each iteration (at each edge pruned).
+        """
+        graph = deepcopy( g)
+        edges_between_compos, temp_graph = self.remove_edges( graph)
+>>>>>>> Stashed changes
         self.edges_between_compo = edges_between_compos
         nb_cc = nx.number_connected_components(graph)
         f = list(graph.edges)
@@ -466,9 +579,32 @@ class Metric_distortion:
             return graph, self.temp_list_md
         return graph
 
+<<<<<<< Updated upstream
     def greedy_pruning(self, alpha=0.5, nb_edges=-1, weight="distortion"):
         graph = deepcopy(self.graph)
         edges_between_compos, graph = self.remove_edges(graph)
+=======
+    def greedy_pruning(self, alpha = 0.5, nb_edges = -1, weight = "distortion") :
+        """_summary_
+        Method which prunes the given number of edges  with a distortion lower than the threshold “alpha” .  The edges with the highest distortion are picked. This method is not iterative.
+
+        Parameters
+        ----------
+        alpha : float, optional
+            Thresold such as edges with a distortion smaller than alpha will be pruned, by default 0.5
+        nb_edges : int, optional
+            Number of edges to prune. If it is negative, the algorithm will prune as many edges as possible, by default -1
+        weight : str, optional
+            Label underwhich the distortion is stored in the graph, by default "distortion"
+
+        Returns
+        -------
+        networkx.Graph
+            The pruned graph.
+        """
+        graph =  deepcopy(self.graph)
+        edges_between_compos, graph = self.remove_edges( graph )
+>>>>>>> Stashed changes
         self.edges_between_compo = edges_between_compos
         graph = self.set_distortion_edges(graph, weight=weight)
         nodes = list(graph.nodes)
@@ -504,24 +640,35 @@ class Metric_distortion:
 
         Parameters
         ----------
-        graph : _type_ networkx Graph
-            _description_
+        graph : networkx.Graph
+            Graph for which we want to set the distortion on each edge.
         weight : str, optional
-            _description_ Label underwhich the distortion will be stored in the graph for each edge. , by default 'distortion'
+            Label underwhich the distortion will be stored in the graph for each edge. , by default 'distortion'
 
         Returns
         -------
-        _type_ networkx Graph
-            _description_ Returns the graph for which the distortion has been added to each edge as a new label.
+        networkx.Graph
+            Returns the graph for which the distortion has been added to each edge as a new label.
         """
         for e in graph.edges:
             graph.edges[e][weight] = abs(
                 np.log10(graph.edges[e]["label"] / self.intri_cg.edges[e]["intr_dist"])
             )
 
+<<<<<<< Updated upstream
         return graph
 
     def plt_md_prune_computed(self, save=None):
+=======
+    def plt_md_prune_computed(self, save = None) :
+        """_summary_
+        Method which plots the evolution of the metric distortion depending on the number of edges pruned once the metric distortion pruning is done.
+        Parameters
+        ----------
+        save : str, optional
+            If there is a value, the plot will be saved as pdf with the given string as name, by default None
+        """
+>>>>>>> Stashed changes
         indices = list(range(len(self.temp_list_md)))
         plt.plot(indices, self.temp_list_md, marker="o")
         plt.xlabel("Number of edges pruned")
@@ -540,13 +687,18 @@ class Metric_distortion:
 
         Parameters
         ----------
-        pruned_graph : _type_ networkx Graph
-            _description_ The graph for which the distance matrix between nodes is computed.
+        pruned_graph : networkx.Graph
+            The graph for which the distance matrix between nodes is computed.
 
         Returns
         -------
+<<<<<<< Updated upstream
         _type_ numpy darray
             _description_ Returns the distance matrix between all nodes. If the nodes belong to the same connected component, the value is set to the maximum distance in the graph.
+=======
+        numpy darray
+            Returns the distance matrix between all nodes. If the nodes belong to the same connected component, the value is set to the maximum distance in the graph. 
+>>>>>>> Stashed changes
         """
         nodes = list(self.graph.nodes)
         nodes.sort()
@@ -586,15 +738,15 @@ class Metric_distortion:
 
         Parameters
         ----------
-        distance_matrix : _type_ numpy darray
+        distance_matrix : numpy darray
             _description_ Distance matrix
-        k : _type_ int
-            _description_ Number of neighbors in the k-nearest neighbors graph.
+        k : int
+            Number of neighbors in the k-nearest neighbors graph.
 
         Returns
         -------
-        _type_ networkx Graph
-            _description_ Returns the k-nearest neighbors graph corresponding to the given distance matrix.
+        networkx.Graph
+            Returns the k-nearest neighbors graph corresponding to the given distance matrix.
         """
 
         num_nodes = distance_matrix.shape[0]
@@ -615,6 +767,7 @@ class Metric_distortion:
 
     def connectivity_graph(self, graph):
         """_summary_
+<<<<<<< Updated upstream
         Method which returns the global connectivity of a given graph.
         Parameters
         ----------
@@ -624,6 +777,17 @@ class Metric_distortion:
         -------
         _type_ float
             _description_ Returns the global connectivity of the graph.
+=======
+            Method which returns the global connectivity of a given graph.
+            Parameters
+            ----------
+            graph : networkx.Graph
+                Graph for which the global connectivity is computed.
+            Returns
+            -------
+            float
+                Returns the global connectivity of the graph.
+>>>>>>> Stashed changes
         """
         nodes = list(graph.nodes)
         short_paths = dict(nx.all_pairs_dijkstra_path_length(graph, weight="label"))
@@ -646,7 +810,18 @@ class Metric_distortion:
 
         return C_V_E
 
+<<<<<<< Updated upstream
     def plt_conn_prune_computed(self):
+=======
+
+    
+            
+              
+    def plt_conn_prune_computed(self) :
+        """_summary_
+        Method which plots the evolution of the connectivity depending on the number of edges pruned once the connectivity pruning is done.
+        """
+>>>>>>> Stashed changes
         indices = list(range(len(self.list_rk)))
         # Tracer le graphique
         plt.plot(
@@ -665,13 +840,18 @@ class Metric_distortion:
 
         Parameters
         ----------
-        pruned_gg : _type_ networkx Graph
-            _description_ Disconnected Graph which will be merged.
+        pruned_gg : networkx.Graph
+            _Disconnected Graph which will be merged.
 
         Returns
         -------
+<<<<<<< Updated upstream
         _type_ networkx Graph
             _description_ Returns the given graph for which nodes in between components have been added.
+=======
+        networkx.Graph
+            Returns the given graph for which nodes in between components have been added. 
+>>>>>>> Stashed changes
         """
         min_node = min(list(self.graph.nodes))
         dist_mat = self.get_distance_matrix_ccompo(pruned_gg)
@@ -693,23 +873,28 @@ class Metric_distortion:
 
         Parameters
         ----------
-        pruned_gg : _type_ networkx Graph
+        pruned_gg : networkx.Graph
             _description_
-        nb_edges_pruned : _type_ int, optional
-            _description_ The maximum number of edges which should be pruned. If the value is None, all possible edges will be pruned. , by default None
+        nb_edges_pruned : int, optional
+            The maximum number of edges which should be pruned. If the value is None, all possible edges will be pruned, by default None
 
         Returns
         -------
-        _type_ networkx Graph
-            _description_ Returns the merged and pruned graph.
+        networkx.Graph
+            Returns the merged and pruned graph.
         """
         pruned_gg = self.merge_components(pruned_gg)
         if nb_edges_pruned is None:
             nb_edges_pruned = len(list(pruned_gg.edges))
 
+<<<<<<< Updated upstream
         best_g = None
         graph = deepcopy(pruned_gg)
         f = list(graph.edges)
+=======
+        graph =  deepcopy(pruned_gg)
+        f = list( graph.edges )
+>>>>>>> Stashed changes
         M = []
         based_rk = self.connectivity_graph(graph)
         self.list_rk = [1]
