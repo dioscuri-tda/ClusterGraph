@@ -6,7 +6,7 @@ from copy import deepcopy
 
 class GraphPreprocess :
     
-    def __init__(self, graph,  nodeStrat= None,  edgeStrat = None, renderer = None  ) :
+    def __init__(self, graph,  nodeStrat=None,  edgeStrat=None, renderer=None  ) :
         """_summary_
 
         Parameters
@@ -20,20 +20,30 @@ class GraphPreprocess :
         renderer : _type_ dict or function, optional
             _description_ A dictionary or a function returning a dictionary with nodes as keys and their position in the plot as values, by default None
         """
-        self.graph = deepcopy( graph )
-        self.node_strategy =  nodeStrat
-        self.edge_strategy = edgeStrat 
-        self.renderer = renderer
+        self.graph=deepcopy(graph)
+        self.node_strategy=nodeStrat
+        self.edge_strategy=edgeStrat 
+        self.renderer=renderer
          
-    def fit_graph(self) : 
+    def fit_graph(self): 
         """_summary_
         Method which launch the fit_nodes() and fit_edges() methods with default parameters.
         """
         self.fit_nodes()
         self.fit_edges() 
 
-    def fit_nodes(self, size_strategy = "log", type_coloring = "label", palette = None , color_labels = None, 
-                 X = None, variable = None,  choiceLabel = "max" , coloring_strategy_var = 'lin' , MIN_SIZE_NODE = 0.1    ) :
+    def fit_nodes(
+            self, 
+            size_strategy="log",
+            type_coloring="label", 
+            palette=None , 
+            color_labels=None, 
+            X=None, 
+            variable=None,  
+            choiceLabel="max" , 
+            coloring_strategy_var='lin' , 
+            MIN_SIZE_NODE=0.1    
+        ):
         """_summary_
 
         Parameters
@@ -65,9 +75,10 @@ class GraphPreprocess :
         MIN_SIZE_NODE : float, optional
             The minimum size of nodes in the plot, by default 0.1
         """
-        if( self.node_strategy is None  ) :
-            self.node_strategy = NodeStrategy( self.graph,
-                                              size_strategy=size_strategy,
+        if self.node_strategy is None:
+            self.node_strategy=NodeStrategy( 
+                self.graph,
+                size_strategy=size_strategy,
                 type_coloring=type_coloring,
                 palette=palette,
                 color_labels=color_labels,
@@ -75,13 +86,22 @@ class GraphPreprocess :
                 variable=variable,
                 choiceLabel=choiceLabel,
                 coloring_strategy_var=coloring_strategy_var , 
-                MIN_SIZE_NODE =MIN_SIZE_NODE  )  
+                MIN_SIZE_NODE =MIN_SIZE_NODE  
+            )  
               
         self.node_strategy.fit_nodes()
 
 
-    def fit_edges(self, palette = None, weight = "label", variable = None, norm_weight = "lin" ,
-                 type_coloring = "label" , color_labels = None, coloring_strategy_var = 'lin'   ) :
+    def fit_edges(
+            self, 
+            palette=None, 
+            weight="label", 
+            variable=None, 
+            norm_weight="lin",
+            type_coloring="label", 
+            color_labels=None, 
+            coloring_strategy_var='lin'  
+    ):
         """_summary_
 
         Parameters
@@ -106,11 +126,15 @@ class GraphPreprocess :
             Parameter letting the choice of how fast the color will change depending on the “variable” 's value., by default 'lin'
         """
         
-        if( self.edge_strategy is None  ) :
-            self.edge_strategy = EdgeStrategy( self.graph , 
-                                              palette = palette, weight =  weight , variable = variable, norm_weight = norm_weight ,
-                 type_coloring = type_coloring , color_labels = color_labels , coloring_strategy_var = coloring_strategy_var  )
+        if self.edge_strategy is None:
+            self.edge_strategy=EdgeStrategy( 
+                self.graph, 
+                palette=palette, 
+                weight=weight, 
+                variable=variable, 
+                norm_weight=norm_weight,
+                type_coloring=type_coloring, 
+                color_labels=color_labels, 
+                coloring_strategy_var=coloring_strategy_var  
+            )
         self.edge_strategy.fit_edges()
-        
-        
-       

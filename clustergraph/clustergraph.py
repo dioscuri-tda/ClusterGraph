@@ -1,9 +1,8 @@
 import scipy.spatial.distance as sp
 import numpy as np
 import networkx as nx
-from .utils import get_corresponding_edges
 import matplotlib.pyplot as plt
-from .distances import CreationDistances
+from . import distances
 from pyballmapper import BallMapper
 
 
@@ -69,7 +68,7 @@ class ClusterGraph:
 
 
         # Get a DistancesBetweenClusters object
-        self.distance_clusters = CreationDistances(  metric_clusters= metric_clusters,
+        self.distance_clusters = distances.CreationDistances(  metric_clusters= metric_clusters,
         parameters_metric_clusters= parameters_metric_clusters ,  clusters= clusters , distance_points= distance_points , 
         data_preparation=data_preparation ,
         # Parameters connected with Distance_between_points
