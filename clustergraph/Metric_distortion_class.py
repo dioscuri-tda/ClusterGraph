@@ -603,7 +603,6 @@ class Metric_distortion:
         nodes.sort()
         min_n = nodes[0]
         nb_nodes = len(nodes)
-        print("NB ", nb_nodes)
         dist_mat = np.array([0] * (nb_nodes**2)).reshape(nb_nodes, nb_nodes)
 
         edge_max = -1
