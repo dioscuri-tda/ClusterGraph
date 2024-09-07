@@ -12,8 +12,7 @@ def plot_pie( graph, nb_edges=None, variable="weight_plot", size_nodes = 0.01, r
         G.clear_edges()
         G.add_edges_from(edges)
         
-    edge_colors = [data['color'] for _, _, data in G.edges(data=True)]
-        
+    edge_colors = [data['color'] for _, _, data in G.edges(data=True)] 
     pos = nx.spring_layout( G, seed = random_state )
     nx.draw_networkx_edges(G, pos=pos, edge_color = edge_colors)
 
