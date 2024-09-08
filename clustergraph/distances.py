@@ -23,19 +23,19 @@ def EMD_for_two_clusters(X_1, X_2, distance_points, normalize=True):
 
     Parameters
     ----------
-    X_1 : _type_ numpy darray
-        _description_ Dataset restricted to the indices of the first cluster
-    X_2 : _type_ numpy darray
-        _description_ Dataset restricted to the indices of the second cluster
-    distance_points : _type_, optional
-        _description_, by default None
-    normalize : _type_ bool, optional
-    _description_ If True the distance will be normalized by the number of distances computed, by default True
+    X_1 :  numpy darray
+         Dataset restricted to the indices of the first cluster
+    X_2 :  numpy darray
+         Dataset restricted to the indices of the second cluster
+    distance_points : , optional
+        , by default None
+    normalize :  bool, optional
+     If True the distance will be normalized by the number of distances computed, by default True
 
     Returns
     -------
-    _type_ float
-        _description_ returns the Eart Moving distance between X_1 and X_2
+     float
+         returns the Eart Moving distance between X_1 and X_2
     """
 
     EMD = ot.da.EMDTransport()

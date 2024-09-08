@@ -10,12 +10,12 @@ def get_clusters_from_scikit(prediction):
     From a list of prediction returns a list of clusters with each cluster being a list of indices
     Parameters
     ----------
-    prediction : _type_ list or numpy array
-        _description_ Cluster labels. At each index there is a label corresponding to the cluster of the data point.
+    prediction :  list or numpy array
+         Cluster labels. At each index there is a label corresponding to the cluster of the data point.
     Returns
     -------
-    _type_ list
-        _description_ Returns a list of clusters. Each element of the list is numpy array in which all indices of the points coverd by this cluster are stored.
+     list
+         Returns a list of clusters. Each element of the list is numpy array in which all indices of the points coverd by this cluster are stored.
     """
 
     return [np.where(prediction == clustNum)[0] for clustNum in np.unique(prediction)]
@@ -26,12 +26,12 @@ def get_clusters_from_BM(bm):
     From a BallMapper object returns a list of clusters with each cluster being a list of indices corresponding to the points covered
     Parameters
     ----------
-    bm : _type_ BallMapper
-        _description_
+    bm :  BallMapper
+        
     Returns
     -------
-    _type_ list
-        _description_ Returns a list of clusters. Each element of the list is also a list in which all indices of the points coverd by this cluster are stored.
+     list
+         Returns a list of clusters. Each element of the list is also a list in which all indices of the points coverd by this cluster are stored.
     """
     clusters = list(bm.points_covered_by_landmarks)
     nb_clusters = len(clusters)
@@ -53,12 +53,12 @@ def get_clusters_from_Mapper(graph):
     From a Mapper object returns a list of clusters with each cluster being a list of indices corresponding to the points covered
     Parameters
     ----------
-    graph : _type_
-        _description_
+    graph : 
+        
     Returns
     -------
-    _type_ list
-        _description_ Returns a list of clusters. Each element of the list is also a list in which all indices of the points coverd by this cluster are stored.
+     list
+         Returns a list of clusters. Each element of the list is also a list in which all indices of the points coverd by this cluster are stored.
     """
     clusters = list(graph["nodes"])
     nb_clusters = len(clusters)
@@ -142,18 +142,18 @@ def get_values(list_key_value):
 
     Parameters
     ----------
-    list_key_value : _type_
-        _description_
+    list_key_value : 
+        
 
     Returns
     -------
-    _type_
-        _description_
+    
+        
 
     Raises
     ------
     ValueError
-        _description_
+        
     """
     if list_key_value == []:
         raise ValueError("List is empty")
@@ -171,15 +171,15 @@ def get_sorted_edges(graph, variable_length="label"):
 
     Parameters
     ----------
-    graph : _type_
-        _description_
+    graph : 
+        
     variable_length : str, optional
-        _description_, by default "label"
+        , by default "label"
 
     Returns
     -------
-    _type_
-        _description_
+    
+        
     """
     edges = []
     for edge in graph.edges:
@@ -196,15 +196,15 @@ def get_corresponding_edges(vertices, edges):
 
     Parameters
     ----------
-    vertices : _type_
-        _description_
-    edges : _type_
-        _description_
+    vertices : 
+        
+    edges : 
+        
 
     Returns
     -------
-    _type_
-        _description_
+    
+        
     """
     corres_edges = []
     for edge in edges:
@@ -220,17 +220,17 @@ def max_size_node_graph(graph, variable, nodes=None):
 
     Parameters
     ----------
-    graph : _type_
-        _description_
-    variable : _type_
-        _description_
-    nodes : _type_, optional
-        _description_, by default None
+    graph : 
+        
+    variable : 
+        
+    nodes : , optional
+        , by default None
 
     Returns
     -------
-    _type_
-        _description_
+    
+        
     """
     if not (nodes):
         nodes = graph.nodes

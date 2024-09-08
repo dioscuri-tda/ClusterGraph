@@ -637,7 +637,7 @@ class Metric_distortion:
         Parameters
         ----------
         distance_matrix : numpy darray
-            _description_ Distance matrix
+             Distance matrix
         k : int
             Number of neighbors in the k-nearest neighbors graph.
 
@@ -751,7 +751,7 @@ class Metric_distortion:
         Parameters
         ----------
         pruned_gg : networkx.Graph
-            _description_
+            
         nb_edges_pruned : int, optional
             The maximum number of edges which should be pruned. If the value is None, all possible edges will be pruned, by default None
 

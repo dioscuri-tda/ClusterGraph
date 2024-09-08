@@ -43,11 +43,11 @@ class EdgeStrategy :
         Raises
         ------
         ValueError
-            _description_
+            
         ValueError
-            _description_
+            
         ValueError
-            _description_
+            
         """
         self.myPalette = palette
         self.graph = graph

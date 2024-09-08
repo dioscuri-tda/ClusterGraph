@@ -11,14 +11,14 @@ class GraphPreprocess :
 
         Parameters
         ----------
-        graph : _type_ networkx.Graph
-            _description_ Graph to preprocess. This class will set colors and sizes to edges and nodes of this graph.
-        nodeStrat : _type_ NodeStrategy , optional
-            _description_ The preprocessing configuration of edges can be given if it was created outside this class, by default None
-        edgeStrat : _type_ EdgeStrategy , optional
-            _description_ The preprocessing configuration of edges can be given if it was created outside this class, by default None
-        renderer : _type_ dict or function, optional
-            _description_ A dictionary or a function returning a dictionary with nodes as keys and their position in the plot as values, by default None
+        graph :  networkx.Graph
+             Graph to preprocess. This class will set colors and sizes to edges and nodes of this graph.
+        nodeStrat :  NodeStrategy , optional
+             The preprocessing configuration of edges can be given if it was created outside this class, by default None
+        edgeStrat :  EdgeStrategy , optional
+             The preprocessing configuration of edges can be given if it was created outside this class, by default None
+        renderer :  dict or function, optional
+             A dictionary or a function returning a dictionary with nodes as keys and their position in the plot as values, by default None
         """
         self.graph=deepcopy(graph)
         self.node_strategy=nodeStrat
@@ -119,7 +119,7 @@ class GraphPreprocess :
         type_coloring : str, optional
             If “type_coloring” is set to “label”,  each edge should have one label and “color_labels” should not be equal to None. If “type_coloring” is set to “variable”,  
             the coloring will be continuous and the color will increase as the value increase. The “variable” should not be None , by default "label"
-        color_labels : _type_, optional
+        color_labels : list or dict, optional
             Parameter with labels of each edge. If it is a list, the first index correspond to the first edge. If it is a dictionary, the keys should be edges.
             The values should be labels, the exact colors can be chosen with hexadecimal labels, by default None
         coloring_strategy_var : str, optional

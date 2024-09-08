@@ -30,12 +30,12 @@ class ConnectivityPruning :
     Method which returns the global connectivity of a given graph.
     Parameters
     ----------
-    graph : _type_ networkx graph
-        _description_ Graph for which the global connectivity is computed.
+    graph :  networkx graph
+         Graph for which the global connectivity is computed.
     Returns
     -------
-    _type_ float
-        _description_ Returns the global connectivity of the graph.
+     float
+         Returns the global connectivity of the graph.
 """
         nodes = list(graph.nodes)
         short_paths= dict(nx.all_pairs_dijkstra_path_length(graph, weight= self.weight ) )
