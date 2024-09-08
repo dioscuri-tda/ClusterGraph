@@ -1,0 +1,246 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>clustergraph.c_GraphPreprocess &#8212; ClusterGraph 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for clustergraph.c_GraphPreprocess</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">matplotlib.colors</span> <span class="kn">import</span> <span class="n">to_hex</span>
+<span class="kn">from</span> <span class="nn">.NodeStrategy</span> <span class="kn">import</span> <span class="n">NodeStrategy</span>
+<span class="kn">from</span> <span class="nn">.EdgeStrategy</span> <span class="kn">import</span> <span class="n">EdgeStrategy</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+
+
+<div class="viewcode-block" id="GraphPreprocess"><a class="viewcode-back" href="../../modules.html#clustergraph.c_GraphPreprocess.GraphPreprocess">[docs]</a><span class="k">class</span> <span class="nc">GraphPreprocess</span> <span class="p">:</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span>  <span class="n">nodeStrat</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="n">edgeStrat</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">renderer</span><span class="o">=</span><span class="kc">None</span>  <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;_summary_</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        graph : _type_ networkx.Graph</span>
+<span class="sd">            _description_ Graph to preprocess. This class will set colors and sizes to edges and nodes of this graph.</span>
+<span class="sd">        nodeStrat : _type_ NodeStrategy , optional</span>
+<span class="sd">            _description_ The preprocessing configuration of edges can be given if it was created outside this class, by default None</span>
+<span class="sd">        edgeStrat : _type_ EdgeStrategy , optional</span>
+<span class="sd">            _description_ The preprocessing configuration of edges can be given if it was created outside this class, by default None</span>
+<span class="sd">        renderer : _type_ dict or function, optional</span>
+<span class="sd">            _description_ A dictionary or a function returning a dictionary with nodes as keys and their position in the plot as values, by default None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">=</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node_strategy</span><span class="o">=</span><span class="n">nodeStrat</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edge_strategy</span><span class="o">=</span><span class="n">edgeStrat</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">renderer</span><span class="o">=</span><span class="n">renderer</span>
+         
+<div class="viewcode-block" id="GraphPreprocess.fit_graph"><a class="viewcode-back" href="../../modules.html#clustergraph.c_GraphPreprocess.GraphPreprocess.fit_graph">[docs]</a>    <span class="k">def</span> <span class="nf">fit_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;_summary_</span>
+<span class="sd">        Method which launch the fit_nodes() and fit_edges() methods with default parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit_nodes</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit_edges</span><span class="p">()</span> </div>
+
+<div class="viewcode-block" id="GraphPreprocess.fit_nodes"><a class="viewcode-back" href="../../modules.html#clustergraph.c_GraphPreprocess.GraphPreprocess.fit_nodes">[docs]</a>    <span class="k">def</span> <span class="nf">fit_nodes</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> 
+            <span class="n">size_strategy</span><span class="o">=</span><span class="s2">&quot;log&quot;</span><span class="p">,</span>
+            <span class="n">type_coloring</span><span class="o">=</span><span class="s2">&quot;label&quot;</span><span class="p">,</span> 
+            <span class="n">palette</span><span class="o">=</span><span class="kc">None</span> <span class="p">,</span> 
+            <span class="n">color_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+            <span class="n">X</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+            <span class="n">variable</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  
+            <span class="n">choiceLabel</span><span class="o">=</span><span class="s2">&quot;max&quot;</span> <span class="p">,</span> 
+            <span class="n">coloring_strategy_var</span><span class="o">=</span><span class="s1">&#39;lin&#39;</span> <span class="p">,</span> 
+            <span class="n">MIN_SIZE_NODE</span><span class="o">=</span><span class="mf">0.1</span>    
+        <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;_summary_</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        size_strategy : str, optional</span>
+<span class="sd">            Defines the formula which is used to normalize the size of nodes. It can be &quot;lin&quot;, &quot;log&quot;, &quot;exp&quot; or &quot;id&quot;. , by default &quot;lin&quot;</span>
+<span class="sd">        type_coloring : str, optional</span>
+<span class="sd">            Defines the way to add colors to nodes. It can be with &quot;label&quot; or with &quot;variable&quot;. For &quot;label&quot;, colors are added from a given list or dictionary. </span>
+<span class="sd">            If &quot;variable&quot; is chosen, the color is chosen depending from a feature of the dataset. It can be the average of a given feature inside each node for example. , by default &quot;label&quot;</span>
+<span class="sd">        palette : matplotlib.colors.ListedColormap , optional</span>
+<span class="sd">            The colormap from which color will be chosen for nodes , by default None</span>
+<span class="sd">        color_labels : list, dict or numpy array, optional</span>
+<span class="sd">            Object from which the colors of nodes will be retrieved. The exact colors can be chosen by giving hexadecimal values.</span>
+<span class="sd">            If a list or a numpy array is given and has the same length than the number of nodes, each node will be associated to a label. If the list is longer, the label associated to each node will depend on the which labels are represented inside each nodes by the points covered.</span>
+<span class="sd">            If a dictionary is chosen, the keys should be the nodes and the values the labels on which the color will be chosen. </span>
+<span class="sd">            , by default None</span>
+<span class="sd">        X : numpy darray, optional</span>
+<span class="sd">            The dataset from which the value inside each node will be taken if the type_coloring is set to &quot;variable&quot;., by default None</span>
+<span class="sd">        variable : str or int , optional</span>
+<span class="sd">            If the parameter type_coloring is set to &quot;variable&quot;, this parameter is giving access to the good feature in the dataset. It can be an index or the name of the variable.</span>
+<span class="sd">              , by default None</span>
+<span class="sd">        choiceLabel : str, optional</span>
+<span class="sd">            Can be &quot;max&quot; or &quot;min&quot;. When the parameter &quot;type_coloring&quot; is set to &quot;label&quot;, it defines the way to choose the label inside each node to color them. If &quot;max&quot; is chosen, the most represented label inside each node will be chosen. If &quot;min&quot; is chosen it will be the least represented label.</span>
+<span class="sd">            , by default &quot;max&quot;</span>
+<span class="sd">        coloring_strategy_var : str, optional</span>
+<span class="sd">            Can be &quot;log&quot;, &quot;lin&quot; or &quot;exp&quot;. When the parameter &quot;type_coloring&quot; is set to &quot;variable&quot;, this parameter represents how fast color will changed between nodes depending on the variable&#39;s average value inside each node. </span>
+<span class="sd">            For example if &quot;exp&quot; is chosen, a slight change of average value between two nodes will represent an important change of colors.</span>
+<span class="sd">            , by default &#39;lin&#39;</span>
+<span class="sd">        MIN_SIZE_NODE : float, optional</span>
+<span class="sd">            The minimum size of nodes in the plot, by default 0.1</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_strategy</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">node_strategy</span><span class="o">=</span><span class="n">NodeStrategy</span><span class="p">(</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span>
+                <span class="n">size_strategy</span><span class="o">=</span><span class="n">size_strategy</span><span class="p">,</span>
+                <span class="n">type_coloring</span><span class="o">=</span><span class="n">type_coloring</span><span class="p">,</span>
+                <span class="n">palette</span><span class="o">=</span><span class="n">palette</span><span class="p">,</span>
+                <span class="n">color_labels</span><span class="o">=</span><span class="n">color_labels</span><span class="p">,</span>
+                <span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span>
+                <span class="n">variable</span><span class="o">=</span><span class="n">variable</span><span class="p">,</span>
+                <span class="n">choiceLabel</span><span class="o">=</span><span class="n">choiceLabel</span><span class="p">,</span>
+                <span class="n">coloring_strategy_var</span><span class="o">=</span><span class="n">coloring_strategy_var</span> <span class="p">,</span> 
+                <span class="n">MIN_SIZE_NODE</span> <span class="o">=</span><span class="n">MIN_SIZE_NODE</span>  
+            <span class="p">)</span>  
+              
+        <span class="bp">self</span><span class="o">.</span><span class="n">node_strategy</span><span class="o">.</span><span class="n">fit_nodes</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="GraphPreprocess.fit_edges"><a class="viewcode-back" href="../../modules.html#clustergraph.c_GraphPreprocess.GraphPreprocess.fit_edges">[docs]</a>    <span class="k">def</span> <span class="nf">fit_edges</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> 
+            <span class="n">palette</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+            <span class="n">weight</span><span class="o">=</span><span class="s2">&quot;label&quot;</span><span class="p">,</span> 
+            <span class="n">variable</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+            <span class="n">norm_weight</span><span class="o">=</span><span class="s2">&quot;lin&quot;</span><span class="p">,</span>
+            <span class="n">type_coloring</span><span class="o">=</span><span class="s2">&quot;label&quot;</span><span class="p">,</span> 
+            <span class="n">color_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+            <span class="n">coloring_strategy_var</span><span class="o">=</span><span class="s1">&#39;lin&#39;</span>  
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;_summary_</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        graph : networkx.Graph</span>
+<span class="sd">            Graph to preprocess. Its edges will be colored and normalized.</span>
+<span class="sd">        palette : Colormap, optional</span>
+<span class="sd">            Palette used to color edges, by default None</span>
+<span class="sd">        weight : str, optional</span>
+<span class="sd">            Key in the graph underwhich the size/weight of edges is stored, by default &quot;label&quot;</span>
+<span class="sd">        variable : str, optional</span>
+<span class="sd">            Key giving access to the continuous variable used to color edges, by default None</span>
+<span class="sd">        norm_weight : str, optional</span>
+<span class="sd">            Parameter letting the choice regarding the method used to normalize the size of edges, by default &quot;lin&quot;</span>
+<span class="sd">        type_coloring : str, optional</span>
+<span class="sd">            If “type_coloring” is set to “label”,  each edge should have one label and “color_labels” should not be equal to None. If “type_coloring” is set to “variable”,  </span>
+<span class="sd">            the coloring will be continuous and the color will increase as the value increase. The “variable” should not be None , by default &quot;label&quot;</span>
+<span class="sd">        color_labels : _type_, optional</span>
+<span class="sd">            Parameter with labels of each edge. If it is a list, the first index correspond to the first edge. If it is a dictionary, the keys should be edges.</span>
+<span class="sd">            The values should be labels, the exact colors can be chosen with hexadecimal labels, by default None</span>
+<span class="sd">        coloring_strategy_var : str, optional</span>
+<span class="sd">            Parameter letting the choice of how fast the color will change depending on the “variable” &#39;s value., by default &#39;lin&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_strategy</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">edge_strategy</span><span class="o">=</span><span class="n">EdgeStrategy</span><span class="p">(</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> 
+                <span class="n">palette</span><span class="o">=</span><span class="n">palette</span><span class="p">,</span> 
+                <span class="n">weight</span><span class="o">=</span><span class="n">weight</span><span class="p">,</span> 
+                <span class="n">variable</span><span class="o">=</span><span class="n">variable</span><span class="p">,</span> 
+                <span class="n">norm_weight</span><span class="o">=</span><span class="n">norm_weight</span><span class="p">,</span>
+                <span class="n">type_coloring</span><span class="o">=</span><span class="n">type_coloring</span><span class="p">,</span> 
+                <span class="n">color_labels</span><span class="o">=</span><span class="n">color_labels</span><span class="p">,</span> 
+                <span class="n">coloring_strategy_var</span><span class="o">=</span><span class="n">coloring_strategy_var</span>  
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edge_strategy</span><span class="o">.</span><span class="n">fit_edges</span><span class="p">()</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">ClusterGraph</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">ClusterGraph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../history.html">History</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Mathis Hallier.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

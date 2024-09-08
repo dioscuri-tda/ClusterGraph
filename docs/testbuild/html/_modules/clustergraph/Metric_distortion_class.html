@@ -1,0 +1,926 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>clustergraph.Metric_distortion_class &#8212; ClusterGraph 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for clustergraph.Metric_distortion_class</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">scipy.spatial.distance</span> <span class="kn">import</span> <span class="n">euclidean</span>
+<span class="kn">from</span> <span class="nn">networkx</span> <span class="kn">import</span> <span class="n">add_path</span>
+<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">NearestNeighbors</span>
+<span class="kn">import</span> <span class="nn">random</span>
+
+
+<div class="viewcode-block" id="Metric_distortion"><a class="viewcode-back" href="../../modules.html#clustergraph.Metric_distortion_class.Metric_distortion">[docs]</a><span class="k">class</span> <span class="nc">Metric_distortion</span><span class="p">:</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span> <span class="n">knn_g</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">weight_knn_g</span> <span class="o">=</span> <span class="s1">&#39;label&#39;</span><span class="p">,</span> <span class="n">k_compo</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>  <span class="n">dist_weight</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">algo</span><span class="o">=</span><span class="s2">&quot;bf&quot;</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;_summary_</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        graph : networkx.Graph</span>
+<span class="sd">            Graph to prune.</span>
+<span class="sd">        knn_g : networkx.Graph</span>
+<span class="sd">            The k-nearest neighbors graph from which the intrinsic distance between points of the dataset is retrieved.</span>
+<span class="sd">            The dataset should be the same than the one on which the “graph” was computed.</span>
+<span class="sd">        X : numpy darray</span>
+<span class="sd">            Dataset from which the k-nearest neighbors graph and the graph were computed.</span>
+<span class="sd">        weight_knn_g : str, optional</span>
+<span class="sd">            Key/label underwhich the weight of edges is store in the “graph”. The weight corresponds to the distance between two nodes, by default &#39;label&#39;</span>
+<span class="sd">        k_compo : int, optional</span>
+<span class="sd">            Number of edges that will be added to each disconnected component to merge them after the metric distortion pruning process. </span>
+<span class="sd">            The edges added are edges which are connecting disconnected components and the shortest are picked, by default 2</span>
+<span class="sd">        dist_weight : bool, optional</span>
+<span class="sd">            If “dist_weight” is set to True, the distortion will be computed with weight on edges and it will not be the case if it is set to False, by default True</span>
+<span class="sd">        algo : str in {&quot;bf&quot;, &quot;ps&quot;}, optional</span>
+<span class="sd">            Choice of the algorithm used to prune edges in the graph. “bf” correspond to the best algorithm and also the slowest (the brut force algorithm). It prunes at each iteration the edge which is responsible for the most important decrease of metric distortion. </span>
+<span class="sd">            “ps” is the quickest but does not ensure the best pruning, it prunes at each iteration the edge which has the highest metric distortion, by default &quot;bf&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">graph</span> <span class="o">=</span> <span class="n">graph</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">knn_g</span> <span class="o">=</span> <span class="n">knn_g</span>  <span class="c1"># the k nearest neighbors graph</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">X</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weight_knn_g</span> <span class="o">=</span> <span class="n">weight_knn_g</span>  <span class="c1"># the weight/label used in knn_g</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_points_covered_intr</span> <span class="o">=</span> <span class="s2">&quot;points_covered&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nb_points_disco</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nb_points_should_be_evaluated</span> <span class="o">=</span><span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">k_nn_compo</span> <span class="o">=</span> <span class="n">k_compo</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">dijkstra_length_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">all_pairs_dijkstra_path_length</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">knn_g</span>  <span class="p">,</span> <span class="n">weight</span> <span class="o">=</span> <span class="n">weight_knn_g</span>   <span class="p">))</span>
+        
+
+        <span class="k">if</span> <span class="n">algo</span> <span class="o">==</span> <span class="s2">&quot;bf&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prune</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prune_edges_BF</span>
+        <span class="k">elif</span> <span class="n">algo</span> <span class="o">==</span> <span class="s2">&quot;ps&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prune</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prune_edges_PS</span>
+
+        <span class="k">if</span> <span class="n">dist_weight</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">distortion_graph</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">distortion_graph_weight</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">distortion_graph</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">distortion_graph_no_weight</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">k_nn_compo</span> <span class="o">=</span> <span class="n">k_compo</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dijkstra_length_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">nx</span><span class="o">.</span><span class="n">all_pairs_dijkstra_path_length</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">knn_g</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="n">weight_knn_g</span><span class="p">)</span>
+        <span class="p">)</span>
+
+
+        
+        <span class="c1"># CREATION OF THE INTRINSIC CLUSTERGRAPH</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">intri_cg</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">nodes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">intri_cg</span><span class="o">.</span><span class="n">nodes</span><span class="p">())</span>
+
+        <span class="c1"># Ajouter des aretes entre chaque paire de noeuds</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">intri_cg</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">nodes</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">nodes</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">intrin_dist_cg</span><span class="p">()</span>
+
+    <span class="c1"># COMPUTE INTRINSIC DISTANCE</span>
+<div class="viewcode-block" id="Metric_distortion.intrin_dist_cg"><a class="viewcode-back" href="../../modules.html#clustergraph.Metric_distortion_class.Metric_distortion.intrin_dist_cg">[docs]</a>    <span class="k">def</span> <span class="nf">intrin_dist_cg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;_summary_</span>
+<span class="sd">        Method which adds all the intrinsic distances between clusters to self.intri_cg.</span>
+<span class="sd">        This method creates the intrinsic graph (graph in which the distance between nodes is the average shortest path between points).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">edges_between_compos</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">intri_cg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_edges</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">intri_cg</span><span class="p">)</span>
+        <span class="n">connected_components</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">intri_cg</span><span class="o">.</span><span class="n">subgraph</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">nx</span><span class="o">.</span><span class="n">connected_components</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">intri_cg</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="k">for</span> <span class="n">cc</span> <span class="ow">in</span> <span class="n">connected_components</span><span class="p">:</span>
+            <span class="n">nb_points_inter</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">nb_points</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">)</span>
+            <span class="n">nb_nodes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">cc</span><span class="o">.</span><span class="n">nodes</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">n1</span> <span class="ow">in</span> <span class="n">cc</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+                <span class="c1"># print( cc.nodes[n1]  )</span>
+                <span class="k">for</span> <span class="n">n2</span> <span class="ow">in</span> <span class="n">cc</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">n1</span> <span class="o">&lt;</span> <span class="n">n2</span><span class="p">:</span>
+                        <span class="n">intr_dist_c1_c2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">intr_two_clusters</span><span class="p">(</span>
+                            <span class="n">cc</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">n1</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">label_points_covered_intr</span><span class="p">],</span>
+                            <span class="n">cc</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">n2</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">label_points_covered_intr</span><span class="p">],</span>
+                        <span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">intri_cg</span><span class="o">.</span><span class="n">edges</span><span class="p">[(</span><span class="n">n1</span><span class="p">,</span> <span class="n">n2</span><span class="p">)][</span><span class="s2">&quot;intr_dist&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">intr_dist_c1_c2</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nb_points_disco</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="s2">&quot;Be careful, &quot;</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">nb_points_disco</span><span class="p">,</span>
+                <span class="s2">&quot; intrinsic distance between points have not been evaluated in the metric distortion process. It represents &quot;</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">nb_points_disco</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">nb_points_should_be_evaluated</span><span class="p">,</span>
+                <span class="s2">&quot; of the distances.&quot;</span><span class="p">,</span>
+            <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Metric_distortion.intr_two_clusters"><a class="viewcode-back" href="../../modules.html#clustergraph.Metric_distortion_class.Metric_distortion.intr_two_clusters">[docs]</a>    <span class="k">def</span> <span class="nf">intr_two_clusters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;_summary_</span>
+<span class="sd">        This method computes the average intrinsic distance between two clusters. It ignores the disconnected points.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        c1 : list of integers</span>
+<span class="sd">            It is a cluster represented as a list of indices. Each index corresponds to the index inside the dataset of the point.</span>
+<span class="sd">        c2 : list of integers</span>
+<span class="sd">            It is a cluster represented as a list of indices. Each index corresponds to the index inside the dataset of the point.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            Returns the intrinsic distance between the two given clusters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">l_c1</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">c1</span><span class="p">)</span>
+        <span class="n">l_c2</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">c2</span><span class="p">)</span>
+        <span class="n">intr_dist</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">nb_not_connected</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">c1</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">c2</span><span class="p">:</span>
+                <span class="n">dist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">intr_two_points</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">dist</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">intr_dist</span> <span class="o">+=</span> <span class="n">dist</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">nb_not_connected</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nb_points_disco</span> <span class="o">+=</span> <span class="n">nb_not_connected</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nb_points_should_be_evaluated</span> <span class="o">+=</span> <span class="n">l_c1</span> <span class="o">*</span> <span class="n">l_c2</span>
+        <span class="k">return</span> <span class="n">intr_dist</span> <span class="o">/</span> <span class="p">(</span><span class="n">l_c1</span> <span class="o">*</span> <span class="n">l_c2</span> <span class="o">-</span> <span class="n">nb_not_connected</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Metric_distortion.intr_two_points"><a class="viewcode-back" href="../../modules.html#clustergraph.Metric_distortion_class.Metric_distortion.intr_two_points">[docs]</a>    <span class="k">def</span> <span class="nf">intr_two_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;_summary_</span>
+<span class="sd">        Method which computes the intrinsic distance between two data points (the shortest path between them), represented by their indices.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        i : int</span>
+<span class="sd">            Index of the first data point.</span>
+<span class="sd">        j : int</span>
+<span class="sd">            Index of the second data point.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            Returns the value of the shortest path (or intrinsic distance) between the two data points. </span>
+<span class="sd">            The value is -1, in case the two points do not belong to the same connected component.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dijkstra_length_dict</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span></div>
+
+<div class="viewcode-block" id="Metric_distortion.distortion_graph_no_weight"><a class="viewcode-back" href="../../modules.html#clustergraph.Metric_distortion_class.Metric_distortion.distortion_graph_no_weight">[docs]</a>    <span class="k">def</span> <span class="nf">distortion_graph_no_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span> <span class="n">intrinsic_graph</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;_summary_</span>
+<span class="sd">        Method which computes the distortion between a graph and its intrinsic version (meaning the labels on the edges are the intrinsic distances between clusters).</span>
+<span class="sd">        This method does not take into account the size of clusters.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        graph : networkx.Graph</span>
+<span class="sd">            The graph for which the distortion is computed.</span>
+<span class="sd">        intrinsic_graph : networkx.Graph</span>
+<span class="sd">            The graph in which the edges&#39; labels are the intrinsic distance between clusters. </span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            Returns the distortion. The value is 0 in case, no edge could be evaluated.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">connected_components</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">graph</span><span class="o">.</span><span class="n">subgraph</span><span class="p">(</span><span class="n">c</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">nx</span><span class="o">.</span><span class="n">connected_components</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="n">short_paths</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">all_pairs_dijkstra_path_length</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="s2">&quot;label&quot;</span><span class="p">))</span>
+        <span class="n">distortion_g</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">nb_pair</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">cc</span> <span class="ow">in</span> <span class="n">connected_components</span><span class="p">:</span>
+            <span class="n">dist_cc</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">nodes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">cc</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span>
+            <span class="n">nodes</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">n1</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">n2</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">n1</span> <span class="o">&lt;</span> <span class="n">n2</span><span class="p">:</span>
+                        <span class="n">nb_pair</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="n">distortion_g</span> <span class="o">+=</span> <span class="nb">abs</span><span class="p">(</span>
+                            <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span>
+                                <span class="p">(</span><span class="n">short_paths</span><span class="p">[</span><span class="n">n1</span><span class="p">][</span><span class="n">n2</span><span class="p">])</span>
+                                <span class="o">/</span> <span class="n">intrinsic_graph</span><span class="o">.</span><span class="n">edges</span><span class="p">[(</span><span class="n">n1</span><span class="p">,</span> <span class="n">n2</span><span class="p">)][</span><span class="s2">&quot;intr_dist&quot;</span><span class="p">]</span>
+                            <span class="p">)</span>
+                        <span class="p">)</span>
+
+                        <span class="n">dist_cc</span> <span class="o">+=</span> <span class="nb">abs</span><span class="p">(</span>
+                            <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span>
+                                <span class="p">(</span><span class="n">short_paths</span><span class="p">[</span><span class="n">n1</span><span class="p">][</span><span class="n">n2</span><span class="p">])</span>
+                                <span class="o">/</span> <span class="n">intrinsic_graph</span><span class="o">.</span><span class="n">edges</span><span class="p">[(</span><span class="n">n1</span><span class="p">,</span> <span class="n">n2</span><span class="p">)][</span><span class="s2">&quot;intr_dist&quot;</span><span class="p">]</span>
+                            <span class="p">)</span>
+                        <span class="p">)</span>
+
+            <span class="c1"># print(&quot;DISTORTION COMPONENT : &quot;, dist_cc )</span>
+        <span class="k">if</span> <span class="n">nb_pair</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">distortion_g</span> <span class="o">/</span> <span class="n">nb_pair</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No edge to evaluate&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="Metric_distortion.distortion_graph_weight"><a class="viewcode-back" href="../../modules.html#clustergraph.Metric_distortion_class.Metric_distortion.distortion_graph_weight">[docs]</a>    <span class="k">def</span> <span class="nf">distortion_graph_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span> <span class="n">intrinsic_graph</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;_summary_</span>
+<span class="sd">        Method which computes the distortion between a graph and its intrinsic version (meaning the labels on the edges are the intrinsic distances between clusters).</span>
+<span class="sd">        This method takkes into account the size of clusters.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        graph : networkx.Graph</span>
+<span class="sd">            The graph for which the distortion is computed.</span>
+<span class="sd">        intrinsic_graph : networkx.Graph</span>
+<span class="sd">            The graph in which the edges&#39; labels are the intrinsic distance between clusters. </span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            Returns the distortion. The value is 0 in case, no edge could be evaluated.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">connected_components</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">graph</span><span class="o">.</span><span class="n">subgraph</span><span class="p">(</span><span class="n">c</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">nx</span><span class="o">.</span><span class="n">connected_components</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="n">short_paths</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">all_pairs_dijkstra_path_length</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="s2">&quot;label&quot;</span><span class="p">))</span>
+        <span class="n">dist_global</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">nb_pair_global</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">cc</span> <span class="ow">in</span> <span class="n">connected_components</span><span class="p">:</span>
+            <span class="n">nodes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">cc</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span>
+            <span class="n">weight_total</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">dist_compo</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">nb_pair_compo</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">n1</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">n2</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">n1</span> <span class="o">&lt;</span> <span class="n">n2</span><span class="p">:</span>
+                        <span class="n">weight_n1_n2</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">nb_compo_cluster</span><span class="p">[</span><span class="n">n1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">nb_compo_cluster</span><span class="p">[</span><span class="n">n2</span><span class="p">]</span>
+                        <span class="p">)</span>
+                        <span class="n">dist_pair</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span>
+                            <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span>
+                                <span class="p">(</span><span class="n">short_paths</span><span class="p">[</span><span class="n">n1</span><span class="p">][</span><span class="n">n2</span><span class="p">])</span>
+                                <span class="o">/</span> <span class="n">intrinsic_graph</span><span class="o">.</span><span class="n">edges</span><span class="p">[(</span><span class="n">n1</span><span class="p">,</span> <span class="n">n2</span><span class="p">)][</span><span class="s2">&quot;intr_dist&quot;</span><span class="p">]</span>
+                            <span class="p">)</span>
+                        <span class="p">)</span>
+
+                        <span class="n">dist_compo</span> <span class="o">+=</span> <span class="n">weight_n1_n2</span> <span class="o">*</span> <span class="n">dist_pair</span>
+                        <span class="n">weight_total</span> <span class="o">+=</span> <span class="n">weight_n1_n2</span>
+                        <span class="n">nb_pair_compo</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">nb_pair_compo</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">dist_compo</span> <span class="o">=</span> <span class="n">dist_compo</span> <span class="o">/</span> <span class="p">(</span><span class="n">nb_pair_compo</span> <span class="o">*</span> <span class="n">weight_total</span><span class="p">)</span>
+                <span class="n">nb_pair_global</span> <span class="o">+=</span> <span class="n">nb_pair_compo</span>
+                <span class="n">dist_global</span> <span class="o">+=</span> <span class="n">dist_compo</span> <span class="o">*</span> <span class="n">nb_pair_compo</span>
+
+        <span class="k">if</span> <span class="n">nb_pair_global</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">dist_global</span> <span class="o">=</span> <span class="n">dist_global</span> <span class="o">/</span> <span class="n">nb_pair_global</span>
+            <span class="k">return</span> <span class="n">dist_global</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No edge to evaluate&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">0</span></div>
+
+    <span class="c1"># for the given cluster, returns the component in the knn_g containing most of its points</span>
+<div class="viewcode-block" id="Metric_distortion.associate_cluster_one_compo"><a class="viewcode-back" href="../../modules.html#clustergraph.Metric_distortion_class.Metric_distortion.associate_cluster_one_compo">[docs]</a>    <span class="k">def</span> <span class="nf">associate_cluster_one_compo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cluster</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;_summary_</span>
+<span class="sd">        Method which, for a given cluster, finds dominating connected components in the k-nearest neighbors graph.</span>
+<span class="sd">        It returns the index of the connected component of the knn graph which is the most represented in the cluster.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        cluster : List of int</span>
+<span class="sd">            Corresponds to a cluster represented as a list of indices which are the indices of the points covered by this cluster.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int, int</span>
+<span class="sd">            Returns the index of dominating connected component in the k-nearest neighbors graph and the number of points which belong to this component.</span>
+<span class="sd">              If most points in the cluster belong to the second connected components, the method returns 1 and the numbr of points which are in the second component.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">connected_components</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">knn_g</span><span class="o">.</span><span class="n">subgraph</span><span class="p">(</span><span class="n">c</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">nx</span><span class="o">.</span><span class="n">connected_components</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">knn_g</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="n">number_per_compo</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">cc</span> <span class="ow">in</span> <span class="n">connected_components</span><span class="p">:</span>
+            <span class="n">nodes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">cc</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span>
+            <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">pt</span> <span class="ow">in</span> <span class="n">cluster</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">pt</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">:</span>
+                    <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">number_per_compo</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">count</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">number_per_compo</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">number_per_compo</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Metric_distortion.associate_clusters_compo"><a class="viewcode-back" href="../../modules.html#clustergraph.Metric_distortion_class.Metric_distortion.associate_clusters_compo">[docs]</a>    <span class="k">def</span> <span class="nf">associate_clusters_compo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;_summary_</span>
+<span class="sd">        Method which associates to each node a connected component in the k-nearest neighbors graph.</span>
+<span class="sd">        Each cluster is associated with the component which is the most represented in its points covered.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            Returns a dictionnary with the indices of the connected components in the k-nearest neighbors graph as keys and a list of the nodes (clusters) which belong to each component as value. </span>
+<span class="sd">            </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nb_compo</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">number_connected_components</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">knn_g</span><span class="p">)</span>
+        <span class="n">compo_clusters</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nb_compo_cluster</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nb_compo</span><span class="p">):</span>
+            <span class="n">compo_clusters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+            <span class="n">compo</span><span class="p">,</span> <span class="n">nb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">associate_cluster_one_compo</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">n</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">label_points_covered_intr</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="n">compo_clusters</span><span class="p">[</span><span class="n">compo</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nb_compo_cluster</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">nb</span>
+
+        <span class="k">return</span> <span class="n">compo_clusters</span></div>
+
+<div class="viewcode-block" id="Metric_distortion.remove_edges"><a class="viewcode-back" href="../../modules.html#clustergraph.Metric_distortion_class.Metric_distortion.remove_edges">[docs]</a>    <span class="k">def</span> <span class="nf">remove_edges</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">graph</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;_summary_</span>
+<span class="sd">        Method which removes all edges which are connecting two nodes in the graph which belong to two different disconnected component in the k-nearest neighbors graph.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        graph : networkx.Graph</span>
+<span class="sd">            The graph for which, the edges connecting two disconnected components should be removed.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list, networkx.Graph</span>
+<span class="sd">            Returns a list of edges for which each value is as followed [ node_i, node_j, data ]. With &quot;data&quot; being the dictionary of all labels attached to a given edge.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">compo_clusters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">associate_clusters_compo</span><span class="p">()</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">compo_clusters</span><span class="p">)</span>
+        <span class="n">edges_in_between</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">:</span>
+            <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">compo_clusters</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="ow">and</span> <span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">compo_clusters</span><span class="p">[</span><span class="n">k</span><span class="p">]):</span>
+                    <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">break</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">found</span><span class="p">):</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="n">e</span><span class="p">])</span>
+                <span class="n">edges_in_between</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">data</span><span class="p">])</span>
+                <span class="n">graph</span><span class="o">.</span><span class="n">remove_edge</span><span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">edges_in_between</span><span class="p">,</span> <span class="n">graph</span></div>
+
+    
+    <span class="c1"># FUNCTION WHICH RETURN THE GRAPH PRUNED WITH CHANGING THE CONNECTIVITY </span>
+<div class="viewcode-block" id="Metric_distortion.prune_edges_BF"><a class="viewcode-back" href="../../modules.html#clustergraph.Metric_distortion_class.Metric_distortion.prune_edges_BF">[docs]</a>    <span class="k">def</span> <span class="nf">prune_edges_BF</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span>  <span class="n">nb_edges_pruned</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="p">,</span>  <span class="n">md_plot</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;_summary_</span>
+<span class="sd">        Method which prunes the given number of edges iteratively by picking the edge lowing down the most the metric distortion at each iteration. </span>
+<span class="sd">        This algorithm stops when the number of edges pruned is reached or when the lowest metric distortion is reached.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        graph : networkx.Graph</span>
+<span class="sd">            Graph to prune.</span>
+<span class="sd">        nb_edges_pruned : int, optional</span>
+<span class="sd">            Maximum number of edges to prune. If it is negative, the algorithm will prune as many edges as possible, by default -1</span>
+<span class="sd">        md_plot : bool, optional</span>
+<span class="sd">            If &quot;md_plot&quot; is set to True, the method will store and return a list with the metric distortion at each iteration, by default True</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        networkx.Graph or networkx.Graph, list</span>
+<span class="sd">            The pruned graph and if &quot;md_plot&quot; is set to true, the evolution of the distortion at each iteration (at each edge pruned).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">temp_graph</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+        <span class="n">edges_between_compos</span><span class="p">,</span> <span class="n">temp_graph</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_edges</span><span class="p">(</span><span class="n">temp_graph</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edges_between_compo</span> <span class="o">=</span> <span class="n">edges_between_compos</span>
+        <span class="n">nb_cc</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">number_connected_components</span><span class="p">(</span><span class="n">temp_graph</span><span class="p">)</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">temp_graph</span><span class="o">.</span><span class="n">edges</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">nb_edges_pruned</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">nb_edges_pruned</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">nb_edges_pruned</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">f</span><span class="p">),</span> <span class="n">nb_edges_pruned</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">md_plot</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">temp_list_md</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">distortion_graph</span><span class="p">(</span><span class="n">temp_graph</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">intri_cg</span><span class="p">)]</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nb_edges_pruned</span><span class="p">):</span>
+            <span class="n">e_smallest</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">md_smallest</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">distortion_graph</span><span class="p">(</span><span class="n">temp_graph</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">intri_cg</span><span class="p">)</span>
+            <span class="n">f_minus_M</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">f_minus_M</span><span class="p">:</span>
+                <span class="n">edge_data</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">temp_graph</span><span class="o">.</span><span class="n">get_edge_data</span><span class="p">(</span><span class="n">edge</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">edge</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+                <span class="n">temp_graph</span><span class="o">.</span><span class="n">remove_edge</span><span class="p">(</span><span class="n">edge</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">edge</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">nb_compo</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">number_connected_components</span><span class="p">(</span><span class="n">temp_graph</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">nb_compo</span> <span class="o">==</span> <span class="n">nb_cc</span><span class="p">:</span>
+                    <span class="n">md</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">distortion_graph</span><span class="p">(</span><span class="n">temp_graph</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">intri_cg</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">md</span> <span class="o">&lt;</span> <span class="n">md_smallest</span><span class="p">:</span>
+                        <span class="n">md_smallest</span> <span class="o">=</span> <span class="n">md</span>
+                        <span class="n">e_smallest</span> <span class="o">=</span> <span class="n">edge</span>
+
+                <span class="n">temp_graph</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">edge</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">edge</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">**</span><span class="n">edge_data</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">e_smallest</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)):</span>
+
+                <span class="c1"># DELETE THE smallest FROM THE GRAPH</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">f</span><span class="p">)):</span>
+                    <span class="k">if</span> <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">e_smallest</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">e_smallest</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                        <span class="n">f</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                        <span class="k">break</span>
+
+                <span class="n">temp_graph</span><span class="o">.</span><span class="n">remove_edge</span><span class="p">(</span><span class="n">e_smallest</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">e_smallest</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">md_plot</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">temp_list_md</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">md_smallest</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">break</span>
+        <span class="k">if</span> <span class="n">md_plot</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">temp_graph</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">temp_list_md</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">temp_graph</span></div>
+        
+    
+<div class="viewcode-block" id="Metric_distortion.prune_edges_PS"><a class="viewcode-back" href="../../modules.html#clustergraph.Metric_distortion_class.Metric_distortion.prune_edges_PS">[docs]</a>    <span class="k">def</span> <span class="nf">prune_edges_PS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span>  <span class="n">nb_edges_pruned</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">md_plot</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;_summary_</span>
+<span class="sd">        Method which prunes the given number of edges iteratively by picking the edge with the highest metric distortion at each iteration. </span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        g : networkx.Graph</span>
+<span class="sd">            Graph to prune.</span>
+<span class="sd">        nb_edges_pruned : int, optional</span>
+<span class="sd">            Maximum number of edges to prune. If it is negative, the algorithm will prune as many edges as possible, by default -1</span>
+<span class="sd">        md_plot : bool, optional</span>
+<span class="sd">            If &quot;md_plot&quot; is set to True, the method will store and return a list with the metric distortion at each iteration, by default True</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        networkx.Graph or networkx.Graph, list</span>
+<span class="sd">            The pruned graph and if &quot;md_plot&quot; is set to true, the evolution of the distortion at each iteration (at each edge pruned).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">graph</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span> <span class="n">g</span><span class="p">)</span>
+        <span class="n">edges_between_compos</span><span class="p">,</span> <span class="n">temp_graph</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_edges</span><span class="p">(</span> <span class="n">graph</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edges_between_compo</span> <span class="o">=</span> <span class="n">edges_between_compos</span>
+        <span class="n">nb_cc</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">number_connected_components</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">nb_edges_pruned</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">nb_edges_pruned</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">md_plot</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">temp_list_md</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">distortion_graph</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">intri_cg</span><span class="p">)]</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nb_edges_pruned</span><span class="p">):</span>
+            <span class="n">e_smallest</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">md_smallest</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+
+            <span class="c1"># GET F\M</span>
+            <span class="n">f_minus_M</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">f_minus_M</span><span class="p">:</span>
+                <span class="n">edge_data</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">temp_graph</span><span class="o">.</span><span class="n">get_edge_data</span><span class="p">(</span><span class="n">edge</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">edge</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+                <span class="n">graph</span><span class="o">.</span><span class="n">remove_edge</span><span class="p">(</span><span class="n">edge</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">edge</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">nb_compo</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">number_connected_components</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">nb_compo</span> <span class="o">==</span> <span class="n">nb_cc</span><span class="p">:</span>
+                    <span class="n">md_path</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span>
+                            <span class="n">nx</span><span class="o">.</span><span class="n">dijkstra_path_length</span><span class="p">(</span>
+                                <span class="n">graph</span><span class="p">,</span> <span class="n">edge</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">edge</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">weight</span><span class="o">=</span><span class="s2">&quot;label&quot;</span>
+                            <span class="p">)</span>
+                            <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">intri_cg</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="n">edge</span><span class="p">][</span><span class="s2">&quot;intr_dist&quot;</span><span class="p">]</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+
+                    <span class="k">if</span> <span class="n">md_path</span> <span class="o">&lt;</span> <span class="n">md_smallest</span><span class="p">:</span>
+                        <span class="n">md_smallest</span> <span class="o">=</span> <span class="n">md_path</span>
+                        <span class="n">e_smallest</span> <span class="o">=</span> <span class="n">edge</span>
+
+                <span class="n">graph</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">edge</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">edge</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">**</span><span class="n">edge_data</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">e_smallest</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)):</span>
+                <span class="c1"># DELETE THE LARGEST FROM THE GRAPH</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">f</span><span class="p">)):</span>
+                    <span class="k">if</span> <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">e_smallest</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">e_smallest</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                        <span class="n">f</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                        <span class="k">break</span>
+                <span class="n">graph</span><span class="o">.</span><span class="n">remove_edge</span><span class="p">(</span><span class="n">e_smallest</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">e_smallest</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+                <span class="k">if</span> <span class="n">md_plot</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">temp_list_md</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">distortion_graph</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">intri_cg</span><span class="p">)</span>
+                    <span class="p">)</span>
+        <span class="k">if</span> <span class="n">md_plot</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">graph</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">temp_list_md</span>
+        <span class="k">return</span> <span class="n">graph</span></div>
+
+<div class="viewcode-block" id="Metric_distortion.greedy_pruning"><a class="viewcode-back" href="../../modules.html#clustergraph.Metric_distortion_class.Metric_distortion.greedy_pruning">[docs]</a>    <span class="k">def</span> <span class="nf">greedy_pruning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">nb_edges</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">weight</span> <span class="o">=</span> <span class="s2">&quot;distortion&quot;</span><span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;_summary_</span>
+<span class="sd">        Method which prunes the given number of edges  with a distortion lower than the threshold “alpha” .  The edges with the highest distortion are picked. This method is not iterative.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        alpha : float, optional</span>
+<span class="sd">            Thresold such as edges with a distortion smaller than alpha will be pruned, by default 0.5</span>
+<span class="sd">        nb_edges : int, optional</span>
+<span class="sd">            Number of edges to prune. If it is negative, the algorithm will prune as many edges as possible, by default -1</span>
+<span class="sd">        weight : str, optional</span>
+<span class="sd">            Label underwhich the distortion is stored in the graph, by default &quot;distortion&quot;</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        networkx.Graph</span>
+<span class="sd">            The pruned graph.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">graph</span> <span class="o">=</span>  <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">)</span>
+        <span class="n">edges_between_compos</span><span class="p">,</span> <span class="n">graph</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_edges</span><span class="p">(</span> <span class="n">graph</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edges_between_compo</span> <span class="o">=</span> <span class="n">edges_between_compos</span>
+        <span class="n">graph</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_distortion_edges</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="n">weight</span><span class="p">)</span>
+        <span class="n">nodes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span>
+        <span class="n">md</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">distortion_graph</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">intri_cg</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">temp_list_md</span> <span class="o">=</span> <span class="p">[</span><span class="n">md</span><span class="p">]</span>
+        <span class="n">sorted_edges</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="s2">&quot;distortion&quot;</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">nb_edges</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">nb_edges</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sorted_edges</span><span class="p">)</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">nb_compo</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">number_connected_components</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">sorted_edges</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">[(</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">])][</span><span class="s2">&quot;distortion&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">alpha</span><span class="p">:</span>
+                <span class="n">edge</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">[(</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">])])</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;edge &quot;</span><span class="p">,</span> <span class="n">edge</span><span class="p">)</span>
+                <span class="n">graph</span><span class="o">.</span><span class="n">remove_edge</span><span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+                <span class="k">if</span> <span class="n">nx</span><span class="o">.</span><span class="n">number_connected_components</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">nb_compo</span><span class="p">:</span>
+                    <span class="n">graph</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">**</span><span class="n">edge</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">md</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">distortion_graph</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">intri_cg</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">temp_list_md</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">md</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="n">nb_edges</span><span class="p">:</span>
+                    <span class="k">break</span>
+
+        <span class="k">return</span> <span class="n">graph</span></div>
+
+<div class="viewcode-block" id="Metric_distortion.set_distortion_edges"><a class="viewcode-back" href="../../modules.html#clustergraph.Metric_distortion_class.Metric_distortion.set_distortion_edges">[docs]</a>    <span class="k">def</span> <span class="nf">set_distortion_edges</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="s2">&quot;distortion&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;_summary_</span>
+<span class="sd">        Method which locally computes the distortion for each edge by computing the ratio between its length and the intrinsic distance between the two nodes.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        graph : networkx.Graph</span>
+<span class="sd">            Graph for which we want to set the distortion on each edge.</span>
+<span class="sd">        weight : str, optional</span>
+<span class="sd">            Label underwhich the distortion will be stored in the graph for each edge. , by default &#39;distortion&#39;</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        networkx.Graph</span>
+<span class="sd">            Returns the graph for which the distortion has been added to each edge as a new label.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">:</span>
+            <span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="n">e</span><span class="p">][</span><span class="n">weight</span><span class="p">]</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="n">e</span><span class="p">][</span><span class="s2">&quot;label&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">intri_cg</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="n">e</span><span class="p">][</span><span class="s2">&quot;intr_dist&quot;</span><span class="p">])</span>
+            <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Metric_distortion.plt_md_prune_computed"><a class="viewcode-back" href="../../modules.html#clustergraph.Metric_distortion_class.Metric_distortion.plt_md_prune_computed">[docs]</a>    <span class="k">def</span> <span class="nf">plt_md_prune_computed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;_summary_</span>
+<span class="sd">        Method which plots the evolution of the metric distortion depending on the number of edges pruned once the metric distortion pruning is done.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        save : str, optional</span>
+<span class="sd">            If there is a value, the plot will be saved as pdf with the given string as name, by default None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">temp_list_md</span><span class="p">)))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">temp_list_md</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Number of edges pruned&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Metric distortion&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Metric distortion depending on the number of pruned edges&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">save</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">fname</span><span class="o">=</span><span class="n">save</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;pdf&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Metric_distortion.get_distance_matrix_ccompo"><a class="viewcode-back" href="../../modules.html#clustergraph.Metric_distortion_class.Metric_distortion.get_distance_matrix_ccompo">[docs]</a>    <span class="k">def</span> <span class="nf">get_distance_matrix_ccompo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pruned_graph</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;_summary_</span>
+<span class="sd">        Method which returns a distance matrix between all nodes in the given graph. The real distance is used when nodes belong to different components in the graph. Otherwise, the distance is set to the maximum one.</span>
+<span class="sd">        It is done in order to merge the graph with the smallest distances between disconnected nodes.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        pruned_graph : networkx.Graph</span>
+<span class="sd">            The graph for which the distance matrix between nodes is computed.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        numpy darray</span>
+<span class="sd">            Returns the distance matrix between all nodes. If the nodes belong to the same connected component, the value is set to the maximum distance in the graph. </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nodes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span>
+        <span class="n">nodes</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="n">min_n</span> <span class="o">=</span> <span class="n">nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">nb_nodes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span>
+        <span class="n">dist_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">nb_nodes</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">nb_nodes</span><span class="p">,</span> <span class="n">nb_nodes</span><span class="p">)</span>
+
+        <span class="n">edge_max</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">:</span>
+            <span class="n">dist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="n">e</span><span class="p">][</span><span class="s2">&quot;label&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">dist</span> <span class="o">&gt;</span> <span class="n">edge_max</span><span class="p">:</span>
+                <span class="n">edge_max</span> <span class="o">=</span> <span class="n">dist</span>
+
+        <span class="n">maxi</span> <span class="o">=</span> <span class="n">edge_max</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">paths</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">all_pairs_dijkstra_path_length</span><span class="p">(</span><span class="n">pruned_graph</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="s2">&quot;label&quot;</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">n1</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">n2</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">n1</span> <span class="o">&lt;</span> <span class="n">n2</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">dist</span> <span class="o">=</span> <span class="n">paths</span><span class="p">[</span><span class="n">n1</span><span class="p">][</span><span class="n">n2</span><span class="p">]</span>
+                        <span class="n">dist</span> <span class="o">=</span> <span class="n">maxi</span>
+                    <span class="k">except</span><span class="p">:</span>
+                        <span class="n">dist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">[(</span><span class="n">n1</span><span class="p">,</span> <span class="n">n2</span><span class="p">)][</span><span class="s2">&quot;label&quot;</span><span class="p">]</span>
+
+                    <span class="n">dist_mat</span><span class="p">[</span><span class="n">n1</span> <span class="o">-</span> <span class="n">min_n</span><span class="p">][</span><span class="n">n2</span> <span class="o">-</span> <span class="n">min_n</span><span class="p">]</span> <span class="o">=</span> <span class="n">dist</span>
+                    <span class="n">dist_mat</span><span class="p">[</span><span class="n">n2</span> <span class="o">-</span> <span class="n">min_n</span><span class="p">][</span><span class="n">n1</span> <span class="o">-</span> <span class="n">min_n</span><span class="p">]</span> <span class="o">=</span> <span class="n">dist</span>
+                <span class="k">elif</span> <span class="n">n1</span> <span class="o">==</span> <span class="n">n2</span><span class="p">:</span>
+                    <span class="n">dist_mat</span><span class="p">[</span><span class="n">n1</span> <span class="o">-</span> <span class="n">min_n</span><span class="p">][</span><span class="n">n2</span> <span class="o">-</span> <span class="n">min_n</span><span class="p">]</span> <span class="o">=</span> <span class="n">maxi</span>
+        <span class="k">return</span> <span class="n">dist_mat</span></div>
+
+<div class="viewcode-block" id="Metric_distortion.create_knn_graph_merge_compo_CG"><a class="viewcode-back" href="../../modules.html#clustergraph.Metric_distortion_class.Metric_distortion.create_knn_graph_merge_compo_CG">[docs]</a>    <span class="k">def</span> <span class="nf">create_knn_graph_merge_compo_CG</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">distance_matrix</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;_summary_</span>
+<span class="sd">        Method which creates the k-nearest neighbors graph corresponding to the given distance matrix.</span>
+<span class="sd">        In the class, this methods is used to know which edges should be added in order to connect disconnected components.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        distance_matrix : numpy darray</span>
+<span class="sd">            _description_ Distance matrix</span>
+<span class="sd">        k : int</span>
+<span class="sd">            Number of neighbors in the k-nearest neighbors graph.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        networkx.Graph</span>
+<span class="sd">            Returns the k-nearest neighbors graph corresponding to the given distance matrix.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">num_nodes</span> <span class="o">=</span> <span class="n">distance_matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">nn</span> <span class="o">=</span> <span class="n">NearestNeighbors</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;precomputed&quot;</span><span class="p">)</span>
+        <span class="n">nn</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">distance_matrix</span><span class="p">)</span>
+
+        <span class="n">nn_adjacency</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">kneighbors_graph</span><span class="p">(</span>
+            <span class="n">X</span><span class="o">=</span><span class="n">distance_matrix</span><span class="p">,</span> <span class="n">n_neighbors</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;distance&quot;</span>
+        <span class="p">)</span>
+        <span class="n">nn_Graph</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">from_scipy_sparse_array</span><span class="p">(</span><span class="n">nn_adjacency</span><span class="p">,</span> <span class="n">edge_attribute</span><span class="o">=</span><span class="s2">&quot;label&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">nn_Graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">nn_Graph</span><span class="o">.</span><span class="n">remove_edge</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">a</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="n">nn_Graph</span></div>
+
+<div class="viewcode-block" id="Metric_distortion.connectivity_graph"><a class="viewcode-back" href="../../modules.html#clustergraph.Metric_distortion_class.Metric_distortion.connectivity_graph">[docs]</a>    <span class="k">def</span> <span class="nf">connectivity_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">graph</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;_summary_</span>
+<span class="sd">            Method which returns the global connectivity of a given graph.</span>
+<span class="sd">            Parameters</span>
+<span class="sd">            ----------</span>
+<span class="sd">            graph : networkx.Graph</span>
+<span class="sd">                Graph for which the global connectivity is computed.</span>
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">            float</span>
+<span class="sd">                Returns the global connectivity of the graph.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nodes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span>
+        <span class="n">short_paths</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">all_pairs_dijkstra_path_length</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="s2">&quot;label&quot;</span><span class="p">))</span>
+        <span class="n">nb_nodes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span>
+        <span class="n">C_V_E</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">nb_not_existing_path</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nb_nodes</span><span class="p">):</span>
+            <span class="c1"># We go twice for the same values, improve that</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">nb_nodes</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">j</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">C_V_E</span> <span class="o">+=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">short_paths</span><span class="p">[</span><span class="n">nodes</span><span class="p">[</span><span class="n">i</span><span class="p">]][</span><span class="n">nodes</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span>
+                    <span class="k">except</span><span class="p">:</span>
+                        <span class="n">nb_not_existing_path</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">nb_not_existing_path</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">C_V_E</span> <span class="o">=</span> <span class="n">C_V_E</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">/</span> <span class="p">(</span><span class="n">nb_nodes</span> <span class="o">*</span> <span class="p">(</span><span class="n">nb_nodes</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">C_V_E</span> <span class="o">=</span> <span class="n">C_V_E</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">/</span> <span class="p">(</span><span class="n">nb_nodes</span> <span class="o">*</span> <span class="p">(</span><span class="n">nb_nodes</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">nb_not_existing_path</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">C_V_E</span></div>
+
+
+    
+            
+              
+<div class="viewcode-block" id="Metric_distortion.plt_conn_prune_computed"><a class="viewcode-back" href="../../modules.html#clustergraph.Metric_distortion_class.Metric_distortion.plt_conn_prune_computed">[docs]</a>    <span class="k">def</span> <span class="nf">plt_conn_prune_computed</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;_summary_</span>
+<span class="sd">        Method which plots the evolution of the connectivity depending on the number of edges pruned once the connectivity pruning is done.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">list_rk</span><span class="p">)))</span>
+        <span class="c1"># Tracer le graphique</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+            <span class="n">indices</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">list_rk</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span>
+        <span class="p">)</span>  <span class="c1"># Utilisez &#39;mamder&#39; pour ajouter des points sur le graphique</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Nb of edges pruned&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Connectivity&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Connectivity depending on the number of pruned edges&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+    <span class="c1"># methods adding the nearest neighbors edges in between components</span>
+<div class="viewcode-block" id="Metric_distortion.merge_components"><a class="viewcode-back" href="../../modules.html#clustergraph.Metric_distortion_class.Metric_distortion.merge_components">[docs]</a>    <span class="k">def</span> <span class="nf">merge_components</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pruned_gg</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;_summary_</span>
+<span class="sd">        Method which adds edges to the given graph, in order to have a graph with less disconnected components. The merge is achieved by connecting each node to its k_nn_compo nearest node which are in another components.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        pruned_gg : networkx.Graph</span>
+<span class="sd">            _Disconnected Graph which will be merged.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        networkx.Graph</span>
+<span class="sd">            Returns the given graph for which nodes in between components have been added. </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">min_node</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">))</span>
+        <span class="n">dist_mat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_distance_matrix_ccompo</span><span class="p">(</span><span class="n">pruned_gg</span><span class="p">)</span>
+        <span class="n">graph_missing_edges</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_knn_graph_merge_compo_CG</span><span class="p">(</span>
+            <span class="n">dist_mat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k_nn_compo</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">graph_missing_edges</span><span class="o">.</span><span class="n">edges</span><span class="p">:</span>
+            <span class="n">pruned_gg</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span>
+                <span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">min_node</span><span class="p">,</span>
+                <span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">min_node</span><span class="p">,</span>
+                <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">get_edge_data</span><span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">min_node</span><span class="p">,</span> <span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">min_node</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">pruned_gg</span></div>
+
+<div class="viewcode-block" id="Metric_distortion.conn_prune_merged_graph"><a class="viewcode-back" href="../../modules.html#clustergraph.Metric_distortion_class.Metric_distortion.conn_prune_merged_graph">[docs]</a>    <span class="k">def</span> <span class="nf">conn_prune_merged_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pruned_gg</span><span class="p">,</span> <span class="n">nb_edges_pruned</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;_summary_</span>
+<span class="sd">        Method which after merging the disconnected components in the graph, prune a given number of edges in order to get a less noisy graph.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        pruned_gg : networkx.Graph</span>
+<span class="sd">            _description_</span>
+<span class="sd">        nb_edges_pruned : int, optional</span>
+<span class="sd">            The maximum number of edges which should be pruned. If the value is None, all possible edges will be pruned, by default None</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        networkx.Graph</span>
+<span class="sd">            Returns the merged and pruned graph.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pruned_gg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">merge_components</span><span class="p">(</span><span class="n">pruned_gg</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">nb_edges_pruned</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">nb_edges_pruned</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">pruned_gg</span><span class="o">.</span><span class="n">edges</span><span class="p">))</span>
+
+        <span class="n">graph</span> <span class="o">=</span>  <span class="n">deepcopy</span><span class="p">(</span><span class="n">pruned_gg</span><span class="p">)</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span> <span class="n">graph</span><span class="o">.</span><span class="n">edges</span> <span class="p">)</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">based_rk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_graph</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">list_rk</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nb_edges_pruned</span><span class="p">):</span>
+            <span class="n">rk_largest</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+            <span class="n">e_largest</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="c1"># GET F\M</span>
+            <span class="n">f_minus_M</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">f_minus_M</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="p">(</span><span class="ne">Exception</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">M</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">f_minus_M</span><span class="p">)):</span>
+                    <span class="k">if</span> <span class="n">f_minus_M</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="n">f_minus_M</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                        <span class="n">f_minus_M</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                        <span class="k">break</span>
+
+            <span class="n">c_fix_loop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_graph</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">f_minus_M</span><span class="p">:</span>
+                <span class="n">edge_data</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">get_edge_data</span><span class="p">(</span><span class="n">edge</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">edge</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+                <span class="n">edge_err</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">edge_data</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">])</span>
+
+                <span class="c1"># print(&#39;REMOVE&#39;, edge)</span>
+                <span class="n">graph</span><span class="o">.</span><span class="n">remove_edge</span><span class="p">(</span><span class="n">edge</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">edge</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">nb_compo</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">number_connected_components</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">nb_compo</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">rk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_graph</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span> <span class="o">/</span> <span class="n">c_fix_loop</span>
+
+                    <span class="k">if</span> <span class="n">rk</span> <span class="o">&gt;</span> <span class="n">rk_largest</span><span class="p">:</span>
+                        <span class="n">rk_largest</span> <span class="o">=</span> <span class="n">rk</span>
+                        <span class="n">e_largest</span> <span class="o">=</span> <span class="n">edge</span>
+                        <span class="n">c_largest</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_graph</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span> <span class="o">/</span> <span class="n">based_rk</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">M</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">edge</span><span class="p">)</span>
+
+                <span class="n">graph</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">edge</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">edge</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">**</span><span class="n">edge_data</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">e_largest</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)):</span>
+                <span class="c1"># DELETE THE largest FROM THE GRAPH</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">f</span><span class="p">)):</span>
+                    <span class="k">if</span> <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">e_largest</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">e_largest</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                        <span class="n">f</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                        <span class="k">break</span>
+
+                <span class="n">graph</span><span class="o">.</span><span class="n">remove_edge</span><span class="p">(</span><span class="n">e_largest</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">e_largest</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">list_rk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c_largest</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">graph</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">ClusterGraph</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">ClusterGraph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../history.html">History</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Mathis Hallier.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
