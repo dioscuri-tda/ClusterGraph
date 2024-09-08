@@ -57,19 +57,19 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    X_1 : _type_ numpy darray</span>
-<span class="sd">        _description_ Dataset restricted to the indices of the first cluster</span>
-<span class="sd">    X_2 : _type_ numpy darray</span>
-<span class="sd">        _description_ Dataset restricted to the indices of the second cluster</span>
-<span class="sd">    distance_points : _type_, optional</span>
-<span class="sd">        _description_, by default None</span>
-<span class="sd">    normalize : _type_ bool, optional</span>
-<span class="sd">    _description_ If True the distance will be normalized by the number of distances computed, by default True</span>
+<span class="sd">    X_1 :  numpy darray</span>
+<span class="sd">         Dataset restricted to the indices of the first cluster</span>
+<span class="sd">    X_2 :  numpy darray</span>
+<span class="sd">         Dataset restricted to the indices of the second cluster</span>
+<span class="sd">    distance_points : , optional</span>
+<span class="sd">        , by default None</span>
+<span class="sd">    normalize :  bool, optional</span>
+<span class="sd">     If True the distance will be normalized by the number of distances computed, by default True</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    _type_ float</span>
-<span class="sd">        _description_ returns the Eart Moving distance between X_1 and X_2</span>
+<span class="sd">     float</span>
+<span class="sd">         returns the Eart Moving distance between X_1 and X_2</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">EMD</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">da</span><span class="o">.</span><span class="n">EMDTransport</span><span class="p">()</span>

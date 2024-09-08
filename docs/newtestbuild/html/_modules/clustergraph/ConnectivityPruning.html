@@ -64,12 +64,12 @@
 <span class="sd">    Method which returns the global connectivity of a given graph.</span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    graph : _type_ networkx graph</span>
-<span class="sd">        _description_ Graph for which the global connectivity is computed.</span>
+<span class="sd">    graph :  networkx graph</span>
+<span class="sd">         Graph for which the global connectivity is computed.</span>
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    _type_ float</span>
-<span class="sd">        _description_ Returns the global connectivity of the graph.</span>
+<span class="sd">     float</span>
+<span class="sd">         Returns the global connectivity of the graph.</span>
 <span class="sd">&quot;&quot;&quot;</span>
         <span class="n">nodes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span>
         <span class="n">short_paths</span><span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">all_pairs_dijkstra_path_length</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span> <span class="p">)</span> <span class="p">)</span>

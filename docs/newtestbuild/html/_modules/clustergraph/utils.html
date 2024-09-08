@@ -44,12 +44,12 @@
 <span class="sd">    From a list of prediction returns a list of clusters with each cluster being a list of indices</span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    prediction : _type_ list or numpy array</span>
-<span class="sd">        _description_ Cluster labels. At each index there is a label corresponding to the cluster of the data point.</span>
+<span class="sd">    prediction :  list or numpy array</span>
+<span class="sd">         Cluster labels. At each index there is a label corresponding to the cluster of the data point.</span>
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    _type_ list</span>
-<span class="sd">        _description_ Returns a list of clusters. Each element of the list is numpy array in which all indices of the points coverd by this cluster are stored.</span>
+<span class="sd">     list</span>
+<span class="sd">         Returns a list of clusters. Each element of the list is numpy array in which all indices of the points coverd by this cluster are stored.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">return</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">prediction</span> <span class="o">==</span> <span class="n">clustNum</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">clustNum</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">prediction</span><span class="p">)]</span></div>
@@ -60,12 +60,12 @@
 <span class="sd">    From a BallMapper object returns a list of clusters with each cluster being a list of indices corresponding to the points covered</span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    bm : _type_ BallMapper</span>
-<span class="sd">        _description_</span>
+<span class="sd">    bm :  BallMapper</span>
+<span class="sd">        </span>
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    _type_ list</span>
-<span class="sd">        _description_ Returns a list of clusters. Each element of the list is also a list in which all indices of the points coverd by this cluster are stored.</span>
+<span class="sd">     list</span>
+<span class="sd">         Returns a list of clusters. Each element of the list is also a list in which all indices of the points coverd by this cluster are stored.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">clusters</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">bm</span><span class="o">.</span><span class="n">points_covered_by_landmarks</span><span class="p">)</span>
     <span class="n">nb_clusters</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span>
@@ -87,12 +87,12 @@
 <span class="sd">    From a Mapper object returns a list of clusters with each cluster being a list of indices corresponding to the points covered</span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    graph : _type_</span>
-<span class="sd">        _description_</span>
+<span class="sd">    graph : </span>
+<span class="sd">        </span>
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    _type_ list</span>
-<span class="sd">        _description_ Returns a list of clusters. Each element of the list is also a list in which all indices of the points coverd by this cluster are stored.</span>
+<span class="sd">     list</span>
+<span class="sd">         Returns a list of clusters. Each element of the list is also a list in which all indices of the points coverd by this cluster are stored.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">clusters</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">graph</span><span class="p">[</span><span class="s2">&quot;nodes&quot;</span><span class="p">])</span>
     <span class="n">nb_clusters</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span>
@@ -176,18 +176,18 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    list_key_value : _type_</span>
-<span class="sd">        _description_</span>
+<span class="sd">    list_key_value : </span>
+<span class="sd">        </span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    _type_</span>
-<span class="sd">        _description_</span>
+<span class="sd">    </span>
+<span class="sd">        </span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
 <span class="sd">    ValueError</span>
-<span class="sd">        _description_</span>
+<span class="sd">        </span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">list_key_value</span> <span class="o">==</span> <span class="p">[]:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;List is empty&quot;</span><span class="p">)</span>
@@ -205,15 +205,15 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    graph : _type_</span>
-<span class="sd">        _description_</span>
+<span class="sd">    graph : </span>
+<span class="sd">        </span>
 <span class="sd">    variable_length : str, optional</span>
-<span class="sd">        _description_, by default &quot;label&quot;</span>
+<span class="sd">        , by default &quot;label&quot;</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    _type_</span>
-<span class="sd">        _description_</span>
+<span class="sd">    </span>
+<span class="sd">        </span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">edges</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">:</span>
@@ -230,15 +230,15 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    vertices : _type_</span>
-<span class="sd">        _description_</span>
-<span class="sd">    edges : _type_</span>
-<span class="sd">        _description_</span>
+<span class="sd">    vertices : </span>
+<span class="sd">        </span>
+<span class="sd">    edges : </span>
+<span class="sd">        </span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    _type_</span>
-<span class="sd">        _description_</span>
+<span class="sd">    </span>
+<span class="sd">        </span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">corres_edges</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">edges</span><span class="p">:</span>
@@ -254,17 +254,17 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    graph : _type_</span>
-<span class="sd">        _description_</span>
-<span class="sd">    variable : _type_</span>
-<span class="sd">        _description_</span>
-<span class="sd">    nodes : _type_, optional</span>
-<span class="sd">        _description_, by default None</span>
+<span class="sd">    graph : </span>
+<span class="sd">        </span>
+<span class="sd">    variable : </span>
+<span class="sd">        </span>
+<span class="sd">    nodes : , optional</span>
+<span class="sd">        , by default None</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    _type_</span>
-<span class="sd">        _description_</span>
+<span class="sd">    </span>
+<span class="sd">        </span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">nodes</span><span class="p">):</span>
         <span class="n">nodes</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">nodes</span>

@@ -81,14 +81,14 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;_summary_</span>
 <span class="sd">    Function which plots a graph with the asked number of edges sorted from shortest to longest or the opposite. The edges and nodes can be colored.</span>
 <span class="sd">    ----------</span>
-<span class="sd">    g : _type_ networkx graph</span>
-<span class="sd">        _description_ The graph to be displayed.</span>
-<span class="sd">    nb_edges : _type_ int </span>
-<span class="sd">        _description_ The number of edges which will be displayed in the visualization. The edges are sorted hence the shortest or the longest will be shown.</span>
-<span class="sd">    size_nodes : _type_ int </span>
-<span class="sd">        _description_ Baseline for the node&#39;s size on the visualization. Bigger the number, bigger the nodes.</span>
-<span class="sd">    random_state : _type_ int </span>
-<span class="sd">        _description_ The random state which will be used to plot the graph. If the value is None, the position of the graph will change each time.</span>
+<span class="sd">    g :  networkx graph</span>
+<span class="sd">         The graph to be displayed.</span>
+<span class="sd">    nb_edges :  int </span>
+<span class="sd">         The number of edges which will be displayed in the visualization. The edges are sorted hence the shortest or the longest will be shown.</span>
+<span class="sd">    size_nodes :  int </span>
+<span class="sd">         Baseline for the node&#39;s size on the visualization. Bigger the number, bigger the nodes.</span>
+<span class="sd">    random_state :  int </span>
+<span class="sd">         The random state which will be used to plot the graph. If the value is None, the position of the graph will change each time.</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
     
@@ -134,25 +134,25 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;_summary_</span>
 <span class="sd">    Method which plots into an interactive matplotlib window the graph g with a slider in order to choose the number of edges.</span>
 <span class="sd">    ----------</span>
-<span class="sd">    g : _type_ networkx graph</span>
-<span class="sd">        _description_ The graph which is displayed.</span>
-<span class="sd">    reverse : _type_ bool </span>
-<span class="sd">        _description_ If reverse is True, the edges will be dispalyed from longest to shortest. Otherwise it will be from shortest to longest.</span>
-<span class="sd">    random_state : _type_ int</span>
-<span class="sd">        _description_ The random state which will be used to plot the graph. If the value is None, the position of the graph will change each time.</span>
-<span class="sd">    weight : _type_ string</span>
-<span class="sd">        _description_ Label underwhich the weight of the edges is stored. This weight is used to sort the edges.</span>
-<span class="sd">    weight_shown : _type_ string</span>
-<span class="sd">        _description_  Label which will be displayed on the plot. Can be the normalized value of each edge. </span>
-<span class="sd">    max_node_size : _type_ int</span>
-<span class="sd">        _description_ The maximum size of a node of the visualized graph.</span>
-<span class="sd">    min_node_size : _type_ int</span>
-<span class="sd">        _description_ The minimum size of a node of the visualized graph.</span>
+<span class="sd">    g :  networkx graph</span>
+<span class="sd">         The graph which is displayed.</span>
+<span class="sd">    reverse :  bool </span>
+<span class="sd">         If reverse is True, the edges will be dispalyed from longest to shortest. Otherwise it will be from shortest to longest.</span>
+<span class="sd">    random_state :  int</span>
+<span class="sd">         The random state which will be used to plot the graph. If the value is None, the position of the graph will change each time.</span>
+<span class="sd">    weight :  string</span>
+<span class="sd">         Label underwhich the weight of the edges is stored. This weight is used to sort the edges.</span>
+<span class="sd">    weight_shown :  string</span>
+<span class="sd">          Label which will be displayed on the plot. Can be the normalized value of each edge. </span>
+<span class="sd">    max_node_size :  int</span>
+<span class="sd">         The maximum size of a node of the visualized graph.</span>
+<span class="sd">    min_node_size :  int</span>
+<span class="sd">         The minimum size of a node of the visualized graph.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    _type_ Slider</span>
-<span class="sd">        _description_ The slider which is displayed.</span>
+<span class="sd">     Slider</span>
+<span class="sd">         The slider which is displayed.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     
     
@@ -164,13 +164,13 @@
 <span class="sd">    Function which returns the labels for the nodes and edges of a given graph.</span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    G : _type_ networkx graph</span>
-<span class="sd">        _description_ Corresponds to the Graph for which, the colors of nodes and edges are demanded.</span>
+<span class="sd">    G :  networkx graph</span>
+<span class="sd">         Corresponds to the Graph for which, the colors of nodes and edges are demanded.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    _type_ list , list</span>
-<span class="sd">        _description_ Returns the lists of colors for the nodes and for the edges of the graph G</span>
+<span class="sd">     list , list</span>
+<span class="sd">         Returns the lists of colors for the nodes and for the edges of the graph G</span>
 <span class="sd">    &quot;&quot;&quot;</span>
         <span class="c1"># We try to get the colors with the given labels, if it fails we use a default value  </span>
         <span class="k">try</span> <span class="p">:</span>    
@@ -190,17 +190,17 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;_summary_</span>
 <span class="sd">    Function which returns the list of the size of nodes. Those sizes correspond to the size of each node in the visualization.</span>
 <span class="sd">    ----------</span>
-<span class="sd">    G : _type_ networkx graph</span>
-<span class="sd">        _description_ Corresponds to the Graph for which, the size of nodes is demanded.</span>
-<span class="sd">    max_size : _type_ int</span>
-<span class="sd">        _description_ Corresponds to the maximum size of a node in the visualization.</span>
-<span class="sd">    min_size : _type_ int</span>
-<span class="sd">        _description_ Corresponds to the minimum size of a node in the visualization.</span>
+<span class="sd">    G :  networkx graph</span>
+<span class="sd">         Corresponds to the Graph for which, the size of nodes is demanded.</span>
+<span class="sd">    max_size :  int</span>
+<span class="sd">         Corresponds to the maximum size of a node in the visualization.</span>
+<span class="sd">    min_size :  int</span>
+<span class="sd">         Corresponds to the minimum size of a node in the visualization.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    _type_ list</span>
-<span class="sd">        _description_ Returns the list of the size of the nodes for the visualization.</span>
+<span class="sd">     list</span>
+<span class="sd">         Returns the list of the size of the nodes for the visualization.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">[</span>  <span class="n">data</span><span class="p">[</span><span class="s1">&#39;size_plot&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">max_size</span>  <span class="o">+</span> <span class="n">min_size</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="kc">True</span><span class="p">)]</span>
     
@@ -213,20 +213,20 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;_summary_</span>
 <span class="sd">    Function which will be called when the value of the slider changes. This function changes the number of edges displayed in the visualized graph.</span>
 <span class="sd">    ----------</span>
-<span class="sd">    num_edges : _type_ int </span>
-<span class="sd">        _description_ Number of edges to display. It is the value of the slider.</span>
-<span class="sd">    g : _type_ networkx graph</span>
-<span class="sd">        _description_ The graph with the maximum number of edges which can be plotted. The baseline graph.</span>
-<span class="sd">    reverse : _type_ bool </span>
-<span class="sd">        _description_ If reverse is True, the edges will be dispalyed from longest to shortest. Otherwise it will be from shortest to longest.</span>
-<span class="sd">    random_state : _type_ int</span>
-<span class="sd">        _description_ The random state which will be used to plot the graph. If the value is None, the position of the graph will change each time.</span>
-<span class="sd">    weight : _type_ string</span>
-<span class="sd">        _description_ Label underwhich the weight of the edges is stored. This weight is used to sort the edges.</span>
-<span class="sd">    weight_shown : _type_ string</span>
-<span class="sd">        _description_  Label which will be displayed on the plot. Can be the normalized value of each edge. </span>
-<span class="sd">    node_sizes : _type_ list</span>
-<span class="sd">        _description_ List of the size of the nodes in the visualization.</span>
+<span class="sd">    num_edges :  int </span>
+<span class="sd">         Number of edges to display. It is the value of the slider.</span>
+<span class="sd">    g :  networkx graph</span>
+<span class="sd">         The graph with the maximum number of edges which can be plotted. The baseline graph.</span>
+<span class="sd">    reverse :  bool </span>
+<span class="sd">         If reverse is True, the edges will be dispalyed from longest to shortest. Otherwise it will be from shortest to longest.</span>
+<span class="sd">    random_state :  int</span>
+<span class="sd">         The random state which will be used to plot the graph. If the value is None, the position of the graph will change each time.</span>
+<span class="sd">    weight :  string</span>
+<span class="sd">         Label underwhich the weight of the edges is stored. This weight is used to sort the edges.</span>
+<span class="sd">    weight_shown :  string</span>
+<span class="sd">          Label which will be displayed on the plot. Can be the normalized value of each edge. </span>
+<span class="sd">    node_sizes :  list</span>
+<span class="sd">         List of the size of the nodes in the visualization.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
         <span class="n">ax</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
