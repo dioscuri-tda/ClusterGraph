@@ -10,7 +10,7 @@ import random
 
 class Metric_distortion:
     
-    def __init__(self, graph, knn_g, X, weight_knn_g = 'label', k_compo = 2,  dist_weight = True, algo="bf" ) :
+    def __init__(self, graph, knn_g, weight_knn_g = 'label', k_compo = 2,  dist_weight = True, algo="bf" ) :
         """_summary_
 
         Parameters
@@ -20,8 +20,6 @@ class Metric_distortion:
         knn_g : networkx.Graph
             The k-nearest neighbors graph from which the intrinsic distance between points of the dataset is retrieved.
             The dataset should be the same than the one on which the “graph” was computed.
-        X : numpy darray
-            Dataset from which the k-nearest neighbors graph and the graph were computed.
         weight_knn_g : str, optional
             Key/label underwhich the weight of edges is store in the “graph”. The weight corresponds to the distance between two nodes, by default 'label'
         k_compo : int, optional
@@ -35,7 +33,6 @@ class Metric_distortion:
         """
         self.graph = graph
         self.knn_g = knn_g  # the k nearest neighbors graph
-        self.X = X
         self.weight_knn_g = weight_knn_g  # the weight/label used in knn_g
         self.label_points_covered_intr = "points_covered"
         self.nb_points_disco = 0
@@ -83,9 +80,6 @@ class Metric_distortion:
             self.intri_cg.subgraph(c) for c in nx.connected_components(self.intri_cg)
         ]
         for cc in connected_components:
-            nb_points_inter = 0
-            nb_points = len(self.X)
-            nb_nodes = len(list(cc.nodes))
             for n1 in cc.nodes:
                 # print( cc.nodes[n1]  )
                 for n2 in cc.nodes:

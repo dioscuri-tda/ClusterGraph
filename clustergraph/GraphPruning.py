@@ -15,7 +15,7 @@ from .Metric_distortion_class import Metric_distortion
 class GraphPruning :
     
     def __init__(self,  graph,  type_pruning = "conn" ,  algo ="bf", weight = "label" ,
-                knn_g = None , X = None, sample = 1,  weight_knn_g = 'label', k_compo = 2, dist_weight = True ) :
+                knn_g = None ,  weight_knn_g = 'label', k_compo = 2, dist_weight = True ) :
         """_summary_
 
         Parameters
@@ -32,8 +32,6 @@ class GraphPruning :
         knn_g : networkx.Graph, optional
             The k-nearest neighbors graph from which the intrinsic distance between points of the dataset is retrieved. 
             The dataset should be the same than the one on which the “graph” was computed. It is mandatory when the "type_pruning" is "md", by default None
-        X : numpy darray, optional
-           Dataset from which the k-nearest neighbors graph and the graph were computed, by default None
         weight_knn_g : str, optional
             Key/label underwhich the weight of edges is store in the “graph”. The weight corresponds to the distance between two nodes, by default 'label'
         k_compo : int, optional
@@ -51,7 +49,7 @@ class GraphPruning :
             self.prunedStrategy =  ConnectivityPruning(algo = algo, weight=weight )
         
         elif( type_pruning == "md" ) :
-            self.prunedStrategy =  Metric_distortion( graph =  graph, knn_g = knn_g , X = X,   weight_knn_g = weight_knn_g , k_compo = k_compo , dist_weight = dist_weight, algo =algo)
+            self.prunedStrategy =  Metric_distortion( graph =  graph, knn_g = knn_g ,  weight_knn_g = weight_knn_g , k_compo = k_compo , dist_weight = dist_weight, algo =algo)
         
     
     
