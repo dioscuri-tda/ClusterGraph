@@ -1,0 +1,352 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>clustergraph.ConnectivityPruning &#8212; ClusterGraph 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for clustergraph.ConnectivityPruning</h1><div class="highlight"><pre>
+<span></span>
+<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+
+
+<div class="viewcode-block" id="ConnectivityPruning"><a class="viewcode-back" href="../../modules.html#clustergraph.ConnectivityPruning.ConnectivityPruning">[docs]</a><span class="k">class</span> <span class="nc">ConnectivityPruning</span> <span class="p">:</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>  <span class="n">algo</span> <span class="o">=</span><span class="s2">&quot;bf&quot;</span><span class="p">,</span> <span class="n">weight</span> <span class="o">=</span> <span class="s2">&quot;label&quot;</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;_summary_</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        algo : str {&quot;bf&quot;, “ps”} , optional</span>
+<span class="sd">            Choice of the algorithm used to prune edges in the graph. “bf” correspond to the best and also the slowest algorithm (the brut force algorithm).</span>
+<span class="sd">              “ps” is the quickest but does not ensure the best pruning, by default &quot;bf&quot;</span>
+<span class="sd">        weight : str, optional</span>
+<span class="sd">            The key underwhich the weight/size of edges is stored in the graph, by default &quot;label&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="n">weight</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">algo</span> <span class="o">==</span> <span class="s2">&quot;bf&quot;</span><span class="p">)</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prune</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">BF_edge_choice</span>
+
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prune</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">PS_edge_choice</span>
+
+    
+<div class="viewcode-block" id="ConnectivityPruning.connectivity_graph"><a class="viewcode-back" href="../../modules.html#clustergraph.ConnectivityPruning.ConnectivityPruning.connectivity_graph">[docs]</a>    <span class="k">def</span> <span class="nf">connectivity_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>  <span class="n">graph</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;_summary_</span>
+<span class="sd">    Method which returns the global connectivity of a given graph.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    graph :  networkx graph</span>
+<span class="sd">         Graph for which the global connectivity is computed.</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">     float</span>
+<span class="sd">         Returns the global connectivity of the graph.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+        <span class="n">nodes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span>
+        <span class="n">short_paths</span><span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">all_pairs_dijkstra_path_length</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="n">nb_nodes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span>
+        <span class="n">C_V_E</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">nb_not_existing_path</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nb_nodes</span><span class="p">)</span> <span class="p">:</span>
+            <span class="c1"># We go twice for the same values, improve that </span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">nb_nodes</span><span class="p">)</span> <span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">i</span> <span class="o">!=</span><span class="n">j</span><span class="p">)</span> <span class="p">:</span>
+                    <span class="k">try</span> <span class="p">:</span>
+                        <span class="n">C_V_E</span> <span class="o">+=</span> <span class="mi">1</span><span class="o">/</span><span class="n">short_paths</span><span class="p">[</span> <span class="n">nodes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">][</span><span class="n">nodes</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="p">]</span>
+                    <span class="k">except</span> <span class="p">:</span>
+                        <span class="n">nb_not_existing_path</span> <span class="o">+=</span><span class="mi">1</span>
+                        
+        <span class="k">if</span><span class="p">(</span> <span class="n">nb_not_existing_path</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">C_V_E</span> <span class="o">=</span> <span class="n">C_V_E</span> <span class="o">*</span> <span class="mi">2</span><span class="o">/</span> <span class="p">(</span> <span class="n">nb_nodes</span> <span class="o">*</span><span class="p">(</span><span class="n">nb_nodes</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">)</span> 
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="n">C_V_E</span> <span class="o">=</span> <span class="n">C_V_E</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span><span class="o">/</span> <span class="p">(</span> <span class="n">nb_nodes</span> <span class="o">*</span><span class="p">(</span><span class="n">nb_nodes</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">)</span> <span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="n">nb_not_existing_path</span> <span class="p">)</span>
+            
+        <span class="k">return</span> <span class="n">C_V_E</span></div>
+    
+
+<div class="viewcode-block" id="ConnectivityPruning.BF_edge_choice"><a class="viewcode-back" href="../../modules.html#clustergraph.ConnectivityPruning.ConnectivityPruning.BF_edge_choice">[docs]</a>    <span class="k">def</span> <span class="nf">BF_edge_choice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">nb_edges</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">score</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;_summary_</span>
+<span class="sd">    Method which prunes a given number of edges by using the Brute Force algorithm based on the connectivity.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    g : networkx.Graph</span>
+<span class="sd">        Graph for which the edges are pruned.</span>
+<span class="sd">    nb_edges : int</span>
+<span class="sd">        Number of edges to be pruned</span>
+<span class="sd">    score : bool</span>
+<span class="sd">        If True, the method also returns the evolution of the connectivity.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    networkx.Graph , list</span>
+<span class="sd">        Returns the pruned graph and if the parameter score is True, returns also a list of float which corresponds to the evolution of the connectivity kept after each pruned edge compared to the original graph.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+        <span class="n">graph</span> <span class="o">=</span>  <span class="n">g</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span> <span class="n">graph</span><span class="o">.</span><span class="n">edges</span> <span class="p">)</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">conn_prune</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        
+        <span class="k">if</span><span class="p">(</span><span class="n">nb_edges</span><span class="o">==-</span><span class="mi">1</span><span class="p">)</span> <span class="p">:</span>
+            <span class="n">nb_edges</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nb_edges</span><span class="p">)</span> <span class="p">:</span>
+            <span class="n">rk_largest</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;-inf&#39;</span><span class="p">)</span>
+            <span class="n">e_largest</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="c1"># GET F\M</span>
+            <span class="n">f_minus_M</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> 
+            <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span><span class="n">f_minus_M</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>  <span class="p">)</span> <span class="p">:</span>
+                <span class="k">raise</span><span class="p">(</span><span class="ne">Exception</span><span class="p">)</span>
+                
+            <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">M</span> <span class="p">:</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">f_minus_M</span><span class="p">)</span> <span class="p">):</span>
+                    <span class="k">if</span><span class="p">(</span> <span class="n">f_minus_M</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span>  <span class="n">f_minus_M</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>  <span class="p">)</span> <span class="p">:</span>
+                        <span class="n">f_minus_M</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                        <span class="k">break</span>
+            
+            <span class="n">c_fix_loop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_graph</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+            
+            <span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">f_minus_M</span> <span class="p">:</span>
+                <span class="n">edge_data</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span> <span class="n">graph</span><span class="o">.</span><span class="n">get_edge_data</span><span class="p">(</span> <span class="n">edge</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">,</span> <span class="n">edge</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span>
+                <span class="n">edge_err</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span> <span class="n">edge_data</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span> <span class="p">)</span>
+                
+                <span class="c1">#print(&#39;REMOVE&#39;, edge)</span>
+                <span class="n">graph</span><span class="o">.</span><span class="n">remove_edge</span><span class="p">(</span> <span class="n">edge</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">edge</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span>
+                <span class="n">nb_compo</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">number_connected_components</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+                
+                <span class="k">if</span><span class="p">(</span> <span class="n">nb_compo</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="p">:</span>
+                    <span class="n">rk</span> <span class="o">=</span>   <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_graph</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span> <span class="o">/</span> <span class="n">c_fix_loop</span>  
+
+                    <span class="k">if</span><span class="p">(</span><span class="n">rk</span> <span class="o">&gt;</span> <span class="n">rk_largest</span> <span class="p">)</span> <span class="p">:</span>
+                        <span class="n">rk_largest</span> <span class="o">=</span> <span class="n">rk</span>
+                        <span class="n">e_largest</span> <span class="o">=</span> <span class="n">edge</span>
+                    
+                <span class="k">else</span> <span class="p">:</span>
+                    <span class="n">M</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">edge</span><span class="p">)</span>
+                    
+                <span class="n">graph</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span> <span class="n">edge</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">edge</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">**</span><span class="n">edge_data</span> <span class="p">)</span>
+                
+
+            <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">e_largest</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="c1"># DELETE THE largest FROM THE GRAPH </span>
+                <span class="n">conn_prune</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rk_largest</span><span class="p">)</span> 
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="p">):</span>
+                        <span class="k">if</span><span class="p">(</span>   <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">e_largest</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span>  <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">e_largest</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>     <span class="p">)</span> <span class="p">:</span>
+                            <span class="n">f</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                            <span class="k">break</span>
+                <span class="c1">#print(&quot;REMOVE&quot;, e_largest)</span>
+                <span class="n">graph</span><span class="o">.</span><span class="n">remove_edge</span><span class="p">(</span> <span class="n">e_largest</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">e_largest</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span>
+                
+        <span class="k">if</span><span class="p">(</span><span class="ow">not</span><span class="p">(</span><span class="n">score</span><span class="p">)</span> <span class="p">):</span>
+            <span class="k">return</span> <span class="n">graph</span> 
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="k">return</span> <span class="n">graph</span><span class="p">,</span> <span class="n">conn_prune</span></div>
+        
+
+
+
+    <span class="c1"># Each round, the less useful edge (for the two nodes it directly connects) is deleted (we don&#39;t measure the impact of that on the whole graph)          </span>
+<div class="viewcode-block" id="ConnectivityPruning.PS_edge_choice"><a class="viewcode-back" href="../../modules.html#clustergraph.ConnectivityPruning.ConnectivityPruning.PS_edge_choice">[docs]</a>    <span class="k">def</span> <span class="nf">PS_edge_choice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">nb_edges</span><span class="p">,</span>  <span class="n">score</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;_summary_</span>
+<span class="sd">        Method which prunes a given number of edges by using the Path Simplification algorithm. </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        g : networkx.Graph</span>
+<span class="sd">            Graph for which the edges are pruned.</span>
+<span class="sd">        nb_edges : int</span>
+<span class="sd">            Number of edges to be pruned</span>
+<span class="sd">        score : bool</span>
+<span class="sd">            If True, the method also returns the evolution of the evaluation criteria.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        networkx.Graph , list</span>
+<span class="sd">            Returns pruned graph and if the parameter score is True, </span>
+<span class="sd">            returns also a list of float which corresponds to the evolution of the evaluation criteria.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">graph</span> <span class="o">=</span>  <span class="n">g</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span> <span class="n">graph</span><span class="o">.</span><span class="n">edges</span> <span class="p">)</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">lost_prune</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nb_edges</span><span class="p">)</span> <span class="p">:</span>
+            <span class="n">k_largest</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;-inf&#39;</span><span class="p">)</span>
+            <span class="n">e_largest</span> <span class="o">=</span> <span class="kc">False</span>
+            
+            <span class="c1"># GET F\M</span>
+            <span class="n">f_minus_M</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> 
+            <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span><span class="n">f_minus_M</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>  <span class="p">)</span> <span class="p">:</span>
+                <span class="c1">#print(&quot;MIN&quot;, f_minus_M)</span>
+                <span class="c1">#print( &quot;F&quot;, f)</span>
+                <span class="k">raise</span><span class="p">(</span><span class="ne">Exception</span><span class="p">)</span>
+                
+                
+            <span class="c1">#print(f_minus_M)</span>
+            <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">M</span> <span class="p">:</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">f_minus_M</span><span class="p">)</span> <span class="p">):</span>
+                    <span class="k">if</span><span class="p">(</span> <span class="n">f_minus_M</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span>  <span class="n">f_minus_M</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>  <span class="p">)</span> <span class="p">:</span>
+                        <span class="n">f_minus_M</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                        <span class="k">break</span>
+                        
+                        
+            <span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">f_minus_M</span> <span class="p">:</span>
+                <span class="n">edge_data</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span> <span class="n">graph</span><span class="o">.</span><span class="n">get_edge_data</span><span class="p">(</span> <span class="n">edge</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">,</span> <span class="n">edge</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span>
+                <span class="n">edge_err</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span> <span class="n">edge_data</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span> <span class="p">)</span>
+                
+                <span class="c1">#print(&#39;REMOVE&#39;, edge)</span>
+                <span class="n">graph</span><span class="o">.</span><span class="n">remove_edge</span><span class="p">(</span> <span class="n">edge</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">edge</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span>
+                
+                <span class="k">try</span> <span class="p">:</span>
+                    <span class="n">min_path_error</span> <span class="o">=</span>  <span class="mi">1</span><span class="o">/</span><span class="n">nx</span><span class="o">.</span><span class="n">dijkstra_path_length</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">edge</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">edge</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="s1">&#39;label&#39;</span><span class="p">)</span>
+                    
+                <span class="k">except</span> <span class="n">nx</span><span class="o">.</span><span class="n">NetworkXNoPath</span> <span class="p">:</span>
+                    <span class="n">min_path_error</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+                    
+                <span class="c1">#print(&quot;ADD&quot;, edge)    </span>
+                <span class="n">graph</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span> <span class="n">edge</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">edge</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">**</span><span class="n">edge_data</span> <span class="p">)</span>
+                
+                
+                <span class="k">if</span> <span class="p">(</span><span class="n">min_path_error</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="o">/</span><span class="n">edge_err</span> <span class="p">)</span> <span class="p">:</span>
+                    <span class="n">k</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="c1"># Delete the edge</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="p">):</span>
+                        <span class="k">if</span><span class="p">(</span>   <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">edge</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span>  <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">edge</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>     <span class="p">)</span> <span class="p">:</span>
+                            <span class="n">f</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                            <span class="n">graph</span><span class="o">.</span><span class="n">remove_edge</span><span class="p">(</span> <span class="n">edge</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">edge</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span>
+                            <span class="n">e_largest</span> <span class="o">=</span> <span class="kc">False</span>
+                            <span class="k">break</span>
+                    <span class="k">break</span>
+                                
+                <span class="k">elif</span> <span class="p">(</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">min_path_error</span> <span class="ow">and</span>  <span class="n">min_path_error</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="o">/</span><span class="n">edge_err</span> <span class="p">)</span> <span class="p">:</span>
+                    <span class="n">k</span> <span class="o">=</span> <span class="n">min_path_error</span><span class="o">/</span> <span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">edge_err</span><span class="p">)</span>
+                    
+                <span class="k">else</span> <span class="p">:</span>
+                    <span class="n">k</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;-inf&#39;</span><span class="p">)</span>
+                    <span class="n">M</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span><span class="n">edge</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">edge</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">]</span> <span class="p">)</span>
+                
+                <span class="k">if</span> <span class="p">(</span> <span class="n">k</span> <span class="o">&gt;</span> <span class="n">k_largest</span>  <span class="p">)</span> <span class="p">:</span>
+                    <span class="n">k_largest</span> <span class="o">=</span> <span class="n">k</span>
+                    <span class="n">e_largest</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span> <span class="n">edge</span> <span class="p">)</span>
+                
+
+            <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">e_largest</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="c1"># DELETE THE LARGEST FROM THE GRAPH          </span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="p">):</span>
+                        <span class="k">if</span><span class="p">(</span>   <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">e_largest</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span>  <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">e_largest</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>     <span class="p">)</span> <span class="p">:</span>
+                            <span class="n">f</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                            <span class="k">break</span>
+                <span class="n">lost_prune</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">k_largest</span> <span class="p">)</span>
+                <span class="n">graph</span><span class="o">.</span><span class="n">remove_edge</span><span class="p">(</span> <span class="n">e_largest</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">e_largest</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span>
+                            
+            <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span> <span class="s2">&quot;EMERGENCY&quot;</span> <span class="p">)</span>
+                <span class="k">raise</span><span class="p">(</span><span class="ne">Exception</span><span class="p">)</span>
+            
+        <span class="k">if</span><span class="p">(</span><span class="ow">not</span><span class="p">(</span><span class="n">score</span><span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">return</span> <span class="n">graph</span> 
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lost_prune</span><span class="p">)</span> <span class="p">),</span> <span class="n">lost_prune</span> <span class="p">)</span>
+            <span class="k">return</span> <span class="n">graph</span><span class="p">,</span> <span class="n">lost_prune</span></div></div>
+            
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">ClusterGraph</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">ClusterGraph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../history.html">History</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Mathis Hallier.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
