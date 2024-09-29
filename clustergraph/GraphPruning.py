@@ -14,13 +14,13 @@ from .Metric_distortion_class import Metric_distortion
 
 class GraphPruning :
     
-    def __init__(self,  graph,  type_pruning = "conn" ,  algo ="bf", weight = "label" ,
+    def __init__(self,  graph=None,  type_pruning = "conn" ,  algo ="bf", weight = "label" ,
                 knn_g = None ,  weight_knn_g = 'label', k_compo = 2, dist_weight = True ) :
         """_summary_
 
         Parameters
         ----------
-        graph : networkx.Graph
+        graph : networkx.Graph, optional
             Graph to prune
         type_pruning : str in {"conn", "md"}, optional
             The type of pruning chosen. It can be "md" for the metric distortion pruning or "conn" for the connectivity pruning. The connectivity pruning returns a summary of the graph meanwhile the metric distortion pruning returns a graph which tends to be close to the shape of data, by default "conn"
@@ -40,16 +40,17 @@ class GraphPruning :
         dist_weight : bool, optional
             If “dist_weight” is set to True, the distortion will be computed with weight on edges and it will not be the case if it is set to False, by default True
         """
+        if graph != None :
+            self.original_graph = graph
 
-        self.original_graph = graph
         self.pruned_graph = None
         self.merged_graph = None
 
         if (type_pruning == "conn") :
-            self.prunedStrategy =  ConnectivityPruning(algo = algo, weight=weight )
+            self.prunedStrategy =  ConnectivityPruning(algo=algo, weight=weight )
         
         elif( type_pruning == "md" ) :
-            self.prunedStrategy =  Metric_distortion( graph =  graph, knn_g = knn_g ,  weight_knn_g = weight_knn_g , k_compo = k_compo , dist_weight = dist_weight, algo =algo)
+            self.prunedStrategy =  Metric_distortion( graph=self.original_graph, knn_g = knn_g ,  weight_knn_g = weight_knn_g , k_compo = k_compo , dist_weight = dist_weight, algo =algo)
         
     
     

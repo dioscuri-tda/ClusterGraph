@@ -3,10 +3,12 @@ import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
 from . import distances
+from .c_GraphPreprocess import GraphPreprocess
+from .GraphPruning import GraphPruning
 from pyballmapper import BallMapper
 
 
-class ClusterGraph:
+class ClusterGraph(GraphPreprocess, GraphPruning):
 
     def __init__(
         self,
@@ -16,6 +18,13 @@ class ClusterGraph:
         # Parameters connected with Distance_between_points
         metric_points=sp.euclidean,
         parameters_metric_points={},
+        type_pruning = "conn", 
+        algo ="bf",
+        weight = "label",
+        knn_g = None,  
+        weight_knn_g = 'label', 
+        k_compo = 2,
+        dist_weight = True 
     ):
 
         self.clusters = clusters
@@ -61,3 +70,28 @@ class ClusterGraph:
             ],
             weight="label",
         )
+
+        GraphPreprocess.__init__(self)
+        self.graph_prepro = self.graph
+
+        GraphPruning.__init__(self, 
+            graph=self.graph,
+            type_pruning = type_pruning, 
+            algo =algo,
+            weight = weight,
+            knn_g = knn_g,  
+            weight_knn_g = weight_knn_g, 
+            k_compo = k_compo,
+            dist_weight = dist_weight
+        )
+        self.original_graph=self.graph
+
+    def get_graph(self):
+        """
+        Returns
+        -------
+        networkx.Graph
+            Returns the ClusterGraph
+        """
+        return self.graph
+    
