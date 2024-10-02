@@ -36,7 +36,7 @@ class Metric_distortion:
         self.weight_knn_g = weight_knn_g  # the weight/label used in knn_g
         self.label_points_covered_intr = "points_covered"
         self.nb_points_disco = 0
-        self.nb_points_should_be_evaluated =0
+        self.nb_points_should_be_evaluated = 0
         self.k_nn_compo = k_compo 
         self.dijkstra_length_dict = dict(nx.all_pairs_dijkstra_path_length( self.knn_g  , weight = weight_knn_g   ))
         
@@ -56,8 +56,6 @@ class Metric_distortion:
             nx.all_pairs_dijkstra_path_length(self.knn_g, weight=weight_knn_g)
         )
 
-
-        
         # CREATION OF THE INTRINSIC CLUSTERGRAPH
         self.intri_cg = graph.copy()
         nodes = list(self.intri_cg.nodes())
@@ -347,7 +345,7 @@ class Metric_distortion:
 
     
     # FUNCTION WHICH RETURN THE GRAPH PRUNED WITH CHANGING THE CONNECTIVITY 
-    def prune_edges_BF(self, graph,  nb_edges_pruned = -1 ,  md_plot = True ) :
+    def prune_edges_BF(self, graph, nb_edges_pruned = -1, md_plot = True) :
         """_summary_
         Method which prunes the given number of edges iteratively by picking the edge lowing down the most the metric distortion at each iteration. 
         This algorithm stops when the number of edges pruned is reached or when the lowest metric distortion is reached.
@@ -370,6 +368,7 @@ class Metric_distortion:
         self.edges_between_compo = edges_between_compos
         nb_cc = nx.number_connected_components(temp_graph)
         f = list(temp_graph.edges)
+        removed_edges = []
 
         if nb_edges_pruned <= 0:
             nb_edges_pruned = len(f)
@@ -405,20 +404,20 @@ class Metric_distortion:
                         f.pop(i)
                         break
 
+                removed_edges.append((e_smallest[0], e_smallest[1]))
                 temp_graph.remove_edge(e_smallest[0], e_smallest[1])
                 if md_plot:
                     self.temp_list_md.append(md_smallest)
-
             else:
                 break
         if md_plot:
-            return temp_graph, self.temp_list_md
+            return temp_graph, removed_edges, self.temp_list_md
 
         else:
-            return temp_graph
+            return temp_graph, removed_edges
         
     
-    def prune_edges_PS(self, g,  nb_edges_pruned = None, md_plot = True ) :
+    def prune_edges_PS(self, g, nb_edges_pruned=None, md_plot=True) :
         """_summary_
         Method which prunes the given number of edges iteratively by picking the edge with the highest metric distortion at each iteration. 
 
@@ -436,8 +435,8 @@ class Metric_distortion:
         networkx.Graph or networkx.Graph, list
             The pruned graph and if "md_plot" is set to true, the evolution of the distortion at each iteration (at each edge pruned).
         """
-        graph = deepcopy( g)
-        edges_between_compos, temp_graph = self.remove_edges( graph)
+        graph = deepcopy(g)
+        edges_between_compos, temp_graph = self.remove_edges(graph)
         self.edges_between_compo = edges_between_compos
         nb_cc = nx.number_connected_components(graph)
         f = list(graph.edges)
@@ -445,7 +444,7 @@ class Metric_distortion:
             nb_edges_pruned = len(f)
         if md_plot:
             self.temp_list_md = [self.distortion_graph(graph, self.intri_cg)]
-
+        removed_edges = []
         for i in range(nb_edges_pruned):
             e_smallest = False
             md_smallest = np.inf
@@ -479,6 +478,7 @@ class Metric_distortion:
                     if f[i][0] == e_smallest[0] and f[i][1] == e_smallest[1]:
                         f.pop(i)
                         break
+                removed_edges.append((e_smallest[0], e_smallest[1]))
                 graph.remove_edge(e_smallest[0], e_smallest[1])
 
                 if md_plot:
@@ -486,8 +486,8 @@ class Metric_distortion:
                         self.distortion_graph(graph, self.intri_cg)
                     )
         if md_plot:
-            return graph, self.temp_list_md
-        return graph
+            return graph, removed_edges, self.temp_list_md
+        return graph, removed_edges
 
     def greedy_pruning(self, alpha = 0.5, nb_edges = -1, weight = "distortion") :
         """_summary_
@@ -598,7 +598,6 @@ class Metric_distortion:
         min_n = nodes[0]
         nb_nodes = len(nodes)
         dist_mat = np.array([0] * (nb_nodes**2)).reshape(nb_nodes, nb_nodes)
-
         edge_max = -1
         for e in self.graph.edges:
             dist = self.graph.edges[e]["label"]
@@ -735,10 +734,9 @@ class Metric_distortion:
                 e[1] + min_node,
                 **self.graph.get_edge_data(e[0] + min_node, e[1] + min_node)
             )
-
         return pruned_gg
 
-    def conn_prune_merged_graph(self, pruned_gg, nb_edges_pruned=None):
+    def conn_prune_merged_graph(self, pruned_gg, nb_edges_pruned=None, k_compo = None):
         """_summary_
         Method which after merging the disconnected components in the graph, prune a given number of edges in order to get a less noisy graph.
 
@@ -754,12 +752,16 @@ class Metric_distortion:
         networkx.Graph
             Returns the merged and pruned graph.
         """
+        if not(k_compo is None):
+            self.k_nn_compo = k_compo
+
         pruned_gg = self.merge_components(pruned_gg)
         if nb_edges_pruned is None:
             nb_edges_pruned = len(list(pruned_gg.edges))
 
-        graph =  deepcopy(pruned_gg)
-        f = list( graph.edges )
+        graph = deepcopy(pruned_gg)
+        removed_edges = []
+        f = list(graph.edges)
         M = []
         based_rk = self.connectivity_graph(graph)
         self.list_rk = [1]
@@ -783,11 +785,8 @@ class Metric_distortion:
             for edge in f_minus_M:
                 edge_data = deepcopy(graph.get_edge_data(edge[0], edge[1]))
                 edge_err = deepcopy(edge_data["label"])
-
-                # print('REMOVE', edge)
                 graph.remove_edge(edge[0], edge[1])
                 nb_compo = nx.number_connected_components(graph)
-
                 if nb_compo == 1:
                     rk = self.connectivity_graph(graph) / c_fix_loop
 
@@ -795,7 +794,6 @@ class Metric_distortion:
                         rk_largest = rk
                         e_largest = edge
                         c_largest = self.connectivity_graph(graph) / based_rk
-
                 else:
                     M.append(edge)
 
@@ -809,6 +807,7 @@ class Metric_distortion:
                         break
 
                 graph.remove_edge(e_largest[0], e_largest[1])
+                removed_edges.append( (e_largest[0], e_largest[1]) )
                 self.list_rk.append(c_largest)
 
-        return graph
+        return graph, removed_edges, self.list_rk

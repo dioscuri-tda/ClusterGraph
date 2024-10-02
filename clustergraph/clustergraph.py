@@ -93,5 +93,10 @@ class ClusterGraph(GraphPreprocess, GraphPruning):
         networkx.Graph
             Returns the ClusterGraph
         """
-        return self.graph
+        if self.is_pruned != "not_pruned" :
+            return self.graph
+        else :
+            pruned_graph = self.graph.copy()
+            pruned_graph.remove_edges_from(self.prunedEdgesHistory[self.is_pruned]["edges"])
+            return pruned_graph
     
