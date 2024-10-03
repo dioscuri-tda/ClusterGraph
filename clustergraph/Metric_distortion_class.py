@@ -728,13 +728,15 @@ class Metric_distortion:
         graph_missing_edges = self.create_knn_graph_merge_compo_CG(
             dist_mat, self.k_nn_compo
         )
+        current_edges_between_compos = []
         for e in graph_missing_edges.edges:
             pruned_gg.add_edge(
                 e[0] + min_node,
                 e[1] + min_node,
                 **self.graph.get_edge_data(e[0] + min_node, e[1] + min_node)
             )
-        return pruned_gg
+            current_edges_between_compos.append( (e[0],e[1]) )
+        return pruned_gg, current_edges_between_compos
 
     def conn_prune_merged_graph(self, pruned_gg, nb_edges_pruned=None, k_compo = None):
         """_summary_
@@ -754,14 +756,16 @@ class Metric_distortion:
         """
         if not(k_compo is None):
             self.k_nn_compo = k_compo
-
-        pruned_gg = self.merge_components(pruned_gg)
+        temp_pruned_gg = pruned_gg.copy()
+        temp_pruned_gg, current_edges_between_compos = self.merge_components(temp_pruned_gg)
+    
         if nb_edges_pruned is None:
-            nb_edges_pruned = len(list(pruned_gg.edges))
+            nb_edges_pruned = len(list(self.edges_between_compo))
 
-        graph = deepcopy(pruned_gg)
+        graph = deepcopy(temp_pruned_gg)
         removed_edges = []
-        f = list(graph.edges)
+        #f = list(graph.edges)
+        f = deepcopy(current_edges_between_compos)
         M = []
         based_rk = self.connectivity_graph(graph)
         self.list_rk = [1]

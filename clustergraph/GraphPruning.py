@@ -52,7 +52,7 @@ class GraphPruning :
                                  "conn_bf":{"all_pruned":False, "edges":[], "score":[]},
                                  "conn_ps":{"all_pruned":False, "edges":[], "score":[]},
                                  "in_between_compo":{"edges":[]},
-                                 "conn_merged":{"all_pruned":False, "edges":[], "score":[], 'k_compo': -1}
+                                 "conn_merged":{"all_pruned":False, "edges":[], "score":[], 'k_compo': -1, "other_edges_remove":[]}
                                  }
         if not(graph is None) :
             if (type_pruning == "conn"):
@@ -135,11 +135,11 @@ class GraphPruning :
         if( self.prunedEdgesHistory[self.is_pruned]["all_pruned"] or 
            ( nb_edge_pruned > 0 and len(self.prunedEdgesHistory[self.is_pruned]["edges"]) >= nb_edge_pruned
              ) ) :
-            print("Recomputed")
             pruned_graph = self.original_graph.copy()
             if nb_edge_pruned == -1 :
                 nb_edge_pruned = len(self.prunedEdgesHistory[self.is_pruned]["edges"])
             pruned_graph.remove_edges_from(self.prunedEdgesHistory[self.is_pruned]["edges"][:nb_edge_pruned])
+            pruned_graph.remove_edges_from(self.prunedEdgesHistory["in_between_compo"]["edges"])
 
             if score :
                 return pruned_graph, self.prunedEdgesHistory[self.is_pruned]["score"][ :nb_edge_pruned]
@@ -209,7 +209,7 @@ class GraphPruning :
 
 
 
-    def merge_graph(self, nb_edges = -1, k_compo = 2 ) :
+    def merge_graph(self, nb_edges = -1, k_compo = 2, score=False) :
         """_summary_
         Method which after merging the disconnected components in the graph, prune a given number of edges (among the ones added by the merge) in order to get a less noisy graph.
 
@@ -236,37 +236,37 @@ class GraphPruning :
         
         if self.prunedEdgesHistory["conn_merged"]['all_pruned'] and k_compo == self.prunedEdgesHistory["conn_merged"]['k_compo'] :
             merged_graph = self.get_merged_graph(pruning, nb_edges)
+            conn_score = self.prunedEdgesHistory["conn_merged"]['score']
         
         else :
-            print("Pruning ", pruning)
             merged_graph.remove_edges_from(self.prunedEdgesHistory[pruning]["edges"])
-            g, removed_edges, conn_score = self.prunedStrategy.conn_prune_merged_graph(merged_graph, None, k_compo)
+            merged_graph.remove_edges_from(self.prunedEdgesHistory["in_between_compo"]["edges"])
+            g, removed_edges, conn_score = self.prunedMetricDistortionStrategy.conn_prune_merged_graph(merged_graph, None, k_compo)
             self.prunedEdgesHistory["conn_merged"]['all_pruned'] = True
-            self.prunedEdgesHistory["conn_merged"]['edges'] = removed_edges
+            self.prunedEdgesHistory["conn_merged"]['edges'] = deepcopy(removed_edges)
+            between_not_current = []
+            for e in self.prunedEdgesHistory["in_between_compo"]["edges"] :
+                if not (e in removed_edges or (e[1], e[0]) in removed_edges) :
+                    between_not_current.append(e)
+
+            self.prunedEdgesHistory["conn_merged"]["other_edges_remove"] = deepcopy(between_not_current)
             self.prunedEdgesHistory["conn_merged"]['score'] = conn_score
             self.prunedEdgesHistory["conn_merged"]['k_compo'] = k_compo
             merged_graph = self.get_merged_graph(pruning, nb_edges)
-
-        return merged_graph
+        if score :
+            return merged_graph, conn_score
+        else :
+            return merged_graph
     
     def get_merged_graph(self, key, nb_edges) :
         merged_graph = self.original_graph.copy()
         edges_to_prune = deepcopy(self.prunedEdgesHistory[key]["edges"])
+        #edges_to_prune.extend(deepcopy(self.prunedEdgesHistory["in_between_compo"]["edges"]))
         if nb_edges == -1 :
             nb_edges = len(self.prunedEdgesHistory["conn_merged"]['edges'])
         
-        for e in self.prunedEdgesHistory["in_between_compo"]["edges"] :
-            if not(e in self.prunedEdgesHistory["conn_merged"]['edges'][:nb_edges] or 
-                   (e[1],e[0]) in self.prunedEdgesHistory["conn_merged"]['edges'][:nb_edges] 
-            ) :
-                try :
-                    edges_to_prune.remove(e)
-                except :
-                    a = 1
-                try :
-                    edges_to_prune.remove( (e[1],e[0]) )
-                except :
-                    a = 1
+        edges_to_prune.extend( deepcopy(self.prunedEdgesHistory["conn_merged"]['edges'][:nb_edges])  )
+        edges_to_prune.extend( deepcopy(self.prunedEdgesHistory["conn_merged"]["other_edges_remove"])  ) 
 
         merged_graph.remove_edges_from(edges_to_prune)
         return merged_graph
