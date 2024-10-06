@@ -14,7 +14,7 @@ class ClusterGraph(GraphPreprocess, GraphPruning):
         self,
         X,
         clusters,
-        metric_clusters="average",
+        metric_clusters="centroids",
         # Parameters connected with Distance_between_points
         metric_points=sp.euclidean,
         parameters_metric_points={},
@@ -32,14 +32,21 @@ class ClusterGraph(GraphPreprocess, GraphPruning):
         # distance between ids of datapoints
         if metric_points == "precomputed":
             self.distance_points = lambda i, j: X[i, j]
+
+        elif metric_clusters == "centroids" :
+            self.distance_points = lambda c_i, c_j: metric_points( np.mean(X[c_i], axis=0), np.mean(X[c_j], axis=0), 
+                                                                  **parameters_metric_points )
+
         else:
             self.distance_points = lambda i, j: metric_points(
                 X[i], X[j], **parameters_metric_points
             )
 
         # distance between clusters
-        if metric_clusters == "average":
-            self.distance_clusters = distances.average_dist
+        if metric_clusters == "centroids" :
+            self.distance_clusters = distances.centroid_dist
+        elif metric_clusters == "average":
+            self.distance_clusters = distances.average_dist 
         elif metric_clusters == "min":
             self.distance_clusters = distances.min_dist
         elif metric_clusters == "max":
