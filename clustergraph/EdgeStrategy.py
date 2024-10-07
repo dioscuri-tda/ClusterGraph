@@ -15,7 +15,7 @@ import pandas as pd
 
 class EdgeStrategy :
     
-    def __init__(self, graph,  palette = None, weight = "label", variable = None, norm_weight = "lin" ,
+    def __init__(self, graph,  palette = None, weight = "weight", variable = None, norm_weight = "lin" ,
                  type_coloring = "label" , color_labels = None, coloring_strategy_var = 'lin'   ) :
         """_summary_
 
@@ -26,7 +26,7 @@ class EdgeStrategy :
         palette : Colormap, optional
             Palette used to color edges, by default None
         weight : str, optional
-            Key in the graph underwhich the size/weight of edges is stored, by default "label"
+            Key in the graph underwhich the size/weight of edges is stored, by default "weight"
         variable : str, optional
             Key giving access to the continuous variable used to color edges, by default None
         norm_weight : str, optional

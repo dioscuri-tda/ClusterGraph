@@ -4,7 +4,6 @@ import networkx as nx
 from copy import deepcopy
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.neighbors import NearestNeighbors
 import random
 
 from  .ConnectivityPruning import ConnectivityPruning
@@ -14,8 +13,8 @@ from .Metric_distortion_class import Metric_distortion
 
 class GraphPruning :
     
-    def __init__(self,  graph=None,  type_pruning = None,  algo ="bf", weight = "label" ,
-                knn_g = None,  weight_knn_g = 'label', k_compo = 2, dist_weight = True ) :
+    def __init__(self,  graph=None,  type_pruning = None,  algo ="bf", weight = "weight" ,
+                knn_g = None,  weight_knn_g = 'weight', k_compo = 2, dist_weight = True ) :
         """_summary_
 
         Parameters
@@ -28,12 +27,12 @@ class GraphPruning :
             Choice of the algorithm used to prune edges in the graph. “bf” correspond to the best and also the slowest algorithm (the brut force algorithm).
             “ps” is the quickest but does not ensure the best pruning, by default "bf"
         weight : str, optional
-            The key underwhich the weight/size of edges is stored in the graph, by default "label"
+            The key underwhich the weight/size of edges is stored in the graph, by default "weight"
         knn_g : networkx.Graph, optional
             The k-nearest neighbors graph from which the intrinsic distance between points of the dataset is retrieved. 
             The dataset should be the same than the one on which the “graph” was computed. It is mandatory when the "type_pruning" is "md", by default None
         weight_knn_g : str, optional
-            Key/label underwhich the weight of edges is store in the “graph”. The weight corresponds to the distance between two nodes, by default 'label'
+            Key/Weight underwhich the weight of edges is store in the “graph”. The weight corresponds to the distance between two nodes, by default 'weight'
         k_compo : int, optional
             Number of edges that will be added to each disconnected component to merge them after the metric distortion pruning process.
             The edges added are edges which are connecting disconnected components and the shortest are picked, by default 2
@@ -47,8 +46,8 @@ class GraphPruning :
         self.merged_graph = None
         self.is_pruned = "not_pruned"
 
-        self.prunedEdgesHistory={"md_bf" :{"all_pruned":False, "edges":[], "score":[]},
-                                 "md_ps":{"all_pruned":False, "edges":[], "score":[]},
+        self.prunedEdgesHistory={"md_bf" :{"all_pruned":False, "edges":[], "score":[],"knn_g":-1},
+                                 "md_ps":{"all_pruned":False, "edges":[], "score":[], "knn_g":-1},
                                  "conn_bf":{"all_pruned":False, "edges":[], "score":[]},
                                  "conn_ps":{"all_pruned":False, "edges":[], "score":[]},
                                  "in_between_compo":{"edges":[]},
@@ -119,20 +118,24 @@ class GraphPruning :
         self.merged_graph = self.prunedStrategy.conn_prune_merged_graph(pruned_gg, nb_edges ).copy()
         return self.merged_graph
     
-    def prune_distortion(self,
+    def prune_distortion_pr(self,
                 knn_g,
                 nb_edge_pruned = -1, 
                 score = False,
                 algo="bf",
-                weight_knn_g = 'label', 
+                weight_knn_g = 'weight', 
                 k_compo = 2, 
-                dist_weight = True) :
+                dist_weight = True,
+                is_knn_computed = -1) :
         if (algo!="bf" and algo!="ps") :
             raise ValueError("The algorithm can only be 'bf' or 'ps'.")
         
         self.is_pruned = "md_"+algo
         
-        if( self.prunedEdgesHistory[self.is_pruned]["all_pruned"] or 
+        if( 
+            (self.prunedEdgesHistory[self.is_pruned]["all_pruned"] and 
+             self.prunedEdgesHistory[self.is_pruned]["knn_g"] == is_knn_computed  ) 
+           or 
            ( nb_edge_pruned > 0 and len(self.prunedEdgesHistory[self.is_pruned]["edges"]) >= nb_edge_pruned
              ) ) :
             pruned_graph = self.original_graph.copy()
@@ -146,6 +149,7 @@ class GraphPruning :
             else :
                 return pruned_graph
             
+        self.prunedEdgesHistory[self.is_pruned]["knn_g"] = is_knn_computed   
         self.prunedMetricDistortionStrategy=Metric_distortion( 
                                             graph=self.original_graph,
                                             knn_g=knn_g,  
@@ -173,7 +177,7 @@ class GraphPruning :
                 nb_edge_pruned = -1, 
                 score=False,
                 algo="bf",
-                weight="label"
+                weight="weight"
                 ):
         if (algo!="bf" and algo!="ps") :
             raise ValueError("The algorithm can only be 'bf' or 'ps'.")

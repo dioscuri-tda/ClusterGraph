@@ -8,7 +8,7 @@ def plot_pie( graph, nb_edges=None, variable="weight_plot", size_nodes = 0.01, r
     
     G = graph.copy()
     if nb_edges is not None:
-        edges = sorted(G.edges(data=True), key=lambda x: x[2].get("label", 0))[:nb_edges]
+        edges = sorted(G.edges(data=True), key=lambda x: x[2].get("weight", 0))[:nb_edges]
         G.clear_edges()
         G.add_edges_from(edges)
         
@@ -61,7 +61,7 @@ def plot_colored_graph(graph, nb_edges=None, variable="weight_plot", size_nodes 
     G = graph.copy()
 
     if nb_edges is not None:
-        edges = sorted(G.edges(data=True), key=lambda x: x[2].get("label", 0))[:nb_edges]
+        edges = sorted(G.edges(data=True), key=lambda x: x[2].get("weight", 0))[:nb_edges]
         G.clear_edges()
         G.add_edges_from(edges)
 
@@ -93,7 +93,7 @@ def plot_colored_graph(graph, nb_edges=None, variable="weight_plot", size_nodes 
 
 
 
-def plot_slider_graph( g , reverse = False, random_state = None, weight = 'label', 
+def plot_slider_graph( g , reverse = False, random_state = None, weight = 'weight', 
                       weight_shown = "weight_plot" , max_node_size = 800,
                        min_node_size = 100  ):
 

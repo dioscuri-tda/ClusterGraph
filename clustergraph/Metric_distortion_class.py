@@ -10,7 +10,7 @@ import random
 
 class Metric_distortion:
     
-    def __init__(self, graph, knn_g, weight_knn_g = 'label', k_compo = 2,  dist_weight = True, algo="bf" ) :
+    def __init__(self, graph, knn_g, weight_knn_g = 'weight', k_compo = 2,  dist_weight = True, algo="bf" ) :
         """_summary_
 
         Parameters
@@ -21,7 +21,7 @@ class Metric_distortion:
             The k-nearest neighbors graph from which the intrinsic distance between points of the dataset is retrieved.
             The dataset should be the same than the one on which the “graph” was computed.
         weight_knn_g : str, optional
-            Key/label underwhich the weight of edges is store in the “graph”. The weight corresponds to the distance between two nodes, by default 'label'
+            Key/label underwhich the weight of edges is store in the “graph”. The weight corresponds to the distance between two nodes, by default 'weight'
         k_compo : int, optional
             Number of edges that will be added to each disconnected component to merge them after the metric distortion pruning process. 
             The edges added are edges which are connecting disconnected components and the shortest are picked, by default 2
@@ -168,7 +168,7 @@ class Metric_distortion:
         connected_components = [
             graph.subgraph(c).copy() for c in nx.connected_components(graph)
         ]
-        short_paths = dict(nx.all_pairs_dijkstra_path_length(graph, weight="label"))
+        short_paths = dict(nx.all_pairs_dijkstra_path_length(graph, weight="weight"))
         distortion_g = 0
         nb_pair = 0
         for cc in connected_components:
@@ -220,7 +220,7 @@ class Metric_distortion:
         connected_components = [
             graph.subgraph(c).copy() for c in nx.connected_components(graph)
         ]
-        short_paths = dict(nx.all_pairs_dijkstra_path_length(graph, weight="label"))
+        short_paths = dict(nx.all_pairs_dijkstra_path_length(graph, weight="weight"))
         dist_global = 0
         nb_pair_global = 0
         for cc in connected_components:
@@ -460,7 +460,7 @@ class Metric_distortion:
                     md_path = abs(
                         np.log10(
                             nx.dijkstra_path_length(
-                                graph, edge[0], edge[1], weight="label"
+                                graph, edge[0], edge[1], weight="weight"
                             )
                             / self.intri_cg.edges[edge]["intr_dist"]
                         )
@@ -556,7 +556,7 @@ class Metric_distortion:
         """
         for e in graph.edges:
             graph.edges[e][weight] = abs(
-                np.log10(graph.edges[e]["label"] / self.intri_cg.edges[e]["intr_dist"])
+                np.log10(graph.edges[e]["weight"] / self.intri_cg.edges[e]["intr_dist"])
             )
 
     def plt_md_prune_computed(self, save = None) :
@@ -600,12 +600,12 @@ class Metric_distortion:
         dist_mat = np.array([0] * (nb_nodes**2)).reshape(nb_nodes, nb_nodes)
         edge_max = -1
         for e in self.graph.edges:
-            dist = self.graph.edges[e]["label"]
+            dist = self.graph.edges[e]["weight"]
             if dist > edge_max:
                 edge_max = dist
 
         maxi = edge_max + 1
-        paths = dict(nx.all_pairs_dijkstra_path_length(pruned_graph, weight="label"))
+        paths = dict(nx.all_pairs_dijkstra_path_length(pruned_graph, weight="weight"))
 
         for n1 in nodes:
             for n2 in nodes:
@@ -614,7 +614,7 @@ class Metric_distortion:
                         dist = paths[n1][n2]
                         dist = maxi
                     except:
-                        dist = self.graph.edges[(n1, n2)]["label"]
+                        dist = self.graph.edges[(n1, n2)]["weight"]
 
                     dist_mat[n1 - min_n][n2 - min_n] = dist
                     dist_mat[n2 - min_n][n1 - min_n] = dist
@@ -647,7 +647,7 @@ class Metric_distortion:
         nn_adjacency = nn.kneighbors_graph(
             X=distance_matrix, n_neighbors=k, mode="distance"
         )
-        nn_Graph = nx.from_scipy_sparse_array(nn_adjacency, edge_attribute="label")
+        nn_Graph = nx.from_scipy_sparse_array(nn_adjacency, edge_attribute="weight")
         for n in nn_Graph.nodes:
             try:
                 nn_Graph.remove_edge(n, n)
@@ -669,7 +669,7 @@ class Metric_distortion:
                 Returns the global connectivity of the graph.
         """
         nodes = list(graph.nodes)
-        short_paths = dict(nx.all_pairs_dijkstra_path_length(graph, weight="label"))
+        short_paths = dict(nx.all_pairs_dijkstra_path_length(graph, weight="weight"))
         nb_nodes = len(nodes)
         C_V_E = 0
         nb_not_existing_path = 0
@@ -788,7 +788,7 @@ class Metric_distortion:
 
             for edge in f_minus_M:
                 edge_data = deepcopy(graph.get_edge_data(edge[0], edge[1]))
-                edge_err = deepcopy(edge_data["label"])
+                edge_err = deepcopy(edge_data["weight"])
                 graph.remove_edge(edge[0], edge[1])
                 nb_compo = nx.number_connected_components(graph)
                 if nb_compo == 1:

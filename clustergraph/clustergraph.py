@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from . import distances
 from .c_GraphPreprocess import GraphPreprocess
 from .GraphPruning import GraphPruning
+from sklearn.neighbors import NearestNeighbors
 from pyballmapper import BallMapper
 
 
@@ -20,14 +21,32 @@ class ClusterGraph(GraphPreprocess, GraphPruning):
         parameters_metric_points={},
         type_pruning = "conn", 
         algo ="bf",
-        weight = "label",
+        weight = "weight",
         knn_g = None,  
-        weight_knn_g = 'label', 
+        weight_knn_g = 'weight', 
         k_compo = 2,
         dist_weight = True 
     ):
 
         self.clusters = clusters
+        self.is_knn_computed = -1
+        self.X = X
+        if knn_g is None or isinstance(knn_g, (nx.Graph, nx.DiGraph, nx.MultiGraph, nx.MultiDiGraph)) :
+            self.knn_g = knn_g
+            self.is_knn_computed = 0
+            
+        elif isinstance(knn_g, int) :
+            neigh = NearestNeighbors(n_neighbors=knn_g, radius=1)
+            neigh.fit(X=X)
+            nn_adjacency = neigh.kneighbors_graph(X=X, n_neighbors=knn_g, mode="distance")
+            nn_Graph = nx.from_scipy_sparse_array(nn_adjacency, edge_attribute=weight_knn_g)
+
+            for node in nn_Graph.nodes:
+                nn_Graph.remove_edge(node, node)
+            self.knn_g = nn_Graph
+            self.is_knn_computed = knn_g
+        else :
+            raise TypeError("The variable 'knn_g' must be None, an integer or a networkx Graph.")
 
         # distance between ids of datapoints
         if metric_points == "precomputed":
@@ -75,7 +94,7 @@ class ClusterGraph(GraphPreprocess, GraphPruning):
                 for i, C_i in enumerate(clusters[:-1])
                 for j, C_j in enumerate(clusters[i + 1 :], start=(i + 1))
             ],
-            weight="label",
+            weight="weight",
         )
 
         GraphPreprocess.__init__(self)
@@ -86,7 +105,7 @@ class ClusterGraph(GraphPreprocess, GraphPruning):
             type_pruning = type_pruning, 
             algo =algo,
             weight = weight,
-            knn_g = knn_g,  
+            knn_g = self.knn_g,  
             weight_knn_g = weight_knn_g, 
             k_compo = k_compo,
             dist_weight = dist_weight
@@ -106,4 +125,41 @@ class ClusterGraph(GraphPreprocess, GraphPruning):
             pruned_graph = self.graph.copy()
             pruned_graph.remove_edges_from(self.prunedEdgesHistory[self.is_pruned]["edges"])
             return pruned_graph
+        
+
+    def prune_distortion(self,
+                knn_g = 10 ,
+                nb_edge_pruned = -1, 
+                score = False,
+                algo="bf",
+                weight_knn_g = 'weight', 
+                k_compo = 2, 
+                dist_weight = True) :
+        
+        if isinstance(knn_g, (nx.Graph, nx.DiGraph, nx.MultiGraph, nx.MultiDiGraph)) :
+            self.knn_g = knn_g
+            self.is_knn_computed = -1
+            
+        elif isinstance(knn_g, int) :
+            if self.is_knn_computed != knn_g :
+                neigh = NearestNeighbors(n_neighbors=knn_g, radius=1)
+                neigh.fit(X=self.X)
+                nn_adjacency = neigh.kneighbors_graph(X=self.X, n_neighbors=knn_g, mode="distance")
+                nn_Graph = nx.from_scipy_sparse_array(nn_adjacency, edge_attribute=weight_knn_g)
+
+                for node in nn_Graph.nodes:
+                    nn_Graph.remove_edge(node, node)
+                self.knn_g = nn_Graph
+                self.is_knn_computed = knn_g
+        
+        return self.prune_distortion_pr(knn_g=self.knn_g,
+                nb_edge_pruned=nb_edge_pruned,
+                score=score,
+                algo=algo,
+                weight_knn_g=weight_knn_g, 
+                k_compo=k_compo,
+                dist_weight=dist_weight,
+                is_knn_computed=self.is_knn_computed )
+
+        
     

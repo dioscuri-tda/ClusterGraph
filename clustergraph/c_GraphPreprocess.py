@@ -6,7 +6,7 @@ from copy import deepcopy
 
 class GraphPreprocess :
     
-    def __init__(self, graph = None,  nodeStrat=None,  edgeStrat=None, renderer=None  ) :
+    def __init__(self, graph=None, nodeStrat=None, edgeStrat=None) :
         """_summary_
 
         Parameters
@@ -17,15 +17,12 @@ class GraphPreprocess :
              The preprocessing configuration of edges can be given if it was created outside this class, by default None
         edgeStrat :  EdgeStrategy , optional
              The preprocessing configuration of edges can be given if it was created outside this class, by default None
-        renderer :  dict or function, optional
-             A dictionary or a function returning a dictionary with nodes as keys and their position in the plot as values, by default None
         """
         if graph != None :
             self.graph_prepro=deepcopy(graph)
 
         self.node_strategy=nodeStrat
         self.edge_strategy=edgeStrat 
-        self.renderer=renderer
 
     def get_graph_prepro(self):
         """
@@ -48,7 +45,7 @@ class GraphPreprocess :
             node_coloring_strategy_var='lin', 
             MIN_SIZE_NODE=0.1,
             edge_palette=None, 
-            edge_weight="label", 
+            edge_weight="weight", 
             edge_variable=None, 
             edge_norm_weight="lin",
             edge_type_coloring="label", 
@@ -142,7 +139,7 @@ class GraphPreprocess :
     def fit_edges(
             self, 
             edge_palette=None, 
-            edge_weight="label", 
+            edge_weight="weight", 
             edge_variable=None, 
             edge_norm_weight="lin",
             edge_type_coloring="label", 
@@ -158,7 +155,7 @@ class GraphPreprocess :
         edge_palette : Colormap, optional
             Palette used to color edges, by default None
         edge_weight : str, optional
-            Key in the graph underwhich the size/weight of edges is stored, by default "label"
+            Key in the graph underwhich the size/weight of edges is stored, by default "weight"
         edge_variable : str, optional
             Key giving access to the continuous variable used to color edges, by default None
         edge_norm_weight : str, optional

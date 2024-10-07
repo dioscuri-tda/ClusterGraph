@@ -6,7 +6,7 @@ from copy import deepcopy
 
 class ConnectivityPruning :
 
-    def __init__(self,  algo ="bf", weight = "label" ) :
+    def __init__(self,  algo ="bf", weight = "weight" ) :
         """_summary_
 
         Parameters
@@ -15,7 +15,7 @@ class ConnectivityPruning :
             Choice of the algorithm used to prune edges in the graph. “bf” correspond to the best and also the slowest algorithm (the brut force algorithm).
               “ps” is the quickest but does not ensure the best pruning, by default "bf"
         weight : str, optional
-            The key underwhich the weight/size of edges is stored in the graph, by default "label"
+            The key underwhich the weight/size of edges is stored in the graph, by default "weight"
         """
         self.weight = weight
         if(algo == "bf") :
@@ -104,7 +104,7 @@ class ConnectivityPruning :
             
             for edge in f_minus_M :
                 edge_data = deepcopy( graph.get_edge_data( edge[0] , edge[1] ) )
-                edge_err = deepcopy( edge_data['label'] )
+                #edge_err = deepcopy( edge_data[self.weight] )
                 
                 #print('REMOVE', edge)
                 graph.remove_edge( edge[0], edge[1] )
@@ -187,13 +187,13 @@ class ConnectivityPruning :
                         
             for edge in f_minus_M :
                 edge_data = deepcopy( graph.get_edge_data( edge[0] , edge[1] ) )
-                edge_err = deepcopy( edge_data['label'] )
+                edge_err = deepcopy( edge_data[self.weight] )
                 
                 #print('REMOVE', edge)
                 graph.remove_edge( edge[0], edge[1] )
                 
                 try :
-                    min_path_error =  1/nx.dijkstra_path_length(graph, edge[0], edge[1] , weight='label')
+                    min_path_error =  1/nx.dijkstra_path_length(graph, edge[0], edge[1] , weight=self.weight)
                     
                 except nx.NetworkXNoPath :
                     min_path_error = -1
