@@ -6,7 +6,7 @@ from copy import deepcopy
 
 class ConnectivityPruning :
 
-    def __init__(self,  algo ="bf", weight = "label" ) :
+    def __init__(self,  algo ="bf", weight = "weight" ) :
         """_summary_
 
         Parameters
@@ -15,7 +15,7 @@ class ConnectivityPruning :
             Choice of the algorithm used to prune edges in the graph. “bf” correspond to the best and also the slowest algorithm (the brut force algorithm).
               “ps” is the quickest but does not ensure the best pruning, by default "bf"
         weight : str, optional
-            The key underwhich the weight/size of edges is stored in the graph, by default "label"
+            The key underwhich the weight/size of edges is stored in the graph, by default "weight"
         """
         self.weight = weight
         if(algo == "bf") :
@@ -77,7 +77,8 @@ class ConnectivityPruning :
         Returns the pruned graph and if the parameter score is True, returns also a list of float which corresponds to the evolution of the connectivity kept after each pruned edge compared to the original graph.
 """
         graph =  g.copy()
-        f = list( graph.edges )
+        f = list(graph.edges)
+        removed_edges = []
         M = []
         conn_prune = [1]
         
@@ -103,14 +104,14 @@ class ConnectivityPruning :
             
             for edge in f_minus_M :
                 edge_data = deepcopy( graph.get_edge_data( edge[0] , edge[1] ) )
-                edge_err = deepcopy( edge_data['label'] )
+                #edge_err = deepcopy( edge_data[self.weight] )
                 
                 #print('REMOVE', edge)
                 graph.remove_edge( edge[0], edge[1] )
                 nb_compo = nx.number_connected_components(graph)
                 
                 if( nb_compo == 1) :
-                    rk =   self.connectivity_graph(graph) / c_fix_loop  
+                    rk = self.connectivity_graph(graph) / c_fix_loop  
 
                     if(rk > rk_largest ) :
                         rk_largest = rk
@@ -121,7 +122,6 @@ class ConnectivityPruning :
                     
                 graph.add_edge( edge[0], edge[1], **edge_data )
                 
-
             if( not(isinstance(e_largest, bool) ) ) :
                 # DELETE THE largest FROM THE GRAPH 
                 conn_prune.append(rk_largest) 
@@ -129,13 +129,13 @@ class ConnectivityPruning :
                         if(   f[i][0] == e_largest[0] and  f[i][1] == e_largest[1]     ) :
                             f.pop(i)
                             break
-                #print("REMOVE", e_largest)
+                removed_edges.append((e_largest[0], e_largest[1]))
                 graph.remove_edge( e_largest[0], e_largest[1] )
                 
         if(not(score) ):
-            return graph 
+            return graph, removed_edges
         else :
-            return graph, conn_prune
+            return graph, removed_edges, conn_prune
         
 
 
@@ -163,6 +163,7 @@ class ConnectivityPruning :
         graph =  g.copy()
         f = list( graph.edges )
         M = []
+        removed_edges =[]
         lost_prune = []
         for i in range(nb_edges) :
             k_largest = float('-inf')
@@ -186,13 +187,13 @@ class ConnectivityPruning :
                         
             for edge in f_minus_M :
                 edge_data = deepcopy( graph.get_edge_data( edge[0] , edge[1] ) )
-                edge_err = deepcopy( edge_data['label'] )
+                edge_err = deepcopy( edge_data[self.weight] )
                 
                 #print('REMOVE', edge)
                 graph.remove_edge( edge[0], edge[1] )
                 
                 try :
-                    min_path_error =  1/nx.dijkstra_path_length(graph, edge[0], edge[1] , weight='label')
+                    min_path_error =  1/nx.dijkstra_path_length(graph, edge[0], edge[1] , weight=self.weight)
                     
                 except nx.NetworkXNoPath :
                     min_path_error = -1
@@ -231,6 +232,7 @@ class ConnectivityPruning :
                             f.pop(i)
                             break
                 lost_prune.append( k_largest )
+                removed_edges.append((e_largest[0], e_largest[1]))
                 graph.remove_edge( e_largest[0], e_largest[1] )
                             
             if( len(f) != len(graph.edges) ) :
@@ -238,9 +240,9 @@ class ConnectivityPruning :
                 raise(Exception)
             
         if(not(score) ) :
-            return graph 
+            return graph, removed_edges 
         else :
             plt.scatter(range(len(lost_prune) ), lost_prune )
-            return graph, lost_prune
+            return graph, removed_edges, lost_prune
             
 

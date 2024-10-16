@@ -304,7 +304,7 @@ class NodeStrategy :
         # TEST IF WE NEED TO TRANSFORM LABELS INTO HEXADECIMAL VALUES
         all_hex = True
         for k in keys :
-            if( not( is_color_like( self.color_labels[k] )  )   ) :
+            if( not( is_color_like( self.color_labels[k] )) ) :
                 all_hex = False
                 break
         
