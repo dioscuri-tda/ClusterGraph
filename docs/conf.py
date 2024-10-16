@@ -22,8 +22,6 @@ import sys
 
 sys.path.insert(0, os.path.abspath(".."))
 
-import clustergraph
-
 # -- General configuration ---------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -37,7 +35,7 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
     "myst_parser",
-    "sphinx_rtd_theme",
+    # "sphinx_rtd_theme",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -65,6 +63,7 @@ autodoc_mock_imports = [
     "tqdm",
 ]
 
+import clustergraph
 
 # The master toctree document.
 master_doc = "index"
