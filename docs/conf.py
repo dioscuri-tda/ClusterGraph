@@ -22,7 +22,7 @@ import sys
 
 sys.path.insert(0, os.path.abspath(".."))
 
-import clustergraph
+# import clustergraph
 
 # -- General configuration ---------------------------------------------
 
@@ -52,6 +52,7 @@ source_suffix = {
     ".md": "markdown",
 }
 
+autoclass_content = "both"
 
 autodoc_mock_imports = [
     "pandas",
