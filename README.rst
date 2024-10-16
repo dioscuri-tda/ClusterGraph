@@ -16,17 +16,18 @@ ClusterGraph
 
 
 
-ClusterGraph is a tool which allows the visualization of a geometric organization of clusters by using an abstract graph.
+ClusterGraph is a tool which allows the visualization of a geometric organization of clusters.
+
+Installation
+-------
+
+`pip install clustergraph`
+
 
 
 * Free software: MIT license
-* Documentation: https://clustergraph.readthedocs.io.
+* Documentation: https://clustergraph.readthedocs.io. TODO
 
-
-Features
---------
-
-* TODO
 
 Credits
 -------
