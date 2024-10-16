@@ -74,6 +74,7 @@ def draw_graph(
     scale_nodes=True,
     size_nodes=1000,
     random_state=42,
+    precision=2,
     ax=None,
     **kwargs
 ):
@@ -130,7 +131,7 @@ def draw_graph(
     # Afficher les labels des arêtes
     if edge_variable is not None:
         edge_labels = {
-            (u, v): "{:.2f}".format(data[edge_variable])
+            (u, v): "{:.{}f}".format(data[edge_variable], precision)
             for u, v, data in G.edges(data=True)
         }
         nx.draw_networkx_edge_labels(G, edge_labels=edge_labels, ax=ax, **kwargs)

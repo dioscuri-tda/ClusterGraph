@@ -33,7 +33,7 @@ class GraphPreprocess:
         """
         return self.graph_prepro
 
-    def fit_graph(
+    def color_graph(
         self,
         node_size_strategy="log",
         node_type_coloring="label",

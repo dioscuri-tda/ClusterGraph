@@ -180,3 +180,31 @@ class ClusterGraph(GraphPreprocess, GraphPruning):
             dist_weight=dist_weight,
             is_knn_computed=self.is_knn_computed,
         )
+
+    def add_coloring(
+        self,
+        coloring_df,
+        custom_function=np.mean,
+    ):
+        """Takes pandas dataframe and compute the average \
+        of each column for the subset of points covered by each node.
+        Add such values as attributes to each node in the Graph
+
+        Parameters
+        ----------
+        coloring_df: pandas dataframe of shape (n_samples, n_coloring_function)
+        custom_function : callable, optional
+            a function to compute on the `coloring_df` columns, by default numpy.mean
+        custom_name : string, optional
+            sets the attributes naming scheme, by default None, the attribute names will be the column names
+        add_std: bool, default=False
+            Wheter to compute also the standard deviation on each ball
+        """
+        # for each column in the dataframe compute the mean across all nodes and add it as mean attributes
+        for node in self.Graph.nodes:
+            for col_name, avg in (
+                coloring_df.loc[self.Graph.nodes[node]["points_covered"]]
+                .apply(custom_function, axis=0)
+                .items()
+            ):
+                self.Graph.nodes[node][col_name] = avg
