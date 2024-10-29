@@ -5,7 +5,7 @@
 import numpy as np
 
 
-def get_clusters_from_scikit(prediction):
+def get_clusters_from_scikit(prediction, return_mapping=False):
     """_summary_
     From a list of prediction returns a list of clusters with each cluster being a list of indices
     Parameters
@@ -18,7 +18,14 @@ def get_clusters_from_scikit(prediction):
          Returns a list of clusters. Each element of the list is numpy array in which all indices of the points coverd by this cluster are stored.
     """
 
-    return [np.where(prediction == clustNum)[0] for clustNum in np.unique(prediction)]
+    unique_labels = np.unique(prediction)
+
+    if return_mapping:
+        return [np.where(prediction == clustNum)[0] for clustNum in unique_labels], {
+            i: u for i, u in enumerate(unique_labels)
+        }
+    else:
+        return [np.where(prediction == clustNum)[0] for clustNum in unique_labels]
 
 
 def get_clusters_from_BM(bm):
@@ -27,7 +34,7 @@ def get_clusters_from_BM(bm):
     Parameters
     ----------
     bm :  BallMapper
-        
+
     Returns
     -------
      list
@@ -53,8 +60,8 @@ def get_clusters_from_Mapper(graph):
     From a Mapper object returns a list of clusters with each cluster being a list of indices corresponding to the points covered
     Parameters
     ----------
-    graph : 
-        
+    graph :
+
     Returns
     -------
      list
@@ -73,7 +80,6 @@ def get_clusters_from_Mapper(graph):
         list_clusters[nb_nodes] = graph["nodes"][i]
         nb_nodes += 1
     return list_clusters
-
 
 
 def replace_in_array(list_1, list_2, arr, val):
@@ -136,24 +142,23 @@ def insert_sorted_list(liste, element_to_insert):
     return liste
 
 
-
 def get_values(list_key_value):
     """_summary_
 
     Parameters
     ----------
-    list_key_value : 
-        
+    list_key_value :
+
 
     Returns
     -------
-    
-        
+
+
 
     Raises
     ------
     ValueError
-        
+
     """
     if list_key_value == []:
         raise ValueError("List is empty")
@@ -163,23 +168,20 @@ def get_values(list_key_value):
     return values
 
 
-
-
-
 def get_sorted_edges(graph, variable_length="label"):
     """_summary_
 
     Parameters
     ----------
-    graph : 
-        
+    graph :
+
     variable_length : str, optional
         , by default "label"
 
     Returns
     -------
-    
-        
+
+
     """
     edges = []
     for edge in graph.edges:
@@ -190,21 +192,20 @@ def get_sorted_edges(graph, variable_length="label"):
     return edges
 
 
-
 def get_corresponding_edges(vertices, edges):
     """_summary_
 
     Parameters
     ----------
-    vertices : 
-        
-    edges : 
-        
+    vertices :
+
+    edges :
+
 
     Returns
     -------
-    
-        
+
+
     """
     corres_edges = []
     for edge in edges:
@@ -213,24 +214,22 @@ def get_corresponding_edges(vertices, edges):
     return corres_edges
 
 
-
-
 def max_size_node_graph(graph, variable, nodes=None):
     """_summary_
 
     Parameters
     ----------
-    graph : 
-        
-    variable : 
-        
+    graph :
+
+    variable :
+
     nodes : , optional
         , by default None
 
     Returns
     -------
-    
-        
+
+
     """
     if not (nodes):
         nodes = graph.nodes
