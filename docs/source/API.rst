@@ -1,8 +1,5 @@
-clustergraph package
+API
 ====================
-
-Submodules
-----------
 
 clustergraph.ConnectivityPruning module
 ---------------------------------------
@@ -92,10 +89,3 @@ clustergraph.utils module
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
-
-.. automodule:: clustergraph
-   :members:
-   :undoc-members:
-   :show-inheritance:

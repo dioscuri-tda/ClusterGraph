@@ -78,17 +78,20 @@ def draw_graph(
     ax=None,
     **kwargs
 ):
-    """_summary_
-    Function which plots a graph with the asked number of edges sorted from shortest to longest or the opposite. The edges and nodes can be colored.
+    """
+    Function which plots a graph with the asked number of edges sorted from shortest to longest or the opposite.
+    The edges and nodes can be colored.
+
+    Parameters
     ----------
-    graph :  networkx graph
-         The graph to be displayed.
-    nb_edges :  int
-         The number of edges which will be displayed in the visualization. The edges are sorted hence the shortest will be shown.
-    size_nodes :  int
-         Baseline for the node's size on the visualization. Bigger the number, bigger the nodes.
-    random_state :  int
-         The random state which will be used to plot the graph. If the value is None, the position of the graph will change each time.
+    graph : networkx.Graph
+        The graph to be displayed.
+    nb_edges : int
+        The number of edges to display in the visualization. The edges are sorted, so the shortest will be shown.
+    size_nodes : int
+        Baseline for the node's size in the visualization. The bigger the number, the bigger the nodes.
+    random_state : int or None
+        The random state used to plot the graph. If None, the position of the graph will change each time.
 
     """
 
@@ -146,28 +149,30 @@ def plot_slider_graph(
     max_node_size=800,
     min_node_size=100,
 ):
-    """_summary_
-    Method which plots into an interactive matplotlib window the graph g with a slider in order to choose the number of edges.
+    """
+    Method which plots into an interactive matplotlib window the graph `g` with a slider to choose the number of edges.
+
+    Parameters
     ----------
-    g :  networkx graph
-         The graph which is displayed.
-    reverse :  bool
-         If reverse is True, the edges will be dispalyed from longest to shortest. Otherwise it will be from shortest to longest.
-    random_state :  int
-         The random state which will be used to plot the graph. If the value is None, the position of the graph will change each time.
-    weight :  string
-         Label underwhich the weight of the edges is stored. This weight is used to sort the edges.
-    weight_shown :  string
-          Label which will be displayed on the plot. Can be the normalized value of each edge.
-    max_node_size :  int
-         The maximum size of a node of the visualized graph.
-    min_node_size :  int
-         The minimum size of a node of the visualized graph.
+    g : networkx.Graph
+        The graph which is displayed.
+    reverse : bool
+        If `reverse` is True, the edges will be displayed from longest to shortest. Otherwise, it will be from shortest to longest.
+    random_state : int or None
+        The random state used to plot the graph. If `None`, the position of the graph will change each time.
+    weight : str
+        Label under which the weight of the edges is stored. This weight is used to sort the edges.
+    weight_shown : str
+        Label which will be displayed on the plot. Can be the normalized value of each edge.
+    max_node_size : int
+        The maximum size of a node in the visualized graph.
+    min_node_size : int
+        The minimum size of a node in the visualized graph.
 
     Returns
     -------
-     Slider
-         The slider which is displayed.
+    Slider
+        The slider which is displayed.
     """
 
     graph = g.copy()

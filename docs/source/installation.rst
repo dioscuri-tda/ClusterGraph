@@ -26,19 +26,12 @@ you through the process.
 From sources
 ------------
 
-The sources for ClusterGraph can be downloaded from the `Github repo`_.
-
-You can either clone the public repository:
+The sources for ClusterGraph can be downloaded from the `Github repo`_ by cloning the public repository:
 
 .. code-block:: console
 
     $ git clone git://github.com/mhallier/clustergraph
 
-Or download the `tarball`_:
-
-.. code-block:: console
-
-    $ curl -OJL https://github.com/mhallier/clustergraph/tarball/master
 
 Once you have a copy of the source, you can install it with:
 
@@ -48,4 +41,3 @@ Once you have a copy of the source, you can install it with:
 
 
 .. _Github repo: https://github.com/mhallier/clustergraph
-.. _tarball: https://github.com/mhallier/clustergraph/tarball/master

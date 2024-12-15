@@ -1,4 +1,4 @@
-# ClusterGraph
+# Getting started with ClusterGraph
 
 [![version](https://img.shields.io/badge/version-0.3.2-blue)](https://pypi.org/project/clustergraph/)
 [![Documentation Status](https://readthedocs.org/projects/clustergraph/badge/?version=latest)](https://clustergraph.readthedocs.io/en/latest/?badge=latest)
@@ -10,11 +10,11 @@ Two vertices are connected by an edge whose length corresponds to the distance b
 
 Edges that do not contribute to the geometric organization can subsequently be removed, in order to obtain a simpler visualization.  
 
-More information can be found the accompanying paper _"ClusterGraph: a new tool for visualization and compression of multidimensional data" [arXiv:2411.05443](https://arxiv.org/abs/2411.05443)_. 
+More information can be found the accompagning paper _"ClusterGraph: a new tool for visualization and compression of multidimensional data" [arXiv:2411.05443](https://arxiv.org/abs/2411.05443)_. 
 
 
 <picture>
-  <img alt="ClusterGraph pipeline" src="docs/img/CG_pipeline.png" width="900">
+  <img alt="ClusterGraph pipeline" src="_static/CG_pipeline.png" width="900">
 </picture>
 
 ## Install the package 📦   
@@ -40,7 +40,7 @@ pred = model_KM.fit_predict(X)
 ```
 
 <picture>
-  <img alt='circle' src="docs/img/circle.png" width="300">
+  <img alt='circle' src="_static/circle.png" width="300">
 </picture>
 
 
@@ -67,7 +67,7 @@ draw_graph(cluster_g.Graph, ax=ax)
 ```
 
 <picture>
-  <img alt='circle full CG' src="docs/img/circle_full_CG.png" width="300">
+  <img alt='circle full CG' src="_static/circle_full_CG.png" width="300">
 </picture>
 
 
@@ -86,7 +86,7 @@ draw_graph(metric_distortion_graph, ax=ax2)
 ```
 
 <picture>
-  <img alt='circle pruned CG' src="docs/img/circle_pruned_CG.png" width="600">
+  <img alt='circle pruned CG' src="_static/circle_pruned_CG.png" width="600">
 </picture>
 
 For more examples, check out the [example notebooks](https://github.com/dioscuri-tda/clustergraph/tree/main/examples) or the [documentation](https://clustergraph.readthedocs.io).

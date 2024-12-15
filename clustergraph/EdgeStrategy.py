@@ -297,7 +297,7 @@ class EdgeStrategy:
     def get_labels_into_hexa(self):
         """_summary_
         Method transforming the given “color_labels” into a dictionary in which edges are keys and their corresponding hexadecimal colors as values.
-          This method calls the right methods in order to achieve such task.
+        This method calls the right methods in order to achieve such task.
         """
         if type(self.color_labels) is dict:
             keys = list(self.color_labels)
