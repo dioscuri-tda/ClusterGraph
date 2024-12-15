@@ -8,6 +8,7 @@ def draw_graph_pie(
     graph,
     nb_edges=None,
     edge_variable="weight_plot",
+    draw_edge_labels=True,
     scale_nodes=True,
     size_nodes=0.05,
     random_state=42,
@@ -54,23 +55,25 @@ def draw_graph_pie(
             )
 
     # Afficher les labels des arêtes
-    edge_labels = {
-        (u, v): "{:.2f}".format(data[edge_variable])
-        for u, v, data in G.edges(data=True)
-    }
-    nx.draw_networkx_edge_labels(
-        G,
-        pos,
-        edge_labels=edge_labels,
-        font_color="black",
-        font_size=9,
-    )
+    if draw_edge_labels:
+        edge_labels = {
+            (u, v): "{:.2f}".format(data[edge_variable])
+            for u, v, data in G.edges(data=True)
+        }
+        nx.draw_networkx_edge_labels(
+            G,
+            pos,
+            edge_labels=edge_labels,
+            font_color="black",
+            font_size=9,
+        )
 
 
 def draw_graph(
     graph,
     nb_edges=None,
     edge_variable="weight_plot",
+    draw_edge_labels=True,
     scale_nodes=True,
     size_nodes=1000,
     random_state=42,
@@ -132,7 +135,7 @@ def draw_graph(
     )
 
     # Afficher les labels des arêtes
-    if edge_variable is not None:
+    if draw_edge_labels:
         edge_labels = {
             (u, v): "{:.{}f}".format(data[edge_variable], precision)
             for u, v, data in G.edges(data=True)
