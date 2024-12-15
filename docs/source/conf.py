@@ -50,6 +50,8 @@ autodoc_mock_imports = [
     "scipy",
     "tqdm",
     "ot",
+    "ipywidgets",
+    "IPython",
 ]
 
 # -- Options for HTML output -------------------------------------------------
