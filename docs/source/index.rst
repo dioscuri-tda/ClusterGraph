@@ -20,6 +20,7 @@ More information can be found in the accompanying paper *"ClusterGraph: a new to
 
    installation
    getting_started.md
+   pruning.md
    API
 
 Indices and tables
