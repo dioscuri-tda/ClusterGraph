@@ -28,14 +28,10 @@ extensions = [
     "sphinx.ext.napoleon",
     "myst_parser",
     "sphinx_rtd_theme",
-    "sphinx.ext.mathjax",
 ]
 
 # Enable MathJax for rendering LaTeX
-mathjax_path = (
-    "https://cdn.jsdelivr.net/npm/mathjax@2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"
-)
-mathjax = True
+# mathjax_path = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"
 
 source_suffix = {
     ".rst": "restructuredtext",
@@ -68,3 +64,5 @@ html_theme = "sphinx_rtd_theme"
 # html_theme = 'classic'
 
 html_static_path = ["_static"]
+
+debug = True

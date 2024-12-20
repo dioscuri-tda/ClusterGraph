@@ -17,17 +17,6 @@ ClusterGraph offers several pruning strategies, each targeting different aspects
 ### Description
 Threshold pruning removes edges that cause a large metric distortion in the ClusterGraph. Each edge in the graph represents a distance between two clusters, and this pruning strategy eliminates edges with distortion above a specific threshold. Intuitively, edges with high distortion are considered "shortcuts" that do not reflect the true manifold structure of the data.
 
-### Formula
-
-The metric distortion for a path between two clusters \(i\) and \(j\) is given by:
-
-$$
-\delta_e = \frac{|C_i| + |C_j|}{\sum_{v \in V} \deg(v) |C_v|}
-$$
-
-Where \(C_i\) and \(C_j\) are the two clusters, and \(\deg(v)\) is the degree of vertex \(v\).
-
-
 ### Usage
 
 The `threshold_pruning` method uses a predefined metric distortion threshold to prune the graph. If the distortion of an edge exceeds this threshold, the edge is removed.
@@ -86,25 +75,7 @@ Here, `knn_g=5` specifies the number of nearest neighbors to consider for each v
 ## 3. Connectivity-based Pruning
 
 ### Description
-Connectivity-based pruning aims to maintain the overall connectivity of the graph while removing edges. This approach focuses on the quality of paths between vertices and removes edges that do not contribute to the best paths. The main goal is to preserve the connectivity of the graph while simplifying its structure.
-
-### Path Quality Function
-
-The quality of a path between two vertices \(i\) and \(j\) is defined as:
-
-$$
-q(P) = \sum_{\{i,j\} \in P} \frac{1}{d_\mathcal{C}(C_i, C_j)}
-$$
-
-where \(d_\mathcal{C}(C_i, C_j)\) is the distance between the clusters \(C_i\) and \(C_j\).
-
-The connectivity between two vertices is defined as the maximum path quality of any path between them:
-
-$$
-\operatorname{conn}(i,j;E) = \max_{P \in \mathcal{P}(i, j)} q(P)
-$$
-
-The connectivity of the entire graph is the average connectivity over all vertex pairs.
+Connectivity-based pruning aims to maintain the overall connectivity of the graph while removing edges. This approach focuses on the quality of paths between vertices and removes edges that do not contribute to the best paths. The main goal is to preserve the connectivity of the graph while simplifying its structure, as discussed in Zhou, F., Mahler, S., and Toivonen, H. (2012) in *Simplification of Networks by Edge Pruning* [Zhou et al., 2012](https://doi.org/10.1007/978-3-642-31830-6_13).
 
 ### Usage
 
@@ -141,7 +112,9 @@ When selecting a pruning strategy, consider the following:
 
 ## References
 
-If you find these pruning strategies useful, please consider citing our work:
+Zhou, F., Mahler, S., Toivonen, H. (2012). Simplification of Networks by Edge Pruning. In: Berthold, M.R. (ed.) *Bisociative Knowledge Discovery: An Introduction to Concept, Algorithms, Tools, And Applications*, pp. 179–198. Springer, Berlin, Heidelberg. [https://doi.org/10.1007/978-3-642-31830-6_13](https://doi.org/10.1007/978-3-642-31830-6_13)
+
+If you find this useful, please consider citing our work:
 
 ```bibtex
 @misc{dłotko2024clustergraphnewtoolvisualization,
