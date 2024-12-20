@@ -1,23 +1,28 @@
+import numpy as np
+
 #####################
 # ANNEXES FUNCTIONS #
 #####################
 
-import numpy as np
-
 
 def get_clusters_from_scikit(prediction, return_mapping=False):
-    """_summary_
-    From a list of prediction returns a list of clusters with each cluster being a list of indices
+    """
+    From a list of predictions, returns a list of clusters with each cluster being a list of indices.
+
     Parameters
     ----------
-    prediction :  list or numpy array
-         Cluster labels. At each index there is a label corresponding to the cluster of the data point.
+    prediction : list or numpy.ndarray
+        Cluster labels. At each index there is a label corresponding to the cluster of the data point.
+    return_mapping : bool, optional
+        If True, returns a dictionary mapping each cluster label to its index. Default is False.
+
     Returns
     -------
-     list
-         Returns a list of clusters. Each element of the list is numpy array in which all indices of the points coverd by this cluster are stored.
+    list
+        A list of clusters, where each element is a numpy array containing the indices of the data points in that cluster.
+    dict, optional
+        If `return_mapping` is True, a dictionary mapping each cluster label to an index.
     """
-
     unique_labels = np.unique(prediction)
 
     if return_mapping:
@@ -29,22 +34,24 @@ def get_clusters_from_scikit(prediction, return_mapping=False):
 
 
 def get_clusters_from_BM(bm):
-    """_summary_
-    From a BallMapper object returns a list of clusters with each cluster being a list of indices corresponding to the points covered
+    """
+    From a BallMapper object, returns a list of clusters, where each cluster is a list of indices corresponding to the points covered.
+
     Parameters
     ----------
-    bm :  BallMapper
+    bm : BallMapper
+        A BallMapper object which contains information about the clusters.
 
     Returns
     -------
-     list
-         Returns a list of clusters. Each element of the list is also a list in which all indices of the points coverd by this cluster are stored.
+    list
+        A list of clusters, where each element is a list of indices corresponding to the points covered by that cluster.
     """
     clusters = list(bm.points_covered_by_landmarks)
     nb_clusters = len(clusters)
     list_clusters = []
     nb_nodes = 0
-    list_clusters = []
+
     # Creation of the list for keys to be ordered
     for i in clusters:
         list_clusters.append([])
@@ -56,22 +63,24 @@ def get_clusters_from_BM(bm):
 
 
 def get_clusters_from_Mapper(graph):
-    """_summary_
-    From a Mapper object returns a list of clusters with each cluster being a list of indices corresponding to the points covered
+    """
+    From a Mapper object, returns a list of clusters, where each cluster is a list of indices corresponding to the points covered.
+
     Parameters
     ----------
-    graph :
+    graph : dict
+        A Mapper object which contains the cluster information.
 
     Returns
     -------
-     list
-         Returns a list of clusters. Each element of the list is also a list in which all indices of the points coverd by this cluster are stored.
+    list
+        A list of clusters, where each element is a list of indices corresponding to the points covered by that cluster.
     """
     clusters = list(graph["nodes"])
     nb_clusters = len(clusters)
     list_clusters = []
     nb_nodes = 0
-    list_clusters = []
+
     # Creation of the list for keys to be ordered
     for i in clusters:
         list_clusters.append([])
@@ -83,23 +92,24 @@ def get_clusters_from_Mapper(graph):
 
 
 def replace_in_array(list_1, list_2, arr, val):
-    """Function which in a numpy darray replace the crossing positions values for the lines list_1 and columns list_2 and inverse (symetric change) , by the value wanted
+    """
+    Replaces the values in a numpy array at the positions specified by `list_1` and `list_2` (and their symmetric positions) with the given value.
 
     Parameters
     ----------
-    list_1 : list or numpy.array
-        the rows in which we want to change the value
-    list_2 : list or numpy.array
-        the columns in which we want to change the value
-    arr : numpy.darray
-        the darray that we want to modify
+    list_1 : list or numpy.ndarray
+        The rows in which we want to change the value.
+    list_2 : list or numpy.ndarray
+        The columns in which we want to change the value.
+    arr : numpy.ndarray
+        The numpy array to modify.
     val : float or int
-        the value we want to be in those positions
+        The value to place at the specified positions.
 
     Returns
     -------
-    numpy.darray
-       The darray modified
+    numpy.ndarray
+        The modified numpy array.
     """
     for i in list_1:
         for j in list_2:
@@ -109,19 +119,25 @@ def replace_in_array(list_1, list_2, arr, val):
 
 
 def insert_sorted_list(liste, element_to_insert):
-    """Function which inserts in a ordered list a new element. Each element has this form [keys_1, keys_2, value] and we order depending of on the 'value' element.
-    Returns the ordered list with the new element
+    """
+    Inserts an element into an already sorted list based on the 'value' element (the third element in the list).
 
     Parameters
     ----------
     liste : list
-        list of element each element is represented by a list [keys_1, keys_2, value], the list is already ordered based on the 'value'
+        A list of elements, each represented by a list `[key_1, key_2, value]`. The list is already sorted based on the 'value'.
     element_to_insert : list
-       list as followed [keys_1, keys_2, value] that we want to insert in the list by keeping it ordered
+        A list `[key_1, key_2, value]` that we want to insert in the list while maintaining the order based on 'value'.
+
     Returns
     -------
     list
-        Returns the ordered list with the new element
+        The ordered list with the new element inserted.
+
+    Raises
+    ------
+    ValueError
+        If `element_to_insert` contains fewer than 3 elements.
     """
     if len(element_to_insert) < 3:
         raise ValueError("Element to insert has less than 3 elements")
@@ -129,7 +145,8 @@ def insert_sorted_list(liste, element_to_insert):
     index = len(liste)
     if liste == []:
         return [element_to_insert]
-    # Searching for the position
+
+    # Searching for the position to insert
     for i in range(len(liste)):
         if liste[i][2] > element_to_insert[2]:
             index = i
@@ -143,45 +160,46 @@ def insert_sorted_list(liste, element_to_insert):
 
 
 def get_values(list_key_value):
-    """_summary_
+    """
+    Extracts the values from a list of key-value pairs.
 
     Parameters
     ----------
-    list_key_value :
-
+    list_key_value : list
+        A list of key-value pairs, where each element is a list `[key, value]`.
 
     Returns
     -------
-
-
+    list
+        A list of values extracted from the input list of key-value pairs.
 
     Raises
     ------
     ValueError
-
+        If the input list is empty.
     """
     if list_key_value == []:
         raise ValueError("List is empty")
-    values = []
-    for i in list_key_value:
-        values.append(i[1])
+
+    values = [i[1] for i in list_key_value]
     return values
 
 
 def get_sorted_edges(graph, variable_length="label"):
-    """_summary_
+    """
+    Returns the edges of the graph sorted by the specified edge attribute.
 
     Parameters
     ----------
-    graph :
-
+    graph : networkx.Graph
+        A NetworkX graph object.
     variable_length : str, optional
-        , by default "label"
+        The attribute used for sorting the edges. Default is "label".
 
     Returns
     -------
-
-
+    list
+        A list of edges sorted by the specified attribute.
     """
     edges = []
     for edge in graph.edges:
@@ -193,19 +211,20 @@ def get_sorted_edges(graph, variable_length="label"):
 
 
 def get_corresponding_edges(vertices, edges):
-    """_summary_
+    """
+    Returns the edges that correspond to a given set of vertices.
 
     Parameters
     ----------
-    vertices :
-
-    edges :
-
+    vertices : list
+        A list of vertices.
+    edges : list
+        A list of edges, where each edge is represented as `[vertex_1, vertex_2, value]`.
 
     Returns
     -------
-
-
+    list
+        A list of edges where both vertices are in the given list of vertices.
     """
     corres_edges = []
     for edge in edges:
@@ -215,28 +234,28 @@ def get_corresponding_edges(vertices, edges):
 
 
 def max_size_node_graph(graph, variable, nodes=None):
-    """_summary_
+    """
+    Returns the maximum size of a node based on a given attribute in a graph.
 
     Parameters
     ----------
-    graph :
-
-    variable :
-
-    nodes : , optional
-        , by default None
+    graph : networkx.Graph
+        A NetworkX graph object.
+    variable : str
+        The attribute of the node that is used to determine the size.
+    nodes : list, optional
+        A list of nodes to check. If None, all nodes in the graph are checked.
 
     Returns
     -------
-
-
+    int
+        The maximum size of the node based on the given attribute.
     """
-    if not (nodes):
+    if nodes is None:
         nodes = graph.nodes
+
     maxi = 0
     for node in nodes:
-        # print("NODE", node)
-        # print("TEST", graph.nodes[node][variable])
         size = len(graph.nodes[node][variable])
         if size > maxi:
             maxi = size

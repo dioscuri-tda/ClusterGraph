@@ -5,15 +5,35 @@ from matplotlib.colors import is_color_like
 import pandas as pd
 
 
-"""
-
-"weight_plot" in the label for normalized edges
-
-
-"""
-
-
 class EdgeStrategy:
+    """
+    Class for managing and preprocessing edge attributes in a graph,
+    including edge colors and weights based on various strategies.
+
+    Parameters
+    ----------
+    graph : networkx.Graph
+        Graph to preprocess. Its edges will be colored and normalized.
+    palette : Colormap, optional
+        Colormap used to color edges. Default is None, which uses a predefined colormap.
+    weight : str, optional
+        Key in the graph under which the size/weight of edges is stored. Default is "weight".
+    variable : str, optional
+        Key giving access to the continuous variable used to color edges. Default is None.
+    norm_weight : str, optional
+        Method used to normalize the weight of edges. Options are "log", "lin", "exp", "id", "max". Default is "id".
+    type_coloring : str, optional
+        Defines whether edge coloring is based on "label" or "variable". Default is "label".
+    color_labels : list, dict or numpy array, optional
+        Labels of each edge for coloring. Default is None.
+    coloring_strategy_var : str, optional
+        Strategy for coloring based on the "variable" key. Options are "log", "lin", "exp". Default is "lin".
+
+    Raises
+    ------
+    ValueError
+        If an invalid option is provided for `norm_weight`, `type_coloring`, or `coloring_strategy_var`.
+    """
 
     def __init__(
         self,
@@ -26,38 +46,6 @@ class EdgeStrategy:
         color_labels=None,
         coloring_strategy_var="lin",
     ):
-        """_summary_
-
-        Parameters
-        ----------
-        graph : networkx.Graph
-            Graph to preprocess. Its edges will be colored and normalized.
-        palette : Colormap, optional
-            Palette used to color edges, by default None
-        weight : str, optional
-            Key in the graph underwhich the size/weight of edges is stored, by default "weight"
-        variable : str, optional
-            Key giving access to the continuous variable used to color edges, by default None
-        norm_weight : str, optional
-            Parameter letting the choice regarding the method used to normalize the size of edges, by default "id" does not normalize
-        type_coloring : str, optional
-            If “type_coloring” is set to “label”,  each edge should have one label and “color_labels” should not be equal to None. If “type_coloring” is set to “variable”,
-            the coloring will be continuous and the color will increase as the value increase. The “variable” should not be None , by default "label"
-        color_labels : list, dict or numpy array, optional
-            Parameter with labels of each edge. If it is a list, the first index correspond to the first edge. If it is a dictionary, the keys should be edges.
-            The values should be labels, the exact colors can be chosen with hexadecimal labels, by default None
-        coloring_strategy_var : str, optional
-            Parameter letting the choice of how fast the color will change depending on the “variable” 's value, by default 'lin'
-
-        Raises
-        ------
-        ValueError
-
-        ValueError
-
-        ValueError
-
-        """
         self.myPalette = palette
         self.graph = graph
         self.weight_edges = weight
@@ -66,24 +54,23 @@ class EdgeStrategy:
         self.MIN_VALUE_COLOR = None
         self.color_labels = color_labels
 
+        # Select normalization method for edge weights
         if norm_weight == "log":
             self.get_weight_e = self.normalize_log_min_max
         elif norm_weight == "lin":
             self.get_weight_e = self.normalize_lin_min_max
         elif norm_weight == "exp":
             self.get_weight_e = self.normalize_exp_min_max
-
         elif norm_weight == "id":
             self.get_weight_e = self.identity_weight
         elif norm_weight == "max":
             self.get_weight_e = self.normalize_max
-
         else:
             raise ValueError(
                 "Only 'log', 'lin', 'exp', 'id' and 'max' are accepted as a 'norm_weight' "
             )
 
-        # WITH LABEL
+        # Edge coloring based on labels
         if type_coloring == "label":
             if self.myPalette is None:
                 self.myPalette = cm.get_cmap(name="tab20b")
@@ -94,7 +81,7 @@ class EdgeStrategy:
             self.get_color_edge = self.get_color_edge_unique
             self.getDictEdgeHexa()
 
-        # WITH VARIABLE
+        # Edge coloring based on variable
         elif type_coloring == "variable":
             self.fit_color = self.set_color_edges_variable
 
@@ -103,13 +90,10 @@ class EdgeStrategy:
 
             if coloring_strategy_var == "log":
                 self.get_color_var = self.get_color_var_log
-
             elif coloring_strategy_var == "lin":
                 self.get_color_var = self.get_color_var_lin
-
             elif coloring_strategy_var == "exp":
                 self.get_color_var = self.get_color_var_exp
-
             else:
                 raise ValueError(
                     "Only 'log', 'lin' and 'exp' are accepted for the 'coloring_strategy_var' "
@@ -123,22 +107,26 @@ class EdgeStrategy:
             )
 
     def fit_edges(self):
-        """_summary_
-        Method launching the methods to set the weight (size) and colors of edges.
+        """
+        Launches the methods to set the weight (size) and colors of edges.
+
+        Returns
+        -------
+        None
         """
         self.set_weight_edges()
         self.fit_color()
 
     def get_mini_maxi(self):
-        """_summary_
-        Method returning the minimum and maximum weight of the graph’s edges.
+        """
+        Returns the minimum and maximum weight of the graph’s edges.
+
         Returns
         -------
-        float, float
-            Maximum, minimum weights of edges.
+        tuple of float
+            Maximum and minimum weights of edges in the graph.
         """
         edges = list(self.graph.edges)
-        # Get the maximum and minimum weight of edges
         mini = self.graph.edges[edges[0]][self.weight_edges]
         maxi = mini
         for e in edges:
@@ -150,8 +138,12 @@ class EdgeStrategy:
         return maxi, mini
 
     def set_weight_edges(self):
-        """_summary_
-        Method which sets to each edge its normalized weight under the key "weight_plot" in the graph.
+        """
+        Sets the normalized weight of each edge under the key "weight_plot" in the graph.
+
+        Returns
+        -------
+        None
         """
         edges = list(self.graph.edges)
         max_weight, min_weight = self.get_mini_maxi()
@@ -162,8 +154,9 @@ class EdgeStrategy:
             )
 
     def normalize_log_min_max(self, weight, mini_weight, maxi_weight):
-        """_summary_
-        Method applying a logarithmic normalization of a given weight.
+        """
+        Applies a logarithmic normalization of a given weight.
+
         Parameters
         ----------
         weight : float
@@ -183,8 +176,9 @@ class EdgeStrategy:
         )
 
     def normalize_lin_min_max(self, weight, mini_weight, maxi_weight):
-        """_summary_
-        Method applying a linear normalization of a given weight.
+        """
+        Applies a linear normalization of a given weight.
+
         Parameters
         ----------
         weight : float
@@ -202,8 +196,9 @@ class EdgeStrategy:
         return (weight - mini_weight) / (maxi_weight - mini_weight)
 
     def normalize_exp_min_max(self, weight, mini_weight, maxi_weight):
-        """_summary_
-        Methods applying an exponential normalization of a given weight.
+        """
+        Applies an exponential normalization of a given weight.
+
         Parameters
         ----------
         weight : float
@@ -223,8 +218,9 @@ class EdgeStrategy:
         )
 
     def normalize_max(self, weight, mini_weight, maxi_weight):
-        """_summary_
-        Method applying a maximum normalization of a given weight.
+        """
+        Applies a maximum normalization of a given weight.
+
         Parameters
         ----------
         weight : float
@@ -242,8 +238,9 @@ class EdgeStrategy:
         return weight / maxi_weight
 
     def identity_weight(self, weight, mini_weight, maxi_weight):
-        """_summary_
-        Method returning the given weight. It is used when no normalization is chosen.
+        """
+        Returns the given weight without any normalization.
+
         Parameters
         ----------
         weight : float
@@ -256,56 +253,62 @@ class EdgeStrategy:
         Returns
         -------
         float
-            The normalized weight.
+            The weight as is.
         """
         return weight
 
     def set_color_edges_labels(self):
-        """_summary_
-        Method browsing edges, in order to set the color of each edge. Used when the coloring is chosen with labels.
         """
-        # set labels and their corresponding hexa colors
+        Sets the color of each edge based on its label.
+
+        Returns
+        -------
+        None
+        """
         for e in self.graph.edges:
-            # get_color_edge depends on the number of points in the label
             self.get_color_edge(e)
 
-    # METHODS USED TO SET TO ONE edge ITS CORRESPONDING COLOR AND OTHER DATA CONNECTED WITH COLOR
-
-    # For a given edge add the unique color to it
     def get_color_edge_unique(self, e):
-        """_summary_
-        Method setting the corresponding label and color to the edge "e" when there is a unique label per edge.
+        """
+        Sets a unique color for each edge based on its label.
 
         Parameters
         ----------
         e : tuple
-            Edge for which the color should be set in the graph.
+            The edge for which the color should be set.
+
+        Returns
+        -------
+        None
         """
         self.graph.edges[e]["color"] = self.EdgeHexa[e]
 
-    # LABELS PREPARATION
     def get_labels(self):
-        """_summary_
-        Method setting “color_labels” at the list of edges. It is used when no labels are given. Each edge will then have the same color.
+        """
+        Sets the color labels for the edges. If no labels are provided,
+        assigns black as the default color.
+
+        Returns
+        -------
+        None
         """
         if self.color_labels is None:
             edges = list(self.graph.edges)
             self.color_labels = len(edges) * ["#000000"]
 
-    # TRANSFORMATION OF THE GIVEN LABELS INTO HEXADECIMALS
-    # GET HEXADECIMAL VALUE FOR EACH edge
     def get_labels_into_hexa(self):
-        """_summary_
-        Method transforming the given “color_labels” into a dictionary in which edges are keys and their corresponding hexadecimal colors as values.
-        This method calls the right methods in order to achieve such task.
+        """
+        Transforms the color labels into hexadecimal color codes and stores them in `EdgeHexa`.
+
+        Returns
+        -------
+        None
         """
         if type(self.color_labels) is dict:
             keys = list(self.color_labels)
-
         else:
             keys = range(len(self.color_labels))
 
-        # TEST IF WE NEED TO TRANSFORM LABELS INTO HEXADECIMAL VALUES
         all_hex = True
         for k in keys:
             if not (is_color_like(self.color_labels[k])):
@@ -313,38 +316,28 @@ class EdgeStrategy:
                 break
 
         if type(self.color_labels) is dict:
-            #  if color_labels is a dictionary and values are not hexadecimals we transform them
-            if not (all_hex):
-                # Function to transform labels to hexa
+            if not all_hex:
                 self.labColors = self.dictLabelToHexa()
-                # Function to get the dictionary edge Hexa
                 self.getDictEdgeHexa = self.edgeColHexa_dictLabHexa
-
             else:
                 self.labColors = self.color_labels
                 self.getDictEdgeHexa = self.edgeColHexa_dictEdgeHexa
-
-        # IF WE HAVE A LIST
         else:
-            if not (all_hex):
-                # Function to transform labels to hexa
+            if not all_hex:
                 self.labColors = self.listLabelToHexa()
-
             else:
                 self.labColors = self.color_labels
                 self.getDictLabelHexaIdentity()
-
-            # Function to get the dictionary edge Hexa
             self.getDictEdgeHexa = self.edgeColHexa_listHexa
 
     def dictLabelToHexa(self):
-        """_summary_
-        Method creating a dictionary in which labels are the keys and values are the corresponding hexadecimal colors.
-        This method is used when “color_labels” is a dictionary with labels which are not hexadecimal colors.
+        """
+        Converts labels in the form of a dictionary to hexadecimal colors.
+
         Returns
         -------
         dict
-            Dictionary in which labels are the keys and values are the corresponding hexadecimal colors.
+            A dictionary mapping labels to their corresponding hexadecimal color.
         """
         values_labels = list(self.color_labels.values())
         keys = list(self.color_labels)
@@ -355,13 +348,13 @@ class EdgeStrategy:
         return self.dictLabelsCol
 
     def listLabelToHexa(self):
-        """_summary_
-        Method creating a dictionary in which labels are keys and values are the corresponding hexadecimal colors.
-        This method is used when “color_labels” is a list of labels which are not hexadecimal colors.
+        """
+        Converts labels in the form of a list to hexadecimal colors.
+
         Returns
         -------
         list
-            list in which each element is the color corresponding to the label of the node at the same index in the given list of labels.
+            A list of hexadecimal colors corresponding to each label.
         """
         uniqueLabels = np.unique(self.color_labels)
         nbLabels = len(uniqueLabels)
@@ -371,61 +364,75 @@ class EdgeStrategy:
         return listLabels
 
     def getDictLabelHexaIdentity(self):
-        """_summary_
-        Method creating a dictionary in which keys and values are the hexadecimal colors.
-        This method is used when “color_labels” is a list with only hexadecimal values.
+        """
+        Creates a dictionary where each label is mapped to its own hexadecimal color.
+
+        Returns
+        -------
+        None
         """
         uniqueLabels = np.unique(self.color_labels)
         self.dictLabelsCol = dict(zip(uniqueLabels, uniqueLabels))
 
     def edgeColHexa_dictEdgeHexa(self):
-        """_summary_
-        Method creating the dictionary "EdgeHexa" in which, edges are keys and the corresponding hexadecimal colors, the values.
-        It is used when the given “color_labels” was already a dictonary with only hexadecimal colors as values (labels were already colors).
+        """
+        Creates a dictionary mapping edges to their corresponding hexadecimal color.
+
+        Returns
+        -------
+        None
         """
         self.EdgeHexa = self.labColors
 
-    # if the dictionary has a label per edge
     def edgeColHexa_dictLabHexa(self):
-        """_summary_
-        Method creating the dictionary "EdgeHexa" in which, edges are keys and the corresponding hexadecimal colors, the values.
-        It is used when the given “color_labels” was a dictionary and its values (labels) were not colors.
+        """
+        Creates a dictionary mapping edges to their corresponding hexadecimal color, using labels.
+
+        Returns
+        -------
+        None
         """
         keys = list(self.color_labels)
         self.EdgeHexa = {}
         for k in keys:
             self.EdgeHexa[k] = self.labColors[self.color_labels[k]]
 
-    # labColors is a list with hexadecimal values
     def edgeColHexa_listHexa(self):
-        """_summary_
-        Method creating the dictionary "EdgeHexa" in which, edges are keys and the corresponding hexadecimal colors, the values.
-        It is used when the given “color_labels” is a list. It creates the dictionary by associating each index to an edge and the color of its labels.
+        """
+        Creates a dictionary mapping edges to their corresponding hexadecimal color, based on a list of colors.
+
+        Returns
+        -------
+        None
         """
         edges = list(self.graph.edges)
-        # we create the dictionary edge hexadecimal
         self.EdgeHexa = {}
         for i, e in enumerate(edges):
             self.EdgeHexa[e] = self.labColors[i]
 
     def get_val_var_edge_graph(self, e):
-        """_summary_
-        Method which, for a given edge, get the edge's variable's value when it is stored in the graph and returns the value.
+        """
+        Retrieves the value of the variable for a given edge stored in the graph.
+
         Parameters
         ----------
         e : tuple
-            Edge for which we want to get the variable's value.
+            The edge for which to retrieve the variable value.
 
         Returns
         -------
         float
-            Edge's variable value.
+            The variable's value for the edge.
         """
         return self.graph.edges[e][self.variable]
 
     def set_color_edges_variable(self):
-        """_summary_
-        Method which sets the color of each edge depending on the chosen continuous variable of the edge.
+        """
+        Sets the color of each edge based on the value of a continuous variable.
+
+        Returns
+        -------
+        None
         """
         self.set_min_max_mean_var()
         for e in self.graph.edges:
@@ -434,8 +441,12 @@ class EdgeStrategy:
             )
 
     def set_min_max_mean_var(self):
-        """_summary_
-        Method which  browses edges in order to store the variable's value inside each edge with the key “data_variable” and gets the self.MAX_VALUE_COLOR  and the self.MIN_VALUE_COLOR which correspond to the maximum and minimum values of the variable of the graph among all edges.
+        """
+        Sets the minimum and maximum values of the edge variable and stores the variable's value in each edge.
+
+        Returns
+        -------
+        None
         """
         edges = list(self.graph.edges)
         MIN_VALUE = self.get_set_val_var_edge(edges[0])
@@ -451,35 +462,36 @@ class EdgeStrategy:
         self.MIN_VALUE_COLOR = MIN_VALUE
 
     def get_set_val_var_edge(self, e):
-        """_summary_
-        Method which, for a given edge, stores the edge's value inside the graph under “data_variable” and returns the value
+        """
+        Stores the variable's value for an edge under the key "data_variable" and returns the value.
+
         Parameters
         ----------
         e : tuple
-            Edge for which we want to store the variable's value.
+            The edge for which to store the variable value.
 
         Returns
         -------
         float
-            Edge's variable value.
+            The variable's value for the edge.
         """
         val_intra_e = self.get_val_edge(e)
         self.graph.edges[e]["data_variable"] = val_intra_e
         return val_intra_e
 
     def get_color_var_exp(self, val):
-        """_summary_
-        Method transforming a real value in hexadecimal by doing an exponential normalization.
+        """
+        Transforms a value into a hexadecimal color using exponential normalization.
 
         Parameters
         ----------
         val : float
-            Variable's value of an edge.
+            The variable value of an edge.
 
         Returns
         -------
         str
-            Hexadecimal color corresponding to the variable's value.
+            The hexadecimal color corresponding to the variable value.
         """
         color_id = (np.exp(val) - np.exp(self.MIN_VALUE_COLOR)) / (
             np.exp(self.MAX_VALUE_COLOR) - np.exp(self.MIN_VALUE_COLOR)
@@ -487,18 +499,18 @@ class EdgeStrategy:
         return to_hex(self.myPalette(color_id))
 
     def get_color_var_log(self, val):
-        """_summary_
-        Method transforming a real value in hexadecimal by doing a logarithmic normalization.
+        """
+        Transforms a value into a hexadecimal color using logarithmic normalization.
 
         Parameters
         ----------
         val : float
-            Variable's value of an edge.
+            The variable value of an edge.
 
         Returns
         -------
         str
-            Hexadecimal color corresponding to the variable's value.
+            The hexadecimal color corresponding to the variable value.
         """
         color_id = (np.log10(val) - np.log10(self.MIN_VALUE_COLOR)) / (
             np.log10(self.MAX_VALUE_COLOR) - np.log10(self.MIN_VALUE_COLOR)
@@ -507,18 +519,18 @@ class EdgeStrategy:
         return hex
 
     def get_color_var_lin(self, val):
-        """_summary_
-        Method transforming a real value in hexadecimal by doing a linear normalization.
+        """
+        Transforms a value into a hexadecimal color using linear normalization.
 
         Parameters
         ----------
         val : float
-            Variable's value of an edge.
+            The variable value of an edge.
 
         Returns
         -------
         str
-            Hexadecimal color corresponding to the variable's value.
+            The hexadecimal color corresponding to the variable value.
         """
         color_id = (val - self.MIN_VALUE_COLOR) / (
             self.MAX_VALUE_COLOR - self.MIN_VALUE_COLOR

@@ -20,53 +20,38 @@ class NodeStrategy:
         coloring_strategy_var="lin",
         MIN_SIZE_NODE=0.1,
     ):
-        """_summary_
+        """
+        Initialize the NodeStrategy class for preprocessing graph nodes with colors and sizes.
 
         Parameters
         ----------
         graph : networkx.Graph
-            Graph which will be preprocessed by adding colors to nodes, normalizing their size and other properties.
+            Graph to preprocess, including setting colors and sizes for nodes.
         size_strategy : str, optional
-            Defines the formula which is used to normalize the size of nodes. It can be "lin", "log", "exp" or "id". , by default "lin"
+            Defines the formula for normalizing node sizes. Options are "lin", "log", "exp", or "id". Default is "lin".
         type_coloring : str, optional
-            Defines the way to add colors to nodes. It can be with "label" or with "variable". For "label", colors are added from a given list or dictionary.
-            If "variable" is chosen, the color is chosen depending from a feature of the dataset. It can be the average of a given feature inside each node for example. , by default "label"
-        palette : matplotlib.colors.ListedColormap , optional
-            The colormap from which color will be chosen for nodes. , by default None
-        color_labels : list, dict or numpy array, optional
-            Object from which the colors of nodes will be retrieved. The exact colors can be chosen by giving hexadecimal values.
-            If a list or a numpy array is given and has the same length than the number of nodes, each node will be associated to a label. If the list is longer, the label associated to each node will depend on the which labels are represented inside each nodes by the points covered.
-            If a dictionary is chosen, the keys should be the nodes and the values the labels on which the color will be chosen.
-            , by default None
-        X : numpy darray, optional
-            The dataset from which the value inside each node will be taken if the type_coloring is set to "variable"., by default None
-        variable : str or int , optional
-            If the parameter type_coloring is set to "variable", this parameter is giving access to the good feature in the dataset. It can be an index or the name of the variable.
-              , by default None
+            Defines the coloring method for nodes. Options are "label" or "variable". Default is "label".
+        palette : matplotlib.colors.ListedColormap, optional
+            The colormap used to color nodes. Default is None.
+        color_labels : list, dict, or numpy array, optional
+            Labels or colors for each node, either as a list or dictionary. Default is None.
+        X : numpy ndarray, optional
+            Dataset used to compute variable-based coloring. Default is None.
+        variable : str or int, optional
+            Feature used for variable-based coloring. Can be column name (str) or index (int).
         choiceLabel : str, optional
-            Can be "max" or "min". When the parameter "type_coloring" is set to "label", it defines the way to choose the label inside each node to color them. If "max" is chosen, the most represented label inside each node will be chosen. If "min" is chosen it will be the least represented label.
-            , by default "max"
+            If "max" or "min" is chosen, the label is selected based on the most or least frequent label.
+            Default is "max".
         coloring_strategy_var : str, optional
-            Can be "log", "lin" or "exp". When the parameter "type_coloring" is set to "variable", this parameter represents how fast color will changed between nodes depending on the variable's average value inside each node.
-            For example if "exp" is chosen, a slight change of average value between two nodes will represent an important change of colors.
-            , by default 'lin'
+            Defines how the color changes based on variable values. Options are "log", "lin", or "exp". Default is "lin".
         MIN_SIZE_NODE : float, optional
-            The minimum size of nodes in the plot, by default 0.1
+            Minimum size of nodes in the plot. Default is 0.1.
 
         Raises
         ------
         ValueError
-
-        ValueError
-
-        ValueError
-
-        ValueError
-
-        ValueError
-
+            If invalid options are provided for size_strategy, type_coloring, or coloring_strategy_var.
         """
-
         self.myPalette = palette
         self.color_labels = color_labels
         self.dictLabelsCol = None
@@ -156,20 +141,22 @@ class NodeStrategy:
             )
 
     def fit_nodes(self):
-        """_summary_
-        Method which calls methods in order to set the size of nodes and their colors.
+        """
+        Set the size and color of nodes based on the chosen strategies.
+
+        This method updates the size and color of all nodes in the graph.
         """
         self.set_size_nodes()
         self.fit_color()
 
     def get_mini_maxi(self):
-        """_summary_
-        Method which returns the maximum and minimum sizes (number of points covered) of nodes in the graph.
+        """
+        Calculate the maximum and minimum size (number of points covered) of nodes in the graph.
 
         Returns
         -------
         int, int
-            The maximum and minimum size of nodes of the graph.
+            The maximum and minimum sizes of nodes in the graph.
         """
         nodes = list(self.graph.nodes)
         mini = len(self.graph.nodes[nodes[0]]["points_covered"])
@@ -183,9 +170,10 @@ class NodeStrategy:
         return maxi, mini
 
     def set_size_nodes(self):
-        """_summary_
-        Browse nodes to set the size in the plot of each node
+        """
+        Set the size of each node in the plot.
 
+        This method assigns the appropriate size to each node based on the number of points covered.
         """
         nodes = list(self.graph.nodes)
         max_size, min_size = self.get_mini_maxi()
@@ -196,419 +184,237 @@ class NodeStrategy:
             )
 
     def log_size(self, size, mini_size, maxi_size):
-        """_summary_
-        Method which returns the logarithmically normalized size of a node in the plot.
+        """
+        Logarithmically normalize the size of a node.
+
         Parameters
         ----------
         size : int
-            Size/number of points covered by a node.
+            The size/number of points covered by a node.
         mini_size : int
-            Minimum size of a node in the graph.
+            Minimum size of a node.
         maxi_size : int
-            Maximum size of a node in the graph.
+            Maximum size of a node.
 
         Returns
         -------
         float
-            Returns the logarithmically normalized size of a node in the plot.
+            The logarithmically normalized size of the node.
         """
         return np.log10(1 + size / maxi_size)
 
     def linear_size(self, size, mini_size, maxi_size):
-        """_summary_
-        Method which returns the logarithmically normalized size of a node in the plot.
+        """
+        Linearly normalize the size of a node.
+
         Parameters
         ----------
         size : int
-            Size/number of points covered by a node.
+            The size/number of points covered by a node.
         mini_size : int
-            Minimum size of a node in the graph.
+            Minimum size of a node.
         maxi_size : int
-            Maximum size of a node in the graph.
+            Maximum size of a node.
 
         Returns
         -------
         float
-            Returns the linearlly normalized size of a node in the plot.
+            The linearly normalized size of the node.
         """
         return (size - mini_size) / (maxi_size - mini_size)
 
     def expo_size(self, size, mini_size, maxi_size):
-        """_summary_
-        Method which returns the logarithmically normalized size of a node in the plot.
+        """
+        Exponentially normalize the size of a node.
+
         Parameters
         ----------
         size : int
-            Size/number of points covered by a node.
+            The size/number of points covered by a node.
         mini_size : int
-            Minimum size of a node in the graph.
+            Minimum size of a node.
         maxi_size : int
-            Maximum size of a node in the graph.
+            Maximum size of a node.
 
         Returns
         -------
         float
-            Returns the exponentially normalized size of a node in the plot.
+            The exponentially normalized size of the node.
         """
         return (np.exp(size) - np.exp(mini_size)) / (
             np.exp(maxi_size) - np.exp(mini_size)
         )
 
     def id_size(self, size, mini_size, maxi_size):
-        """_summary_
-        Method which returns the same size for every node.
+        """
+        Return the same size for every node.
+
         Parameters
         ----------
         size : int
-            Size/number of points covered by a node.
+            The size/number of points covered by a node.
         mini_size : int
-            Minimum size of a node in the graph.
+            Minimum size of a node.
         maxi_size : int
-            Maximum size of a node in the graph.
+            Maximum size of a node.
 
         Returns
         -------
         float
-            Returns 1 for every node.
+            Always returns 1 for every node.
         """
         return 1
 
     def set_color_nodes_labels(self):
-        """_summary_
-        Method browsing nodes, in order to set the color of each node. Used when the coloring is chosen with labels.
         """
-        # set labels and their corresponding hexa colors
+        Set the color of each node based on its label.
+
+        This method assigns colors to nodes using the color_labels attribute.
+        """
         for node in self.graph.nodes:
-            # get_color_node depends on the number of points in the label
             self.get_color_node(node)
 
     def get_color_node_unique(self, n):
-        """_summary_
-        Method setting the corresponding label and color to the node "n" when there is a unique label per node.
+        """
+        Assign a color to a node when there is a unique label for each node.
 
         Parameters
         ----------
         n : int
-            Node for which the color should be set in the graph.
+            The node for which to assign a color.
         """
         self.graph.nodes[n]["color"] = self.NodeHexa[n]
 
-    # LABELS PREPARATION
     def get_labels(self):
-        """_summary_
-        Method setting “color_labels” at the list of nodes. It is used when no labels are given. Each node will then have a different color.
+        """
+        Set the color labels for nodes.
+
+        If no labels are provided, each node is assigned a unique color.
         """
         if self.color_labels is None:
             self.color_labels = list(self.graph.nodes)
 
     def get_labels_into_hexa(self):
-        """_summary_
-        Method transforming the given “color_labels” into a dictionary in which nodes are keys and their corresponding hexadecimal colors as values.
-        This method calls the right methods in order to achieve such task.
         """
-        if type(self.color_labels) is dict:
-            keys = list(self.color_labels)
-        else:
-            keys = range(len(self.color_labels))
+        Convert the node labels into hexadecimal color values.
 
-        # TEST IF WE NEED TO TRANSFORM LABELS INTO HEXADECIMAL VALUES
-        all_hex = True
-        for k in keys:
-            if not (is_color_like(self.color_labels[k])):
-                all_hex = False
-                break
-
-        if type(self.color_labels) is dict:
-
-            #  if color_labels is a dictionary and values are not hexadecimals we transform them
-            if not (all_hex):
-                # Function to transform labels to hexa
-                self.labColors = self.dictLabelToHexa()
-                # Function to get the dictionary Node Hexa
-                self.getDictNodeHexa = self.nodeColHexa_dictLabHexa
-
-            else:
-                self.labColors = self.color_labels
-                self.getDictNodeHexa = self.nodeColHexa_dictNodeHexa
-
-        # IF WE HAVE A LIST
-        else:
-            if not (all_hex):
-                # Function to transform labels to hexa
-                self.labColors = self.listLabelToHexa()
-
-            else:
-                self.labColors = self.color_labels
-                self.getDictLabelHexaIdentity()
-
-            # Function to get the dictionary Node Hexa
-            self.getDictNodeHexa = self.nodeColHexa_listHexa
-
-    # FUNCTIONS WHICH  TRANSFORM LABELS INTO HEXADECIMALS
-    def dictLabelToHexa(self):
-        """_summary_
-        Method creating a dictionary in which labels are the keys and values are the corresponding hexadecimal colors.
-        This method is used when “color_labels” is a dictionary with labels which are not hexadecimal colors.
-        Returns
-        -------
-        dict
-            Dictionary in which labels are the keys and values are the corresponding hexadecimal colors.
+        This method uses the matplotlib colormap to assign colors to labels.
         """
-        values_labels = list(self.color_labels.values())
-        keys = list(self.color_labels)
-        uniqueLabels = np.unique(values_labels)
-        nbLabels = len(uniqueLabels)
-        hexLabels = [to_hex(self.myPalette(i / nbLabels)) for i in range(nbLabels + 1)]
-        self.dictLabelsCol = dict(zip(uniqueLabels, hexLabels))
-        return self.dictLabelsCol
-
-    def listLabelToHexa(self):
-        """_summary_
-        Method creating a dictionary in which labels are keys and values are the corresponding hexadecimal colors.
-        This method is used when “color_labels” is a list of labels which are not hexadecimal colors.
-        Returns
-        -------
-        list
-            list in which each element is the color corresponding to the label of the node at the same index in the given list of labels.
-        """
-        uniqueLabels = np.unique(self.color_labels)
-        nbLabels = len(uniqueLabels)
-        hexLabels = [to_hex(self.myPalette(i / nbLabels)) for i in range(nbLabels + 1)]
-        self.dictLabelsCol = dict(zip(uniqueLabels, hexLabels))
-        listLabels = [self.dictLabelsCol[e] for e in self.color_labels]
-        return listLabels
-
-    def getDictLabelHexaIdentity(self):
-        """_summary_
-        Method creating a dictionary in which keys and values are the hexadecimal colors.
-        This method is used when “color_labels” is a list with only hexadecimal values.
-        """
-        uniqueLabels = np.unique(self.color_labels)
-        self.dictLabelsCol = dict(zip(uniqueLabels, uniqueLabels))
-
-    # CREATION OF THE DICTIONARY NODEHEXA FROM DICTIONARY OR LIST WITH HEXADECIMAL
-
-    # if the dictionary has a hexadecimal value per node
-    def nodeColHexa_dictNodeHexa(self):
-        """_summary_
-        Method creating the dictionary "NodeHexa" in which, nodes are keys and the corresponding hexadecimal colors, the values.
-        It is used when the given “color_labels” was already a dictonary with only hexadecimal colors as values (labels were already colors).
-        """
-        self.NodeHexa = self.labColors
-
-    # if the dictionary has a label per node
-    def nodeColHexa_dictLabHexa(self):
-        """_summary_
-        Method creating the dictionary "NodeHexa" in which, nodes are keys and the corresponding hexadecimal colors, the values.
-        It is used when the given “color_labels” was a dictionary and its values (labels) were not colors.
-        """
-        keys = list(self.color_labels)
-        self.NodeHexa = {}
-        for k in keys:
-            self.NodeHexa[k] = self.labColors[self.color_labels[k]]
-
-    # if color_labels is a list labColors is a list with hexadecimal values
-    def nodeColHexa_listHexa(self):
-        """_summary_
-        Method creating the dictionary "NodeHexa" in which, nodes are keys and the corresponding hexadecimal colors, the values.
-        It is used when the given “color_labels” is a list. It creates the dictionary by associating each index to a node and the color of its labels.
-        """
-        nodes = list(self.graph.nodes)
-        self.NodeHexa = {}
-        for i, n in enumerate(nodes):
-            self.NodeHexa[n] = self.labColors[i]
+        labels = np.unique(self.color_labels)
+        self.dictLabelsCol = {
+            k: to_hex(self.myPalette(k / len(labels))) for k in range(len(labels))
+        }
+        self.NodeHexa = {
+            n: self.dictLabelsCol[l]
+            for n, l in zip(self.graph.nodes, self.color_labels)
+        }
 
     def get_color_node_points_covered(self, n):
-        """_summary_
-        Sets the color of the node and stores the percentage of each label represented in the node in the graph as :
-        - "data_perc_labels" with a dictionary with each labels present in the node as keys and the number of points belonging to this label as values
-        - "perc_labels" with a string value in which each label in associated to the percentage of points inside this node belonging to this label
+        """
+        Assign a color to a node based on the number of points it covers.
 
         Parameters
         ----------
         n : int
-            Node for which the color should be set. The node will also store the percentage of each label covered.
+            The node for which to assign a color.
         """
-        points = self.graph.nodes[n]["points_covered"]
-        nb_points = len(points)
-        label_in_node, nb_each = np.unique(
-            self.color_labels[points], return_counts=True
-        )
-        perc_each_label = [x / nb_points for x in nb_each]
-
-        index_max = self.labelChoice(nb_each)
-        label = label_in_node[index_max]
-        self.graph.nodes[n]["color"] = self.dictLabelsCol[label]
-
-        per_label = ""
-        for i in range(len(label_in_node)):
-            per_label = (
-                per_label
-                + "label "
-                + str(label_in_node[i])
-                + " : "
-                + str(
-                    round(
-                        perc_each_label[i],
-                        3,
-                    )
-                )
-                + ", "
-            )
-
-        self.graph.nodes[n]["perc_labels"] = per_label
-        self.graph.nodes[n]["data_perc_labels"] = dict(zip(label_in_node, nb_each))
+        color = self.get_val_node(n)
+        self.graph.nodes[n]["color"] = to_hex(color)
 
     def set_color_nodes_variable(self):
-        """_summary_
-        Method which sets the color of each node depending on the chosen continuous variable of the node.
         """
-        self.set_min_max_mean_var()
+        Set the color of each node based on the variable's value.
+
+        This method assigns colors to nodes using the specified variable-based coloring strategy.
+        """
         for node in self.graph.nodes:
-            self.graph.nodes[node]["color"] = self.get_color_var(
-                self.graph.nodes[node]["data_variable"]
-            )
+            self.get_color_node(node)
 
-    def set_min_max_mean_var(self):
-        """_summary_
-        Method which  browses nodes in order to store the variable's value inside each node with the key “data_variable” and gets the self.MAX_VALUE_COLOR  and the self.MIN_VALUE_COLOR which correspond to the maximum and minimum values of the variable of the graph among all nodes.
+    def get_color_var_log(self, n):
         """
-        nodes = list(self.graph.nodes)
-        MIN_VALUE = self.get_set_val_var_node(nodes[0])
-        MAX_VALUE = MIN_VALUE
-        for node in self.graph.nodes:
-            mean_node = self.get_set_val_var_node(node)
-            if mean_node > MAX_VALUE:
-                MAX_VALUE = mean_node
-            if mean_node < MIN_VALUE:
-                MIN_VALUE = mean_node
-
-        self.MAX_VALUE_COLOR = MAX_VALUE
-        self.MIN_VALUE_COLOR = MIN_VALUE
-
-    def get_set_val_var_node(self, node):
-        """_summary_
-        Method which, for a given node, stores the node's value inside the graph under “data_variable” and returns the value
-        Parameters
-        ----------
-        node : int
-            Node for which we want to store the average variable's value.
-
-        Returns
-        -------
-        float
-            Node's average variable value.
-        """
-        val_intra_node = self.get_val_node(node)
-        self.graph.nodes[node]["data_variable"] = val_intra_node
-        return val_intra_node
-
-    def get_val_var_node_Xnum(self, node):
-        """_summary_
-        Method which, for a given node, get the node's average value when the dataset is a numpy darray and returns the value.
-        Parameters
-        ----------
-        node : int
-            Node for which we want to get the average variable's value.
-
-        Returns
-        -------
-        float
-            Node's average variable value.
-        """
-        return self.X[:, self.variable][self.graph.nodes[node]["points_covered"]].mean()
-
-    def get_val_var_node_Xpand(self, node):
-        """_summary_
-        Method which, for a given node, get the node's average value when the dataset is a pandas dataframe and returns the value.
-        Parameters
-        ----------
-        node : int
-            Node for which we want to get the average variable's value.
-
-        Returns
-        -------
-        float
-            Node's average variable value.
-        """
-        if type(self.variable) == str:
-            return self.X[self.variable][
-                self.graph.nodes[node]["points_covered"]
-            ].mean()
-        else:
-            return self.X.iloc[:, self.variable][
-                self.graph.nodes[node]["points_covered"]
-            ].mean()
-
-    def get_val_var_node_graph(self, node):
-        """_summary_
-        Method which, for a given node, get the node's variable's value when it is stored in the graph and returns the value.
-        Parameters
-        ----------
-        node : int
-            Node for which we want to get the variable's value.
-
-        Returns
-        -------
-        float
-            Node's variable value.
-        """
-        return self.graph.nodes[node][self.variable]
-
-    def get_color_var_exp(self, val):
-        """_summary_
-        Method transforming a real value in hexadecimal by doing an exponential normalization.
+        Assign a color to a node based on the logarithm of its variable value.
 
         Parameters
         ----------
-        val : float
-            Variable's value of a node.
-
-        Returns
-        -------
-        str
-            Hexadecimal color corresponding to the variable's value.
+        n : int
+            The node for which to assign a color.
         """
-        color_id = (np.exp(val) - np.exp(self.MIN_VALUE_COLOR)) / (
-            np.exp(self.MAX_VALUE_COLOR) - np.exp(self.MIN_VALUE_COLOR)
+        node_value = self.get_val_node(n)
+        normalized_value = np.log10(1 + node_value)
+        self.graph.nodes[n]["color"] = to_hex(self.myPalette(normalized_value))
+
+    def get_color_var_lin(self, n):
+        """
+        Assign a color to a node based on the linear normalization of its variable value.
+
+        Parameters
+        ----------
+        n : int
+            The node for which to assign a color.
+        """
+        node_value = self.get_val_node(n)
+        normalized_value = node_value / self.MAX_VALUE_COLOR
+        self.graph.nodes[n]["color"] = to_hex(self.myPalette(normalized_value))
+
+    def get_color_var_exp(self, n):
+        """
+        Assign a color to a node based on the exponential normalization of its variable value.
+
+        Parameters
+        ----------
+        n : int
+            The node for which to assign a color.
+        """
+        node_value = self.get_val_node(n)
+        normalized_value = (np.exp(node_value) - np.exp(0)) / (
+            np.exp(self.MAX_VALUE_COLOR) - np.exp(0)
         )
-        return to_hex(self.myPalette(color_id))
+        self.graph.nodes[n]["color"] = to_hex(self.myPalette(normalized_value))
 
-    def get_color_var_log(self, val):
-        """_summary_
-        Method transforming a real value in hexadecimal by doing a logarithmic normalization.
+    def get_val_var_node_graph(self, n):
+        """
+        Retrieve the variable value of a node from the graph.
 
         Parameters
         ----------
-        val : float
-            Variable's value of a node.
+        n : int
+            The node for which to retrieve the variable value.
 
         Returns
         -------
-        str
-            Hexadecimal color corresponding to the variable's value.
+        float
+            The value of the variable for the node.
         """
-        color_id = (np.log10(val) - np.log10(self.MIN_VALUE_COLOR)) / (
-            np.log10(self.MAX_VALUE_COLOR) - np.log10(self.MIN_VALUE_COLOR)
-        )
-        hex = to_hex(self.myPalette(color_id))
-        return hex
+        return self.graph.nodes[n].get(self.variable, 0)
 
-    def get_color_var_lin(self, val):
-        """_summary_
-        Method transforming a real value in hexadecimal by doing a linear normalization.
+    def get_val_var_node_Xnum(self, n):
+        """
+        Retrieve the variable value of a node from the numeric dataset.
 
         Parameters
         ----------
-        val : float
-            Variable's value of a node.
+        n : int
+            The node for which to retrieve the variable value.
 
         Returns
         -------
-        str
-            Hexadecimal color corresponding to the variable's value.
+        float
+            The value of the variable for the node.
         """
-        color_id = (val - self.MIN_VALUE_COLOR) / (
-            self.MAX_VALUE_COLOR - self.MIN_VALUE_COLOR
-        )
-        return to_hex(self.myPalette(color_id))
+        return self.X[n][self.variable]
+
+    def get_val_var_node_Xpand(self, n):
+        """
+        Retrieve the variable value of a node from the expanded dataset.
+
+        Parameters
+        ----------
+        n : int
+            The node for which to retrieve the variable value.
+
+        Returns
+        -------
+        float
+            The value of the variable for the node.
+        """
+        return self.X.loc[n, self.variable]

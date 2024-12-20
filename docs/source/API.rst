@@ -1,18 +1,10 @@
 API
 ====================
 
-clustergraph.ConnectivityPruning module
+clustergraph.clustergraph module
 ---------------------------------------
 
-.. automodule:: clustergraph.ConnectivityPruning
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-clustergraph.EdgeStrategy module
---------------------------------
-
-.. automodule:: clustergraph.EdgeStrategy
+.. automodule:: clustergraph.clustergraph
    :members:
    :undoc-members:
    :show-inheritance:
@@ -25,10 +17,26 @@ clustergraph.GraphPruning module
    :undoc-members:
    :show-inheritance:
 
-clustergraph.Metric\_distortion\_class module
+clustergraph.ConnectivityPruning module
+---------------------------------------
+
+.. automodule:: clustergraph.ConnectivityPruning
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+clustergraph.Metric_distortion_class module
 ---------------------------------------------
 
 .. automodule:: clustergraph.Metric_distortion_class
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+clustergraph.EdgeStrategy module
+--------------------------------
+
+.. automodule:: clustergraph.EdgeStrategy
    :members:
    :undoc-members:
    :show-inheritance:
@@ -41,7 +49,7 @@ clustergraph.NodeStrategy module
    :undoc-members:
    :show-inheritance:
 
-clustergraph.c\_GraphPreprocess module
+clustergraph.c_GraphPreprocess module
 --------------------------------------
 
 .. automodule:: clustergraph.c_GraphPreprocess
@@ -49,13 +57,6 @@ clustergraph.c\_GraphPreprocess module
    :undoc-members:
    :show-inheritance:
 
-clustergraph.clustergraph module
---------------------------------
-
-.. automodule:: clustergraph.clustergraph
-   :members:
-   :undoc-members:
-   :show-inheritance:
 
 clustergraph.distances module
 -----------------------------
@@ -65,7 +66,7 @@ clustergraph.distances module
    :undoc-members:
    :show-inheritance:
 
-clustergraph.plot\_graph module
+clustergraph.plot_graph module
 -------------------------------
 
 .. automodule:: clustergraph.plot_graph
@@ -88,4 +89,3 @@ clustergraph.utils module
    :members:
    :undoc-members:
    :show-inheritance:
-

@@ -30,7 +30,7 @@ The sources for ClusterGraph can be downloaded from the `Github repo`_ by clonin
 
 .. code-block:: console
 
-    $ git clone git://github.com/mhallier/clustergraph
+    $ git clone git://github.com/dioscuri-tda/clustergraph
 
 
 Once you have a copy of the source, you can install it with:
@@ -40,4 +40,4 @@ Once you have a copy of the source, you can install it with:
     $ python setup.py install
 
 
-.. _Github repo: https://github.com/mhallier/clustergraph
+.. _Github repo: https://github.com/dioscuri-tda/clustergraph

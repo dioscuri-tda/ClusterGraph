@@ -15,8 +15,32 @@ def draw_graph_pie(
     ax=None,
     **kwargs
 ):
+    """
+    Draw a graph with pie charts at each node representing its attributes.
 
-    if ax == None:
+    Parameters
+    ----------
+    graph : networkx.Graph
+        The graph to be drawn.
+    nb_edges : int, optional
+        The number of edges to display. If specified, the graph is truncated to include only the smallest `nb_edges` edges.
+    edge_variable : str, optional
+        The edge attribute used for edge labels. Defaults to 'weight_plot'.
+    draw_edge_labels : bool, optional
+        If True, edge labels are drawn. Defaults to True.
+    scale_nodes : bool, optional
+        If True, node sizes are scaled according to the attribute 'size_plot'. Defaults to True.
+    size_nodes : float, optional
+        The baseline size of nodes if `scale_nodes` is False. Defaults to 0.05.
+    random_state : int, optional
+        The random state for the node positioning. Defaults to 42.
+    ax : matplotlib.axes.Axes, optional
+        The axes on which to draw the graph. If None, the current axes are used.
+    **kwargs : keyword arguments
+        Additional arguments passed to `networkx.draw_networkx`.
+
+    """
+    if ax is None:
         ax = plt.gca()
 
     G = graph.copy()
@@ -32,7 +56,6 @@ def draw_graph_pie(
     nx.draw_networkx_edges(G, pos=pos, edge_color=edge_colors)
 
     for node, data in G.nodes(data=True):
-
         attributes = G.nodes[node]["data_perc_labels"]
         keys = list(attributes)
         attrs = [attributes[k] for k in keys]
@@ -54,18 +77,14 @@ def draw_graph_pie(
                 frame=True,
             )
 
-    # Afficher les labels des arêtes
+    # Display edge labels
     if draw_edge_labels:
         edge_labels = {
             (u, v): "{:.2f}".format(data[edge_variable])
             for u, v, data in G.edges(data=True)
         }
         nx.draw_networkx_edge_labels(
-            G,
-            pos,
-            edge_labels=edge_labels,
-            font_color="black",
-            font_size=9,
+            G, pos, edge_labels=edge_labels, font_color="black", font_size=9
         )
 
 
@@ -82,23 +101,33 @@ def draw_graph(
     **kwargs
 ):
     """
-    Function which plots a graph with the asked number of edges sorted from shortest to longest or the opposite.
-    The edges and nodes can be colored.
+    Plot a graph with specified nodes and edges, with optional sorting of edges.
 
     Parameters
     ----------
     graph : networkx.Graph
         The graph to be displayed.
-    nb_edges : int
-        The number of edges to display in the visualization. The edges are sorted, so the shortest will be shown.
-    size_nodes : int
-        Baseline for the node's size in the visualization. The bigger the number, the bigger the nodes.
-    random_state : int or None
-        The random state used to plot the graph. If None, the position of the graph will change each time.
+    nb_edges : int, optional
+        The number of edges to display. If specified, only the first `nb_edges` edges (sorted by weight) are shown.
+    edge_variable : str, optional
+        The edge attribute to be used for edge labels. Defaults to 'weight_plot'.
+    draw_edge_labels : bool, optional
+        If True, edge labels are drawn. Defaults to True.
+    scale_nodes : bool, optional
+        If True, node sizes are scaled based on the 'size_plot' attribute. Defaults to True.
+    size_nodes : int, optional
+        The baseline size of nodes. Larger values make nodes bigger. Defaults to 1000.
+    random_state : int or None, optional
+        Random seed for the node layout. Defaults to 42.
+    precision : int, optional
+        Number of decimal places for edge labels. Defaults to 2.
+    ax : matplotlib.axes.Axes, optional
+        The axes to draw the graph on. If None, the current axes are used.
+    **kwargs : keyword arguments
+        Additional arguments passed to `networkx.draw_networkx`.
 
     """
-
-    if ax == None:
+    if ax is None:
         ax = plt.gca()
 
     G = graph.copy()
@@ -110,17 +139,17 @@ def draw_graph(
         G.clear_edges()
         G.add_edges_from(edges)
 
-    # Obtenir les couleurs des nœuds et des arêtes
+    # Obtain node and edge colors
     node_colors = [data["color"] for _, data in G.nodes(data=True)]
     edge_colors = [data["color"] for _, _, data in G.edges(data=True)]
 
-    # Obtenir la taille des nœuds (multipliée par 100 pour une meilleure visualisation)
+    # Obtain node sizes
     if scale_nodes:
         node_sizes = [data["size_plot"] * size_nodes for _, data in G.nodes(data=True)]
     else:
         node_sizes = [size_nodes for _ in G.nodes()]
 
-    # Créer le dessin du graphique
+    # Create the graph visualization
     if "pos" not in kwargs:
         pos = nx.spring_layout(G, seed=random_state)
         kwargs["pos"] = pos
@@ -134,7 +163,7 @@ def draw_graph(
         **kwargs
     )
 
-    # Afficher les labels des arêtes
+    # Display edge labels
     if draw_edge_labels:
         edge_labels = {
             (u, v): "{:.{}f}".format(data[edge_variable], precision)
@@ -153,76 +182,76 @@ def plot_slider_graph(
     min_node_size=100,
 ):
     """
-    Method which plots into an interactive matplotlib window the graph `g` with a slider to choose the number of edges.
+    Display an interactive graph with a slider to control the number of displayed edges.
 
     Parameters
     ----------
     g : networkx.Graph
-        The graph which is displayed.
-    reverse : bool
-        If `reverse` is True, the edges will be displayed from longest to shortest. Otherwise, it will be from shortest to longest.
-    random_state : int or None
-        The random state used to plot the graph. If `None`, the position of the graph will change each time.
-    weight : str
-        Label under which the weight of the edges is stored. This weight is used to sort the edges.
-    weight_shown : str
-        Label which will be displayed on the plot. Can be the normalized value of each edge.
-    max_node_size : int
-        The maximum size of a node in the visualized graph.
-    min_node_size : int
-        The minimum size of a node in the visualized graph.
+        The graph to be displayed.
+    reverse : bool, optional
+        If True, edges are sorted from longest to shortest. Otherwise, they are sorted from shortest to longest.
+    random_state : int or None, optional
+        Random seed for node positioning. Defaults to None.
+    weight : str, optional
+        The edge attribute used for sorting the edges. Defaults to 'weight'.
+    weight_shown : str, optional
+        The edge attribute used for displaying edge labels. Defaults to 'weight_plot'.
+    max_node_size : int, optional
+        The maximum size of nodes in the plot. Defaults to 800.
+    min_node_size : int, optional
+        The minimum size of nodes in the plot. Defaults to 100.
 
     Returns
     -------
-    Slider
-        The slider which is displayed.
+    matplotlib.widgets.Slider
+        The slider widget used to control the number of displayed edges.
     """
-
     graph = g.copy()
     graph.clear_edges()
 
     def get_colors_from_graph(G):
-        """_summary_
-        Function which returns the labels for the nodes and edges of a given graph.
+        """
+        Retrieve the node and edge colors from the graph. If no colors are set, defaults are used.
+
         Parameters
         ----------
-        G :  networkx graph
-             Corresponds to the Graph for which, the colors of nodes and edges are demanded.
+        G : networkx.Graph
+            The graph for which node and edge colors are retrieved.
 
         Returns
         -------
-         list , list
-             Returns the lists of colors for the nodes and for the edges of the graph G
+        tuple of list of str
+            List of node colors and edge colors.
         """
-        # We try to get the colors with the given labels, if it fails we use a default value
         try:
             node_colors = [data["color"] for _, data in G.nodes(data=True)]
-        except:
+        except KeyError:
             node_colors = "#1f78b4"
 
         try:
             edge_colors = [data["color"] for _, _, data in G.edges(data=True)]
-
-        except:
+        except KeyError:
             edge_colors = "k"
 
         return node_colors, edge_colors
 
     def get_size_nodes_from_graph(G, max_size=max_node_size, min_size=min_node_size):
-        """_summary_
-        Function which returns the list of the size of nodes. Those sizes correspond to the size of each node in the visualization.
+        """
+        Calculate the sizes of nodes based on their 'size_plot' attribute.
+
+        Parameters
         ----------
-        G :  networkx graph
-             Corresponds to the Graph for which, the size of nodes is demanded.
-        max_size :  int
-             Corresponds to the maximum size of a node in the visualization.
-        min_size :  int
-             Corresponds to the minimum size of a node in the visualization.
+        G : networkx.Graph
+            The graph for which node sizes are calculated.
+        max_size : int, optional
+            The maximum size of nodes. Defaults to 800.
+        min_size : int, optional
+            The minimum size of nodes. Defaults to 100.
 
         Returns
         -------
-         list
-             Returns the list of the size of the nodes for the visualization.
+        list of int
+            List of node sizes.
         """
         return [
             data["size_plot"] * max_size + min_size for _, data in G.nodes(data=True)
@@ -239,25 +268,27 @@ def plot_slider_graph(
         weight_shown=weight_shown,
         node_sizes=node_sizes,
     ):
-        """_summary_
-        Function which will be called when the value of the slider changes. This function changes the number of edges displayed in the visualized graph.
-        ----------
-        num_edges :  int
-             Number of edges to display. It is the value of the slider.
-        g :  networkx graph
-             The graph with the maximum number of edges which can be plotted. The baseline graph.
-        reverse :  bool
-             If reverse is True, the edges will be dispalyed from longest to shortest. Otherwise it will be from shortest to longest.
-        random_state :  int
-             The random state which will be used to plot the graph. If the value is None, the position of the graph will change each time.
-        weight :  string
-             Label underwhich the weight of the edges is stored. This weight is used to sort the edges.
-        weight_shown :  string
-              Label which will be displayed on the plot. Can be the normalized value of each edge.
-        node_sizes :  list
-             List of the size of the nodes in the visualization.
         """
+        Update the displayed graph when the slider is moved. Controls the number of displayed edges.
 
+        Parameters
+        ----------
+        num_edges : int
+            The number of edges to display, based on the slider value.
+        g : networkx.Graph
+            The original graph.
+        reverse : bool
+            Whether to reverse the edge sorting order.
+        random_state : int or None
+            The random state for node layout.
+        weight : str
+            The edge attribute used for sorting.
+        weight_shown : str
+            The edge attribute used for displaying edge labels.
+        node_sizes : list of int
+            List of node sizes.
+
+        """
         ax.clear()
         G = g.copy()
 
