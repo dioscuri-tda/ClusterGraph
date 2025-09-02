@@ -252,6 +252,62 @@ class ClusterGraph(GraphPreprocess, GraphPruning):
         networkx.Graph
             The pruned graph after distortion pruning.
         """
+
         if isinstance(knn_g, (nx.Graph, nx.DiGraph, nx.MultiGraph, nx.MultiDiGraph)):
             self.knn_g = knn_g
-            self.is_knn_computed
+            self.is_knn_computed = -1
+
+        elif isinstance(knn_g, int):
+            if self.is_knn_computed != knn_g:
+                neigh = NearestNeighbors(n_neighbors=knn_g, radius=1)
+                neigh.fit(X=self.X)
+                nn_adjacency = neigh.kneighbors_graph(
+                    X=self.X, n_neighbors=knn_g, mode="distance"
+                )
+                nn_Graph = nx.from_scipy_sparse_array(
+                    nn_adjacency, edge_attribute=weight_knn_g
+                )
+
+                for node in nn_Graph.nodes:
+                    nn_Graph.remove_edge(node, node)
+                self.knn_g = nn_Graph
+                self.is_knn_computed = knn_g
+
+        return self.prune_distortion_pr(
+            knn_g=self.knn_g,
+            nb_edge_pruned=nb_edge_pruned,
+            score=score,
+            algo=algo,
+            weight_knn_g=weight_knn_g,
+            k_compo=k_compo,
+            dist_weight=dist_weight,
+            is_knn_computed=self.is_knn_computed,
+        )
+
+    def add_coloring(
+        self,
+        coloring_df,
+        custom_function=np.mean,
+    ):
+        """Takes pandas dataframe and compute the average \
+        of each column for the subset of points covered by each node.
+        Add such values as attributes to each node in the Graph
+
+        Parameters
+        ----------
+        coloring_df: pandas dataframe of shape (n_samples, n_coloring_function)
+        custom_function : callable, optional
+            a function to compute on the `coloring_df` columns, by default numpy.mean
+        custom_name : string, optional
+            sets the attributes naming scheme, by default None, the attribute names will be the column names
+        add_std: bool, default=False
+            Wheter to compute also the standard deviation on each ball
+        """
+        # for each column in the dataframe compute the mean across all nodes and add it as mean attributes
+        for node in self.Graph.nodes:
+            for col_name, avg in (
+                coloring_df.loc[self.Graph.nodes[node]["points_covered"]]
+                .apply(custom_function, axis=0)
+                .items()
+            ):
+                self.Graph.nodes[node][col_name] = avg
