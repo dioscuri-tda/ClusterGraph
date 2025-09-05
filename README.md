@@ -14,7 +14,7 @@ More information can be found the accompanying paper _"ClusterGraph: a new tool 
 
 
 <picture>
-  <img alt="ClusterGraph pipeline" src="docs/img/CG_pipeline.png" width="900">
+  <img alt="ClusterGraph pipeline" src="docs/source/_static/CG_pipeline.png" width="700">
 </picture>
 
 ## Install the package 📦   
@@ -40,7 +40,7 @@ pred = model_KM.fit_predict(X)
 ```
 
 <picture>
-  <img alt='circle' src="docs/img/circle.png" width="300">
+  <img alt='circle' src="docs/source/_static/circle.png" width="300">
 </picture>
 
 
@@ -67,10 +67,10 @@ draw_graph(cluster_g.Graph, ax=ax)
 ```
 
 <picture>
-  <img alt='circle full CG' src="docs/img/circle_full_CG.png" width="300">
+  <img alt='circle full CG' src="docs/source/_static/circle_full_CG.png" width="300">
 </picture>
 
-
+And prune it to reveal the underlying geometry
 ```python
 metric_distortion_graph, md = cluster_g.prune_distortion(knn_g=5, score=True)
 
@@ -86,7 +86,7 @@ draw_graph(metric_distortion_graph, ax=ax2)
 ```
 
 <picture>
-  <img alt='circle pruned CG' src="docs/img/circle_pruned_CG.png" width="600">
+  <img alt='circle pruned CG' src="docs/source/_static/circle_pruned_CG.png" width="600">
 </picture>
 
 For more examples, check out the [example notebooks](https://github.com/dioscuri-tda/clustergraph/tree/main/examples) or the [documentation](https://clustergraph.readthedocs.io).
