@@ -97,3 +97,7 @@ If you find this package useful please cite
 ```
 Dłotko, P., Gurnari, D., Hallier, M., & Jurek-Loughrey, A. (2024). "ClusterGraph: a new tool for visualization and compression of multidimensional data". arXiv preprint arXiv:2411.05443.
 ```
+
+## Licensing
+- **Code**: Licensed under the [MIT License](./LICENSE).
+- **Example data**: Dedicated to the public domain under [CC0 1.0 Universal](./LICENSE-DATA.txt).
