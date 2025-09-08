@@ -2,6 +2,7 @@
 
 [![version](https://img.shields.io/badge/version-0.3.2-blue)](https://pypi.org/project/clustergraph/)
 [![Documentation Status](https://readthedocs.org/projects/clustergraph/badge/)](https://clustergraph.readthedocs.io)
+**ClusterGraph, RRID:** SCR_027405
 
 ClusterGraph is a tool which allows the visualization of the geometric organization of clusters.
 
