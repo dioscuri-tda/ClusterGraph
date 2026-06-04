@@ -1,0 +1,1442 @@
+[
+    {
+        "k_knn": 5,
+        "k_kmeans": 15,
+        "md_min": 0.003027591152513819,
+        "md_max": 0.005437189816852375,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 5,
+        "k_kmeans": 16,
+        "md_min": 0.002516066715541833,
+        "md_max": 0.0046043977771336045,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 5,
+        "k_kmeans": 17,
+        "md_min": 0.00221806593629852,
+        "md_max": 0.0041243893652336125,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 5,
+        "k_kmeans": 18,
+        "md_min": 0.0019205309810159023,
+        "md_max": 0.00358418585535353,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 5,
+        "k_kmeans": 19,
+        "md_min": 0.0016468349635583876,
+        "md_max": 0.003111327995737209,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 5,
+        "k_kmeans": 20,
+        "md_min": 0.001438956111309633,
+        "md_max": 0.002857645263939623,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 5,
+        "k_kmeans": 21,
+        "md_min": 0.0012777334852486033,
+        "md_max": 0.002542146512282797,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 5,
+        "k_kmeans": 22,
+        "md_min": 0.0011609190569898875,
+        "md_max": 0.0023519373304681118,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 5,
+        "k_kmeans": 23,
+        "md_min": 0.0010312585874247238,
+        "md_max": 0.0021648725688771806,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 5,
+        "k_kmeans": 24,
+        "md_min": 0.0009178518069642027,
+        "md_max": 0.0018938823697920795,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 6,
+        "k_kmeans": 15,
+        "md_min": 0.0018971625591773947,
+        "md_max": 0.004306761223515951,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 6,
+        "k_kmeans": 16,
+        "md_min": 0.0015564276209742063,
+        "md_max": 0.0036447586825659795,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 6,
+        "k_kmeans": 17,
+        "md_min": 0.001366956397430673,
+        "md_max": 0.0032732798263657645,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 6,
+        "k_kmeans": 18,
+        "md_min": 0.001162776937479343,
+        "md_max": 0.0028264318118169695,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 6,
+        "k_kmeans": 19,
+        "md_min": 0.0009980148558556834,
+        "md_max": 0.002462507888034505,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 6,
+        "k_kmeans": 20,
+        "md_min": 0.0008371649469210621,
+        "md_max": 0.002255481891484292,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 6,
+        "k_kmeans": 21,
+        "md_min": 0.00073921101863638,
+        "md_max": 0.0020036240456705735,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 6,
+        "k_kmeans": 22,
+        "md_min": 0.0006606930473630538,
+        "md_max": 0.0018517113208412776,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 6,
+        "k_kmeans": 23,
+        "md_min": 0.0005695741464205904,
+        "md_max": 0.0017031881278730472,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 6,
+        "k_kmeans": 24,
+        "md_min": 0.0005105030379332449,
+        "md_max": 0.001486533600761121,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 7,
+        "k_kmeans": 15,
+        "md_min": 0.0013022223416827147,
+        "md_max": 0.0036773265667932,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 7,
+        "k_kmeans": 16,
+        "md_min": 0.0010558449589290282,
+        "md_max": 0.0031063254893018435,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 7,
+        "k_kmeans": 17,
+        "md_min": 0.0008894030064643267,
+        "md_max": 0.0027929524393591337,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 7,
+        "k_kmeans": 18,
+        "md_min": 0.0007405150416863285,
+        "md_max": 0.0024041699160239553,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 7,
+        "k_kmeans": 19,
+        "md_min": 0.0006361511932653374,
+        "md_max": 0.0020973656628902613,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 7,
+        "k_kmeans": 20,
+        "md_min": 0.0005113235522641806,
+        "md_max": 0.0019161933588144366,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 7,
+        "k_kmeans": 21,
+        "md_min": 0.00044436876776177944,
+        "md_max": 0.00170112242998891,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 7,
+        "k_kmeans": 22,
+        "md_min": 0.00037823608831736335,
+        "md_max": 0.0015692444301054931,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 7,
+        "k_kmeans": 23,
+        "md_min": 0.000321739784254759,
+        "md_max": 0.0014468667210507454,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 7,
+        "k_kmeans": 24,
+        "md_min": 0.00029174787238687414,
+        "md_max": 0.0012630296836812493,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 8,
+        "k_kmeans": 15,
+        "md_min": 0.0010973166353526926,
+        "md_max": 0.0034576508168279586,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 8,
+        "k_kmeans": 16,
+        "md_min": 0.0008892898031242989,
+        "md_max": 0.0029198272830637828,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 8,
+        "k_kmeans": 17,
+        "md_min": 0.000724404171720689,
+        "md_max": 0.002619213248444157,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 8,
+        "k_kmeans": 18,
+        "md_min": 0.0005934250960304267,
+        "md_max": 0.002257079970368053,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 8,
+        "k_kmeans": 19,
+        "md_min": 0.0005077825862806376,
+        "md_max": 0.001966251311805312,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 8,
+        "k_kmeans": 20,
+        "md_min": 0.0004112483294704577,
+        "md_max": 0.0017960449609997545,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 8,
+        "k_kmeans": 21,
+        "md_min": 0.0003464785802092491,
+        "md_max": 0.0015923593346652287,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 8,
+        "k_kmeans": 22,
+        "md_min": 0.00028110150200642055,
+        "md_max": 0.0014676222785416954,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 8,
+        "k_kmeans": 23,
+        "md_min": 0.00023824233127481728,
+        "md_max": 0.0013518513990063302,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 8,
+        "k_kmeans": 24,
+        "md_min": 0.00021718770781495084,
+        "md_max": 0.0011798039948217062,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 9,
+        "k_kmeans": 15,
+        "md_min": 0.0008836774704646463,
+        "md_max": 0.0031554618091722336,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 9,
+        "k_kmeans": 16,
+        "md_min": 0.000728292357516666,
+        "md_max": 0.002661764547740809,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 9,
+        "k_kmeans": 17,
+        "md_min": 0.0005162844233990168,
+        "md_max": 0.002391470787908859,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 9,
+        "k_kmeans": 18,
+        "md_min": 0.00040217693315394454,
+        "md_max": 0.0020560133315862725,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 9,
+        "k_kmeans": 19,
+        "md_min": 0.00034807279784658686,
+        "md_max": 0.001793771312056027,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 9,
+        "k_kmeans": 20,
+        "md_min": 0.00029924011875089805,
+        "md_max": 0.001635933176003313,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 9,
+        "k_kmeans": 21,
+        "md_min": 0.00025588957402177133,
+        "md_max": 0.001448750399363985,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 9,
+        "k_kmeans": 22,
+        "md_min": 0.00019994778593104652,
+        "md_max": 0.0013333943061085692,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 9,
+        "k_kmeans": 23,
+        "md_min": 0.00016850831151886942,
+        "md_max": 0.0012299367633275677,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 9,
+        "k_kmeans": 24,
+        "md_min": 0.00015218728071645626,
+        "md_max": 0.001073210284231418,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 10,
+        "k_kmeans": 15,
+        "md_min": 0.0007435712554025945,
+        "md_max": 0.0029672741615613786,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 10,
+        "k_kmeans": 16,
+        "md_min": 0.0006213332439573268,
+        "md_max": 0.0025025248864571008,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 10,
+        "k_kmeans": 17,
+        "md_min": 0.0003877687227455212,
+        "md_max": 0.0022457283986257325,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 10,
+        "k_kmeans": 18,
+        "md_min": 0.0003043439210236489,
+        "md_max": 0.0019327220221753972,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 10,
+        "k_kmeans": 19,
+        "md_min": 0.0002560566377256472,
+        "md_max": 0.0016846016068465537,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 10,
+        "k_kmeans": 20,
+        "md_min": 0.0002339956604549075,
+        "md_max": 0.0015368994493421858,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 10,
+        "k_kmeans": 21,
+        "md_min": 0.0002041583274642663,
+        "md_max": 0.0013585530235869507,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 10,
+        "k_kmeans": 22,
+        "md_min": 0.0001645675318309784,
+        "md_max": 0.0012516274044893575,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 10,
+        "k_kmeans": 23,
+        "md_min": 0.00014631256751625616,
+        "md_max": 0.0011514081034648546,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 10,
+        "k_kmeans": 24,
+        "md_min": 0.00012188629255830204,
+        "md_max": 0.001005224234582027,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 11,
+        "k_kmeans": 15,
+        "md_min": 0.000659818436721723,
+        "md_max": 0.0028086213052580166,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 11,
+        "k_kmeans": 16,
+        "md_min": 0.0005513498267971628,
+        "md_max": 0.00236793729622257,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 11,
+        "k_kmeans": 17,
+        "md_min": 0.00034409491813389566,
+        "md_max": 0.0021250857335932943,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 11,
+        "k_kmeans": 18,
+        "md_min": 0.0002657362990432945,
+        "md_max": 0.0018286572677108758,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 11,
+        "k_kmeans": 19,
+        "md_min": 0.00022720657642322467,
+        "md_max": 0.0015929146191353135,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 11,
+        "k_kmeans": 20,
+        "md_min": 0.0002099664236462267,
+        "md_max": 0.001454011095943713,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 11,
+        "k_kmeans": 21,
+        "md_min": 0.00017970163667344112,
+        "md_max": 0.0012835323221724176,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 11,
+        "k_kmeans": 22,
+        "md_min": 0.0001506526539463558,
+        "md_max": 0.0011829690946203732,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 11,
+        "k_kmeans": 23,
+        "md_min": 0.00013261329443355684,
+        "md_max": 0.0010882384014732158,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 11,
+        "k_kmeans": 24,
+        "md_min": 0.0001131342111632539,
+        "md_max": 0.0009496278564850679,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 12,
+        "k_kmeans": 15,
+        "md_min": 0.0005562969458549797,
+        "md_max": 0.0026768914918142194,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 12,
+        "k_kmeans": 16,
+        "md_min": 0.0004670837085976019,
+        "md_max": 0.002256827104434376,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 12,
+        "k_kmeans": 17,
+        "md_min": 0.0003141084838432116,
+        "md_max": 0.002020976696790946,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 12,
+        "k_kmeans": 18,
+        "md_min": 0.0002445972585454607,
+        "md_max": 0.001741198665010714,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 12,
+        "k_kmeans": 19,
+        "md_min": 0.00021800415451671385,
+        "md_max": 0.0015156777470830217,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 12,
+        "k_kmeans": 20,
+        "md_min": 0.000207319324481979,
+        "md_max": 0.0013829210002485103,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 12,
+        "k_kmeans": 21,
+        "md_min": 0.0001663764455746849,
+        "md_max": 0.0012205595186881978,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 12,
+        "k_kmeans": 22,
+        "md_min": 0.00013657386922138025,
+        "md_max": 0.0011247664320906381,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 12,
+        "k_kmeans": 23,
+        "md_min": 0.00012589521516752597,
+        "md_max": 0.001033249189891652,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 12,
+        "k_kmeans": 24,
+        "md_min": 0.00010705648757221656,
+        "md_max": 0.000901323038837126,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 13,
+        "k_kmeans": 15,
+        "md_min": 0.0004908684316436567,
+        "md_max": 0.0025694392378045727,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 13,
+        "k_kmeans": 16,
+        "md_min": 0.0004136769035172318,
+        "md_max": 0.0021656148232160146,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 13,
+        "k_kmeans": 17,
+        "md_min": 0.00029202045469437887,
+        "md_max": 0.0019352436117265615,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 13,
+        "k_kmeans": 18,
+        "md_min": 0.0002281779170623893,
+        "md_max": 0.0016698186435412233,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 13,
+        "k_kmeans": 19,
+        "md_min": 0.00020559373508660637,
+        "md_max": 0.0014525787227828938,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 13,
+        "k_kmeans": 20,
+        "md_min": 0.0001956720689052969,
+        "md_max": 0.001324880726016676,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 13,
+        "k_kmeans": 21,
+        "md_min": 0.00015362864912580462,
+        "md_max": 0.0011676782340966929,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 13,
+        "k_kmeans": 22,
+        "md_min": 0.00012731901905638668,
+        "md_max": 0.0010755496770496274,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 13,
+        "k_kmeans": 23,
+        "md_min": 0.00011772997260416154,
+        "md_max": 0.000988190814402299,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 13,
+        "k_kmeans": 24,
+        "md_min": 9.941024914775481e-05,
+        "md_max": 0.000861942207989972,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 14,
+        "k_kmeans": 15,
+        "md_min": 0.0004598910716807365,
+        "md_max": 0.002521017794016843,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 14,
+        "k_kmeans": 16,
+        "md_min": 0.0003888006194416992,
+        "md_max": 0.002124585386806717,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 14,
+        "k_kmeans": 17,
+        "md_min": 0.00028585897739001495,
+        "md_max": 0.0018969739960922449,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 14,
+        "k_kmeans": 18,
+        "md_min": 0.00022583533894395238,
+        "md_max": 0.0016370356996539593,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 14,
+        "k_kmeans": 19,
+        "md_min": 0.00020449832316874486,
+        "md_max": 0.001422829905725616,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 14,
+        "k_kmeans": 20,
+        "md_min": 0.00018591173405516244,
+        "md_max": 0.00129777340294159,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 14,
+        "k_kmeans": 21,
+        "md_min": 0.00015017850094098216,
+        "md_max": 0.0011435787349865542,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 14,
+        "k_kmeans": 22,
+        "md_min": 0.00011975741917788442,
+        "md_max": 0.0010523236662843198,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 14,
+        "k_kmeans": 23,
+        "md_min": 0.00011124349997950033,
+        "md_max": 0.0009666635031502445,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 14,
+        "k_kmeans": 24,
+        "md_min": 9.365263032770047e-05,
+        "md_max": 0.0008432139973860447,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 15,
+        "k_kmeans": 15,
+        "md_min": 0.00042809222177817225,
+        "md_max": 0.0024441828717280786,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 15,
+        "k_kmeans": 16,
+        "md_min": 0.0003640164190473851,
+        "md_max": 0.0020596783701043223,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 15,
+        "k_kmeans": 17,
+        "md_min": 0.0002812243668818618,
+        "md_max": 0.0018397944995655609,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 15,
+        "k_kmeans": 18,
+        "md_min": 0.00022621276568878616,
+        "md_max": 0.0015865207596997028,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 15,
+        "k_kmeans": 19,
+        "md_min": 0.0002082271528422978,
+        "md_max": 0.001379532669508533,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 15,
+        "k_kmeans": 20,
+        "md_min": 0.00017954023530281768,
+        "md_max": 0.0012575515548357533,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 15,
+        "k_kmeans": 21,
+        "md_min": 0.00014622081186755798,
+        "md_max": 0.0011080283670505946,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 15,
+        "k_kmeans": 22,
+        "md_min": 0.00012188657346690007,
+        "md_max": 0.0010193751898598664,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 15,
+        "k_kmeans": 23,
+        "md_min": 0.000113101258542098,
+        "md_max": 0.0009367905481354145,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 15,
+        "k_kmeans": 24,
+        "md_min": 9.243637352843918e-05,
+        "md_max": 0.0008169550285268629,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 16,
+        "k_kmeans": 15,
+        "md_min": 0.00041914844733851865,
+        "md_max": 0.0024180891730103495,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 16,
+        "k_kmeans": 16,
+        "md_min": 0.0003586938963342859,
+        "md_max": 0.0020374086766317347,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 16,
+        "k_kmeans": 17,
+        "md_min": 0.00027354578126709045,
+        "md_max": 0.0018194467347465424,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 16,
+        "k_kmeans": 18,
+        "md_min": 0.00022362333056027037,
+        "md_max": 0.001568767711112259,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 16,
+        "k_kmeans": 19,
+        "md_min": 0.00020743202787112692,
+        "md_max": 0.0013640867110652163,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 16,
+        "k_kmeans": 20,
+        "md_min": 0.0001778794222065803,
+        "md_max": 0.0012433212929817924,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 16,
+        "k_kmeans": 21,
+        "md_min": 0.00014570166800936642,
+        "md_max": 0.0010954421598940354,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 16,
+        "k_kmeans": 22,
+        "md_min": 0.00011927345123111956,
+        "md_max": 0.0010077467784073962,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 16,
+        "k_kmeans": 23,
+        "md_min": 0.00011057660505755828,
+        "md_max": 0.0009260604025056682,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 16,
+        "k_kmeans": 24,
+        "md_min": 9.12411746733087e-05,
+        "md_max": 0.0008075527810539168,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 17,
+        "k_kmeans": 15,
+        "md_min": 0.0004253791925199701,
+        "md_max": 0.002372953658079041,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 17,
+        "k_kmeans": 16,
+        "md_min": 0.0003547400789354706,
+        "md_max": 0.0019997180031621014,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 17,
+        "k_kmeans": 17,
+        "md_min": 0.00027530675810620787,
+        "md_max": 0.0017858404958911516,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 17,
+        "k_kmeans": 18,
+        "md_min": 0.00022402262186337703,
+        "md_max": 0.0015390775603175144,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 17,
+        "k_kmeans": 19,
+        "md_min": 0.00020214726928181347,
+        "md_max": 0.001338802932657442,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 17,
+        "k_kmeans": 20,
+        "md_min": 0.00017469443237974388,
+        "md_max": 0.0012195207298721087,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 17,
+        "k_kmeans": 21,
+        "md_min": 0.00014697539950609022,
+        "md_max": 0.0010750233099584563,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 17,
+        "k_kmeans": 22,
+        "md_min": 0.00011897552469374907,
+        "md_max": 0.000988700075130406,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 17,
+        "k_kmeans": 23,
+        "md_min": 0.00011123963635652692,
+        "md_max": 0.0009082726700132851,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 17,
+        "k_kmeans": 24,
+        "md_min": 9.170998809840182e-05,
+        "md_max": 0.0007919828720716249,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 18,
+        "k_kmeans": 15,
+        "md_min": 0.0004193680221339662,
+        "md_max": 0.0023005406950295623,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 18,
+        "k_kmeans": 16,
+        "md_min": 0.00035781775181714334,
+        "md_max": 0.0019379293420710149,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 18,
+        "k_kmeans": 17,
+        "md_min": 0.00028167794505592705,
+        "md_max": 0.0017294872517540638,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 18,
+        "k_kmeans": 18,
+        "md_min": 0.00022941203940229706,
+        "md_max": 0.001490622723416253,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 18,
+        "k_kmeans": 19,
+        "md_min": 0.00020056456440575843,
+        "md_max": 0.0012964199351976817,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 18,
+        "k_kmeans": 20,
+        "md_min": 0.00017629296161193538,
+        "md_max": 0.0011808382282665437,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 18,
+        "k_kmeans": 21,
+        "md_min": 0.00015046675136289744,
+        "md_max": 0.0010411603974711573,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 18,
+        "k_kmeans": 22,
+        "md_min": 0.00012043596872135026,
+        "md_max": 0.0009574896770224586,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 18,
+        "k_kmeans": 23,
+        "md_min": 0.00010835341396223726,
+        "md_max": 0.0008792011326923966,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 18,
+        "k_kmeans": 24,
+        "md_min": 9.113562137329845e-05,
+        "md_max": 0.0007672058844795452,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 19,
+        "k_kmeans": 15,
+        "md_min": 0.0004284908610352155,
+        "md_max": 0.0022157238524704403,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 19,
+        "k_kmeans": 16,
+        "md_min": 0.00036137204102129443,
+        "md_max": 0.00186555492176621,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 19,
+        "k_kmeans": 17,
+        "md_min": 0.0002821779954049612,
+        "md_max": 0.0016628163061216722,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 19,
+        "k_kmeans": 18,
+        "md_min": 0.00021885302193440004,
+        "md_max": 0.0014339279799962237,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 19,
+        "k_kmeans": 19,
+        "md_min": 0.00019867251267832741,
+        "md_max": 0.001246258379395855,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 19,
+        "k_kmeans": 20,
+        "md_min": 0.00017098834683292093,
+        "md_max": 0.0011352536776043853,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 19,
+        "k_kmeans": 21,
+        "md_min": 0.00014564620742114927,
+        "md_max": 0.0010009608707089355,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 19,
+        "k_kmeans": 22,
+        "md_min": 0.0001197882661424038,
+        "md_max": 0.0009208547850356769,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 19,
+        "k_kmeans": 23,
+        "md_min": 0.00010825955709905665,
+        "md_max": 0.0008453154430313436,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 19,
+        "k_kmeans": 24,
+        "md_min": 9.096683247724344e-05,
+        "md_max": 0.0007382585058126899,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 20,
+        "k_kmeans": 15,
+        "md_min": 0.0004260679506680028,
+        "md_max": 0.002194292563170008,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 20,
+        "k_kmeans": 16,
+        "md_min": 0.00035713967338437286,
+        "md_max": 0.0018471646432791436,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 20,
+        "k_kmeans": 17,
+        "md_min": 0.00028089620535621125,
+        "md_max": 0.0016467278162580047,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 20,
+        "k_kmeans": 18,
+        "md_min": 0.00021973610990679243,
+        "md_max": 0.0014193662752868899,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 20,
+        "k_kmeans": 19,
+        "md_min": 0.00019815522699152103,
+        "md_max": 0.001233673493971849,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 20,
+        "k_kmeans": 20,
+        "md_min": 0.0001744816115221433,
+        "md_max": 0.0011237005335125118,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 20,
+        "k_kmeans": 21,
+        "md_min": 0.00014729356643689153,
+        "md_max": 0.0009910338245584828,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 20,
+        "k_kmeans": 22,
+        "md_min": 0.00011954062359007745,
+        "md_max": 0.0009116778592673345,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 20,
+        "k_kmeans": 23,
+        "md_min": 0.00010875987026374099,
+        "md_max": 0.0008370752069330556,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "k_knn": 20,
+        "k_kmeans": 24,
+        "md_min": 9.126529198928059e-05,
+        "md_max": 0.0007309400570245788,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    }
+]

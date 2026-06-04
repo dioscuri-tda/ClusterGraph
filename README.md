@@ -102,3 +102,28 @@ Dłotko, P., Gurnari, D., Hallier, M., & Jurek-Loughrey, A. (2024). "ClusterGrap
 ## Licensing
 - **Code**: Licensed under the [MIT License](./LICENSE).
 - **Example data**: Dedicated to the public domain under [CC0 1.0 Universal](./LICENSE-DATA.txt).
+
+
+# Examples and figure reproducibility
+
+The folder examples contains the processed data and notebooks used to generate the
+figures in the paper *"ClusterGraph: a new tool for visualisation and
+compression of multidimensional data"*
+
+## Contents
+
+- `examples/data/` — processed datasets used as input to the notebooks.
+- `examples/*.ipynb` — notebooks that load the processed data and reproduce the figures.
+
+## Figure → data / notebook mapping
+
+| Figure | Notebook | Processed data | Notes |
+|--------|----------|----------------|-------|
+| Fig. 1 | `1_non_embeddable_example.ipynb` | Generated in notebook | |
+| Fig. 2, 3 | `3_concentric_circles.ipynb` | `data/noisy_circles.csv` | |
+| Fig. 4 | `4_mice_protein.ipynb` | `data/mice_protein_no_NaN.csv` | |
+| Fig. 5 | `` | `` | |
+| Fig. 6 | `5_mice_protein_multilevel.ipynb` | `data/mice_protein_no_NaN.csv` | |
+| Fig. 7 | `4_mice_protein.ipynb` | `data/mice_protein_no_NaN.csv` | |
+| Fig. 8 | `9_lung_cancer_sc_rna.ipynb` | `data/sc_10x_5cl.count.csv and data/sc_10x_5cl.metadata.csv` | |
+| Fig. 9, 10, 11 | `ClusterGraph_stability_visualisation.ipynb` | `ClusterGraph_results_stability/*` | |

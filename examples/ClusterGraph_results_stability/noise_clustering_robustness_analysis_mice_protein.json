@@ -1,0 +1,200 @@
+[
+    {
+        "nb_seed_per_rate": 10,
+        "corrupted_rate": 0.02,
+        "k_knn": 15,
+        "k_kmeans": 14,
+        "md_min_avg": 0.001017608126714175,
+        "md_max_avg": 0.0032368608428008276,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "nb_seed_per_rate": 10,
+        "corrupted_rate": 0.05,
+        "k_knn": 15,
+        "k_kmeans": 14,
+        "md_min_avg": 0.0010067973711317488,
+        "md_max_avg": 0.0032410317573262253,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "nb_seed_per_rate": 10,
+        "corrupted_rate": 0.07,
+        "k_knn": 15,
+        "k_kmeans": 14,
+        "md_min_avg": 0.001013134698665785,
+        "md_max_avg": 0.003244772842468494,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "nb_seed_per_rate": 10,
+        "corrupted_rate": 0.1,
+        "k_knn": 15,
+        "k_kmeans": 14,
+        "md_min_avg": 0.0009987380766538797,
+        "md_max_avg": 0.003243441902826017,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "nb_seed_per_rate": 10,
+        "corrupted_rate": 0.12,
+        "k_knn": 15,
+        "k_kmeans": 14,
+        "md_min_avg": 0.0009640694438738726,
+        "md_max_avg": 0.0032434393765061547,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "nb_seed_per_rate": 10,
+        "corrupted_rate": 0.15,
+        "k_knn": 15,
+        "k_kmeans": 14,
+        "md_min_avg": 0.0009557819748508125,
+        "md_max_avg": 0.0032467509208038057,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "nb_seed_per_rate": 10,
+        "corrupted_rate": 0.02,
+        "k_knn": 15,
+        "k_kmeans": 16,
+        "md_min_avg": 0.00079463228135359,
+        "md_max_avg": 0.0024551018938784993,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "nb_seed_per_rate": 10,
+        "corrupted_rate": 0.05,
+        "k_knn": 15,
+        "k_kmeans": 16,
+        "md_min_avg": 0.0008011446372492605,
+        "md_max_avg": 0.002459417071909659,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "nb_seed_per_rate": 10,
+        "corrupted_rate": 0.07,
+        "k_knn": 15,
+        "k_kmeans": 16,
+        "md_min_avg": 0.0007978981651531981,
+        "md_max_avg": 0.0024595046489980935,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "nb_seed_per_rate": 10,
+        "corrupted_rate": 0.1,
+        "k_knn": 15,
+        "k_kmeans": 16,
+        "md_min_avg": 0.0008023564882621202,
+        "md_max_avg": 0.0024616125445195676,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "nb_seed_per_rate": 10,
+        "corrupted_rate": 0.12,
+        "k_knn": 15,
+        "k_kmeans": 16,
+        "md_min_avg": 0.0007890234418701238,
+        "md_max_avg": 0.0024620021356867457,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "nb_seed_per_rate": 10,
+        "corrupted_rate": 0.15,
+        "k_knn": 15,
+        "k_kmeans": 16,
+        "md_min_avg": 0.0007691391815208648,
+        "md_max_avg": 0.002463478758693503,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "nb_seed_per_rate": 10,
+        "corrupted_rate": 0.02,
+        "k_knn": 15,
+        "k_kmeans": 18,
+        "md_min_avg": 0.0006107302504044238,
+        "md_max_avg": 0.0019250455387803127,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "nb_seed_per_rate": 10,
+        "corrupted_rate": 0.05,
+        "k_knn": 15,
+        "k_kmeans": 18,
+        "md_min_avg": 0.0006087538375130461,
+        "md_max_avg": 0.001928786542874625,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "nb_seed_per_rate": 10,
+        "corrupted_rate": 0.07,
+        "k_knn": 15,
+        "k_kmeans": 18,
+        "md_min_avg": 0.0006153436383453972,
+        "md_max_avg": 0.0019292322327796169,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "nb_seed_per_rate": 10,
+        "corrupted_rate": 0.1,
+        "k_knn": 15,
+        "k_kmeans": 18,
+        "md_min_avg": 0.0006122848303366821,
+        "md_max_avg": 0.0019313358064120343,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "nb_seed_per_rate": 10,
+        "corrupted_rate": 0.12,
+        "k_knn": 15,
+        "k_kmeans": 18,
+        "md_min_avg": 0.0005996977169648896,
+        "md_max_avg": 0.0019316934942330774,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    },
+    {
+        "nb_seed_per_rate": 10,
+        "corrupted_rate": 0.15,
+        "k_knn": 15,
+        "k_kmeans": 18,
+        "md_min_avg": 0.0006033746106181113,
+        "md_max_avg": 0.0019331214963391606,
+        "seed_kmeans": 42,
+        "metrics": "average/euclidean",
+        "kmeans_n_init": 10
+    }
+]
