@@ -122,7 +122,7 @@ compression of multidimensional data"*
 | Fig. 1 | `1_non_embeddable_example.ipynb` | Generated in notebook | |
 | Fig. 2, 3 | `3_concentric_circles.ipynb` | `data/noisy_circles.csv` | |
 | Fig. 4 | `4_mice_protein.ipynb` | `data/mice_protein_no_NaN.csv` | |
-| Fig. 5 | `` | `` | |
+| Fig. 5 | `scanpy_example_clustering.ipynb` | `Uploaded in the notebook` | |
 | Fig. 6 | `5_mice_protein_multilevel.ipynb` | `data/mice_protein_no_NaN.csv` | |
 | Fig. 7 | `4_mice_protein.ipynb` | `data/mice_protein_no_NaN.csv` | |
 | Fig. 8 | `9_lung_cancer_sc_rna.ipynb` | `data/sc_10x_5cl.count.csv and data/sc_10x_5cl.metadata.csv` | |
